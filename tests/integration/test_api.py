@@ -136,6 +136,7 @@ RESEARCH_MUTATING = {
     ("POST", "/v1/datasets/{version_id}/derive"),
     ("POST", "/v1/backtests"),
     ("POST", "/v1/backtests/{run_id}/cancel"),
+    ("POST", "/v1/validations/import"),  # M1-R1: persists completed offline study files
 }
 
 

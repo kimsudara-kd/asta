@@ -1,6 +1,7 @@
 """Property-based tests (Hypothesis): the accounting invariants must hold for ANY action sequence."""
 
 from decimal import Decimal as D
+from typing import Any
 
 from hypothesis import HealthCheck, given, settings
 from hypothesis import strategies as st
@@ -105,7 +106,9 @@ def make_bars(segs, seed):
     return generate_bars(T0, Timeframe.H1, [seg(s, 8) for s in segs], seed, D("100"))
 
 
-COMMON = dict(max_examples=120, deadline=None, suppress_health_check=[HealthCheck.too_slow])
+COMMON: dict[str, Any] = dict(
+    max_examples=120, deadline=None, suppress_health_check=[HealthCheck.too_slow]
+)
 
 
 @settings(**COMMON)

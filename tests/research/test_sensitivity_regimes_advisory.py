@@ -5,6 +5,7 @@ import copy
 from datetime import timedelta
 from decimal import Decimal as D
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -211,7 +212,8 @@ def test_evidence_levels_are_mechanical_and_conservative():
 
 def test_advisor_never_declares_profitability_and_always_carries_the_disclaimer():
     adv = RuleBasedAdvisor()
-    for wf in (good_wf(), {"pooled": {}}, good_wf() | {"warnings": ["x"]}):
+    wfs: list[dict[str, Any]] = [good_wf(), {"pooled": {}}, good_wf() | {"warnings": ["x"]}]
+    for wf in wfs:
         a = adv.summarize(wf)
         text = a.text.lower()
         assert a.disclaimer == DISCLAIMER and "not investment advice" in a.disclaimer.lower()

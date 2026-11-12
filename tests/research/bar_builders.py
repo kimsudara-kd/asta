@@ -21,8 +21,8 @@ def from_closes(
 ) -> list[Bar]:
     out: list[Bar] = []
     prev = D(str(start if start is not None else closes[0]))
-    for i, c in enumerate(closes):
-        c = D(str(c))
+    for i, raw in enumerate(closes):
+        c = D(str(raw))
         hi = max(prev, c) + D(wick)
         lo = min(prev, c) - D(wick)
         out.append(bar(first_index + i, str(prev), str(hi), str(lo), str(c), vol, tf))

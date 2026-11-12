@@ -20,17 +20,25 @@ depends_on = None
 def upgrade() -> None:
     op.add_column("research_validations", sa.Column("content_hash", sa.String(64), nullable=True))
     op.add_column("research_validations", sa.Column("sample_type", sa.String(32), nullable=True))
-    op.add_column("research_validations", sa.Column("strategy_version", sa.String(32), nullable=True))
+    op.add_column(
+        "research_validations", sa.Column("strategy_version", sa.String(32), nullable=True)
+    )
     op.add_column("research_validations", sa.Column("source_datasets", pg.JSONB, nullable=True))
-    op.add_column("research_validations", sa.Column("source_artifact", sa.String(200), nullable=True))
-    op.add_column("research_validations", sa.Column("generated_at", sa.DateTime(timezone=True), nullable=True))
-    op.create_index(
-        "uq_research_validations_content_hash", "research_validations", ["content_hash"], unique=True
+    op.add_column(
+        "research_validations", sa.Column("source_artifact", sa.String(200), nullable=True)
+    )
+    op.add_column(
+        "research_validations", sa.Column("generated_at", sa.DateTime(timezone=True), nullable=True)
+    )
+    op.create_unique_constraint(
+        "uq_research_validations_content_hash", "research_validations", ["content_hash"]
     )
 
 
 def downgrade() -> None:
-    op.drop_index("uq_research_validations_content_hash", table_name="research_validations")
+    op.drop_constraint(
+        "uq_research_validations_content_hash", "research_validations", type_="unique"
+    )
     for c in (
         "generated_at",
         "source_artifact",

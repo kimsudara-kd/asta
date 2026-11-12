@@ -1,10 +1,12 @@
 """Risk controls enforced before simulated orders are accepted (ADR-0007)."""
 
+from collections.abc import Sequence
 from dataclasses import FrozenInstanceError
 from decimal import Decimal as D
 
 import pytest
 
+from asta.research.data.models import Bar
 from asta.research.sim.engine import Engine
 from asta.research.sim.risk import RiskEngine, SimRiskLimits
 from asta.research.types import OrderStatus
@@ -73,7 +75,9 @@ def test_total_exposure_cap_across_assets():
         for s in ("BTC-USDT", "ETH-USDT", "SOL-USDT")
     }
     limits = SimRiskLimits(D("1000"), D("0.2"), D("0.3"), None, None)  # 200 per asset, 300 total
-    series = {s: [bar(i, "100", "101", "99", "100") for i in range(4)] for s in rules}
+    series: dict[str, Sequence[Bar]] = {
+        s: [bar(i, "100", "101", "99", "100") for i in range(4)] for s in rules
+    }
     script = {
         0: [mbuy("a", "200", "BTC-USDT"), mbuy("b", "200", "ETH-USDT"), mbuy("c", "90", "SOL-USDT")]
     }

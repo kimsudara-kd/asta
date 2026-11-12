@@ -1,0 +1,9 @@
+{
+ "holdout_passive_hold": {
+  "net_pnl": "5.21419198",
+  "fees": "0.29931200",
+  "verdict": "BREACHED"
+ },
+ "walk_forward_passive_hold_sum": "36.64970916",
+ "walk_forward_passive_hold_breached_windows": 7
+}

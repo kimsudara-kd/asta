@@ -1,4 +1,5 @@
 """M1-R1 Workstream A: persistence of completed research studies (verbatim, provenance, no dupes)."""
+# ruff: noqa: F811
 
 import json
 import shutil
@@ -11,7 +12,7 @@ from asta.db import research_import as ri
 from asta.db import research_store as rs
 from asta.db.audit_store import recent_audit
 from tests.integration.test_api import sign_in
-from tests.integration.test_research_api import client, post  # noqa: F401
+from tests.integration.test_research_api import client, post  # noqa: F401, F811
 
 pytestmark = pytest.mark.db
 EVIDENCE = Path(__file__).resolve().parents[2] / "docs" / "evidence" / "m1"
@@ -20,7 +21,7 @@ IGN = shutil.ignore_patterns("screenshots", "*.log")
 
 
 def count(db) -> int:
-    return db.execute(text("select count(*) from research_validations")).scalar_one()
+    return int(db.execute(text("select count(*) from research_validations")).scalar_one())
 
 
 def test_import_persists_every_study_verbatim_with_provenance(db):

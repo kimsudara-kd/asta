@@ -114,8 +114,14 @@ def _datasets(report: dict[str, Any]) -> tuple[dict[str, Any], bool]:
     return out, grade
 
 
-def _collect(directory: Path, report: ImportReport) -> tuple[list[_Study], dict[str, Any], bool, datetime | None, dict[str, str]]:
-    data_report, data_sha = _load(directory / "data-report.json") if (directory / "data-report.json").exists() else (None, "")
+def _collect(
+    directory: Path, report: ImportReport
+) -> tuple[list[_Study], dict[str, Any], bool, datetime | None, dict[str, str]]:
+    data_report, data_sha = (
+        _load(directory / "data-report.json")
+        if (directory / "data-report.json").exists()
+        else (None, "")
+    )
     if data_report is None:
         raise StudyImportError("data-report.json is required (source dataset provenance)")
     datasets, research_grade = _datasets(data_report)
@@ -167,7 +173,9 @@ def _collect(directory: Path, report: ImportReport) -> tuple[list[_Study], dict[
                     strategy_id=sid,
                     title=f"Sensitivity: {sid} (full period, default parameters)",
                     sample_type=IN_SAMPLE,
-                    config={"note": "full 3-year period; parameters were not selected out-of-sample"},
+                    config={
+                        "note": "full 3-year period; parameters were not selected out-of-sample"
+                    },
                     result={
                         "scenarios": list(s.get("parameters", [])) + list(s.get("scenarios", [])),
                         "instability_flags": flags,
@@ -253,7 +261,12 @@ def _collect(directory: Path, report: ImportReport) -> tuple[list[_Study], dict[
     for expected in ("walk-forward-*.json",):
         if not list(directory.glob(expected)):
             report.missing_files.append(expected)
-    for name in ("sensitivity.json", "final-holdout.json", "baseline-comparison.json", "quarterly-windows.json"):
+    for name in (
+        "sensitivity.json",
+        "final-holdout.json",
+        "baseline-comparison.json",
+        "quarterly-windows.json",
+    ):
         if not (directory / name).exists():
             report.missing_files.append(name)
     return studies, datasets, research_grade, generated, shas
@@ -267,7 +280,11 @@ def import_studies(db: Session, directory: Path, user: str) -> ImportReport:
     studies, datasets, grade, generated, shas = _collect(directory, report)
     for s in studies:
         h = content_hash(s)
-        config = {**s.config, "source_artifact_sha256": shas.get(s.artifact), "source_artifact": s.artifact}
+        config = {
+            **s.config,
+            "source_artifact_sha256": shas.get(s.artifact),
+            "source_artifact": s.artifact,
+        }
         stmt = (
             pg_insert(ResearchValidation)
             .values(

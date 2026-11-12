@@ -26,6 +26,12 @@ def pts(equities, step=timedelta(hours=1), exposure="0"):
     ]
 
 
+def _risk(rep, key):
+    v = rep.value("risk", key)
+    assert v is not None
+    return v
+
+
 def test_golden_returns_and_cost_breakdown_from_the_round_trip():
     """Same scenario as the engine golden test: net 47.85164945; fees 0.5005 + 0.54890055;
     slippage 0.5 + 0.54945; gross = net + fees + slippage."""
@@ -99,12 +105,12 @@ def test_sharpe_sortino_volatility_formulas_with_enough_days():
     res.equity = series  # analytics read only the persisted points
     rep = compute_performance(res, Timeframe.H1, {"BTC-USDT": RULES}, D("1000"))
     rets = daily_returns(series, D("1000"))
-    mean = sum(rets) / 40
-    sd = (sum((r - mean) ** 2 for r in rets) / 39).sqrt()
-    down = (sum(min(r, 0) ** 2 for r in rets) / 40).sqrt()
-    assert abs(rep.value("risk", "sharpe") - mean / sd * SQRT_365) < D("1e-6")
-    assert abs(rep.value("risk", "sortino") - mean / down * SQRT_365) < D("1e-6")
-    assert abs(rep.value("risk", "volatility_annualized") - sd * SQRT_365) < D("1e-6")
+    mean: D = sum(rets, D(0)) / 40
+    sd: D = (sum(((r - mean) ** 2 for r in rets), D(0)) / 39).sqrt()
+    down: D = (sum((min(r, D(0)) ** 2 for r in rets), D(0)) / 40).sqrt()
+    assert abs(_risk(rep, "sharpe") - mean / sd * SQRT_365) < D("1e-6")
+    assert abs(_risk(rep, "sortino") - mean / down * SQRT_365) < D("1e-6")
+    assert abs(_risk(rep, "volatility_annualized") - sd * SQRT_365) < D("1e-6")
     assert rep.risk["days_loss_ge_1pct"] == 0 and rep.risk["worst_day_return"] == D("-0.005")
 
 

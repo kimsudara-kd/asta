@@ -27,6 +27,12 @@ DATA = make_datasets(symbols=("BTC-USDT", "ETH-USDT"))
 SMA = {"symbols": ["BTC-USDT", "ETH-USDT"], "fast": 6, "slow": 20}
 
 
+def _perf(db, run_id):
+    p = rs.performance_json(db, run_id)
+    assert p is not None
+    return p
+
+
 def persist_datasets(db, tmp_path):
     store = DatasetFileStore(tmp_path)
     ids = {}
@@ -92,7 +98,7 @@ def test_full_run_round_trips_through_postgres_and_reproduces_exactly(db, tmp_pa
     )
     n_fill = db.execute(select(SimulatedFill).where(SimulatedFill.run_id == run_id)).scalars().all()
     assert len(n_eq) == len(out.result.equity) and len(n_fill) == len(out.result.fills) > 0
-    assert rs.performance_json(db, run_id)["returns"]["total_net_pnl"] == format(
+    assert _perf(db, run_id)["returns"]["total_net_pnl"] == format(
         out.performance.returns["total_net_pnl"], "f"
     )
     # reproduce from ONLY what is in the database + the content-addressed files
@@ -289,3 +295,83 @@ def test_persisting_a_large_run_is_fast_regression(db, tmp_path):
     )
     assert len(n) == len(out.result.equity)
     assert elapsed < 30, f"persisting took {elapsed:.1f}s (row-by-row inserts?)"
+
+
+# ------------------------------------------------------------------ M1-R1 workstream B
+def test_stored_ledger_reconciles_to_stored_fills_and_stored_pnl(db, tmp_path):
+    """Using ONLY database rows: ledger balances, fill-derived balances and reported P&L agree."""
+    run_id, cfg, out, _ = completed_run(db, tmp_path)
+    ledger = {
+        r[0]: r[1]
+        for r in db.execute(
+            text(
+                "select asset, sum(amount) from simulated_ledger_entries "
+                "where run_id=:r and kind not in ('RESERVE','RELEASE') group by asset"
+            ),
+            {"r": str(run_id)},
+        )
+    }
+    fills = (
+        db.execute(
+            select(SimulatedFill)
+            .where(SimulatedFill.run_id == run_id)
+            .order_by(SimulatedFill.fill_id)
+        )
+        .scalars()
+        .all()
+    )
+    assert fills
+    derived = {"USDT": cfg.starting_cash}
+    for f in fills:
+        b = f.symbol.split("-")[0]
+        sign = 1 if f.side == "BUY" else -1
+        derived["USDT"] -= sign * f.notional
+        derived[b] = derived.get(b, 0) + sign * f.quantity
+        derived[f.fee_asset] = derived.get(f.fee_asset, 0) - f.fee_amount
+    for asset in set(ledger) | set(derived):
+        assert ledger.get(asset, 0) == derived.get(asset, 0), asset
+    last = db.execute(
+        select(PortfolioEquitySnapshot.equity)
+        .where(PortfolioEquitySnapshot.run_id == run_id)
+        .order_by(PortfolioEquitySnapshot.ts.desc())
+        .limit(1)
+    ).scalar_one()
+    stored = _perf(db, run_id)["returns"]
+    assert (
+        abs(last - cfg.starting_cash - __import__("decimal").Decimal(stored["total_net_pnl"]))
+        < 1e-8
+    )
+    assert str(last) and out.result.reconcile.ok
+
+
+def test_restart_recovery_keeps_completed_runs_and_resubmission_reproduces(db, tmp_path):
+    run_id, cfg, out, store = completed_run(db, tmp_path)
+    ids = {
+        s: str(
+            db.execute(
+                select(HistoricalDatasetVersion.id).where(HistoricalDatasetVersion.checksum == c)
+            ).scalar_one()
+        )
+        for s, c in cfg.dataset_checksums.items()
+    }
+    crashed = rs.create_run(db, cfg.replace(label="crashed"), ids, "tester", "abc123")
+    db.commit()
+    rs.set_running(db, crashed.id)  # the process "dies" here; nothing else is written
+    assert rs.recover_interrupted(db) == 1
+    assert rs.recover_interrupted(db) == 0  # idempotent
+    done, dead = db.get(BacktestRun, run_id), db.get(BacktestRun, crashed.id)
+    db.refresh(done)
+    db.refresh(dead)
+    assert done.status == "COMPLETED" and done.result_checksum == out.result_checksum
+    assert dead.status == "FAILED" and "restart" in dead.error and dead.result_checksum is None
+    assert (
+        db.execute(  # a failed run never leaves partial result rows behind
+            text("select count(*) from simulated_fills where run_id=:r"), {"r": str(dead.id)}
+        ).scalar_one()
+        == 0
+    )
+    # resubmitting the same configuration after the crash reproduces the original result exactly
+    detail = rs.run_json(db, done)
+    data = {s: store.load(c) for s, c in cfg.dataset_checksums.items()}
+    again = run_backtest(BacktestConfig.from_json(json.loads(json.dumps(detail["config"]))), data)
+    assert again.result_checksum == done.result_checksum

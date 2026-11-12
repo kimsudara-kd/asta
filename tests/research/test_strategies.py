@@ -1,6 +1,7 @@
 """Behavioural tests for the grid, trend-pullback and baseline strategies (hand-designed series)."""
 
 from decimal import Decimal as D
+from typing import Any
 
 import pytest
 
@@ -40,7 +41,7 @@ def orders_by_tag(res, prefix):
 
 # ============================================================ regime grid
 def grid_params(**kw):
-    base = dict(
+    base: dict[str, Any] = dict(
         symbols=(BTC,),
         range_mode="fixed",
         fixed_ranges=((BTC, D("95"), D("105")),),
@@ -190,7 +191,7 @@ def test_grid_honours_the_risk_engines_halt_flag():
 
 # ============================================================ trend pullback
 def tp_params(**kw):
-    base = dict(
+    base: dict[str, Any] = dict(
         symbols=(BTC,),
         ema_fast=3,
         ema_slow=6,

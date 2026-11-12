@@ -1,0 +1,486 @@
+{
+ "fresh_process": {
+  "artefact_digests_equal": {
+   "checkpoints": true,
+   "equity": true,
+   "fills": true,
+   "ledger": true,
+   "orders": true,
+   "risk_events": true
+  },
+  "checksum_equal": true,
+  "pythonhashseed": "424242",
+  "run": "regime_grid_default"
+ },
+ "lookahead": {
+  "regime_grid_default": {
+   "equity_identical": true,
+   "equity_points_compared": 12959,
+   "fills_before_cut": 1298,
+   "fills_identical": true
+  },
+  "sma_cross_default": {
+   "equity_identical": true,
+   "equity_points_compared": 12959,
+   "fills_before_cut": 284,
+   "fills_identical": true
+  },
+  "trend_pullback_default": {
+   "equity_identical": true,
+   "equity_points_compared": 12959,
+   "fills_before_cut": 536,
+   "fills_identical": true
+  }
+ },
+ "overall_pass": true,
+ "runs": {
+  "all_cash": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "1 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "1 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=1000.00000000 reported=1000.00000000 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=0E-8 derived=0E-8",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=0E-8 fills=0",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=0E-8 quote-asset fills=0",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 0,
+    "ledger_entries": 1,
+    "orders": 0,
+    "risk_events": 0
+   },
+   "matches_original_run": true,
+   "net_pnl": "0E-8",
+   "original_result_checksum": "440d94f0aee6f1a4832dca156309ee62d7aa36fc1cbccd120d1c73878b50f142",
+   "profitable_but_breached": false,
+   "repeat_identical": true,
+   "result_checksum": "440d94f0aee6f1a4832dca156309ee62d7aa36fc1cbccd120d1c73878b50f142",
+   "risk_verdict": "PASSED",
+   "status": "COMPLETED",
+   "verdict_reported_with_return": true
+  },
+  "passive_hold_BTC_only_100": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "7 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "2 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=1124.2008075622 reported=1124.2008075622 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=124.20080756 derived=124.2008075622",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=0E-8 fills=0",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=0.09978702 quote-asset fills=0",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 1,
+    "ledger_entries": 7,
+    "orders": 1,
+    "risk_events": 5
+   },
+   "matches_original_run": true,
+   "net_pnl": "124.20080756",
+   "original_result_checksum": "1b696d75571e38169f761d49ac7b02cbe6e1159b8da49f62febfa1385581b1ad",
+   "profitable_but_breached": true,
+   "repeat_identical": true,
+   "result_checksum": "1b696d75571e38169f761d49ac7b02cbe6e1159b8da49f62febfa1385581b1ad",
+   "risk_verdict": "BREACHED",
+   "status": "STOPPED_RISK_HALT",
+   "verdict_reported_with_return": true
+  },
+  "passive_hold_equal_weight_300": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "19 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "4 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=1295.0242487422 reported=1295.0242487422 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=295.02424874 derived=295.0242487422",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=0E-8 fills=0",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=0.29991108 quote-asset fills=0",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 3,
+    "ledger_entries": 19,
+    "orders": 3,
+    "risk_events": 325
+   },
+   "matches_original_run": true,
+   "net_pnl": "295.02424874",
+   "original_result_checksum": "647306bfe7e47a4c17f9794e0a07811dc938ce699416d77d5ad2258d811b2f85",
+   "profitable_but_breached": true,
+   "repeat_identical": true,
+   "result_checksum": "647306bfe7e47a4c17f9794e0a07811dc938ce699416d77d5ad2258d811b2f85",
+   "risk_verdict": "BREACHED",
+   "status": "STOPPED_RISK_HALT",
+   "verdict_reported_with_return": true
+  },
+  "passive_hold_reference_full_capital": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "13 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "3 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=1494.2546356610 reported=1494.2546356610 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=494.25463566 derived=494.2546356610",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=0E-8 fills=0",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=0.66626153 quote-asset fills=0",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 2,
+    "ledger_entries": 13,
+    "orders": 3,
+    "risk_events": 1
+   },
+   "matches_original_run": true,
+   "net_pnl": "494.25463566",
+   "original_result_checksum": "17c6b9011211f80b056278f415943c1a8845ad3aefe362b0b8b5623d188e2f94",
+   "profitable_but_breached": false,
+   "repeat_identical": true,
+   "result_checksum": "17c6b9011211f80b056278f415943c1a8845ad3aefe362b0b8b5623d188e2f94",
+   "risk_verdict": "PASSED",
+   "status": "COMPLETED",
+   "verdict_reported_with_return": true
+  },
+  "regime_grid_default": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "14270 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "4 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=980.9333707330 reported=980.9333707330 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=-19.06662927 derived=-19.0666292670",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=-22.12765598 fills=-22.12765598",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=39.05239410 quote-asset fills=19.52173030",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 2040,
+    "ledger_entries": 14270,
+    "orders": 3540,
+    "risk_events": 11
+   },
+   "matches_original_run": true,
+   "net_pnl": "-19.06662927",
+   "original_result_checksum": "2456c81784cd5716ac848c13f268d070b787d6ccd462daf878e2a2942d45394a",
+   "profitable_but_breached": false,
+   "repeat_identical": true,
+   "result_checksum": "2456c81784cd5716ac848c13f268d070b787d6ccd462daf878e2a2942d45394a",
+   "risk_verdict": "PASSED",
+   "status": "COMPLETED",
+   "verdict_reported_with_return": true
+  },
+  "sma_cross_default": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "1563 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "4 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=1160.0052310978 reported=1160.0052310978 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=160.00523110 derived=160.0052310978",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=159.94741012 fills=159.94741012",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=25.70256157 quote-asset fills=12.93726685",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 284,
+    "ledger_entries": 1563,
+    "orders": 288,
+    "risk_events": 7
+   },
+   "matches_original_run": true,
+   "net_pnl": "160.00523110",
+   "original_result_checksum": "3a6805de98510a8d3805466a16a222fa3ac605eece0a1456cbe73a9ce4b47ab6",
+   "profitable_but_breached": true,
+   "repeat_identical": true,
+   "result_checksum": "3a6805de98510a8d3805466a16a222fa3ac605eece0a1456cbe73a9ce4b47ab6",
+   "risk_verdict": "BREACHED",
+   "status": "STOPPED_RISK_HALT",
+   "verdict_reported_with_return": true
+  },
+  "trend_pullback_default": {
+   "artefact_digests_equal": {
+    "checkpoints": true,
+    "equity": true,
+    "fills": true,
+    "ledger": true,
+    "orders": true,
+    "risk_events": true
+   },
+   "audit": [
+    {
+     "check": "ledger sequence is strictly increasing",
+     "detail": "2951 entries",
+     "ok": true
+    },
+    {
+     "check": "fill-derived balances equal ledger balances (exact)",
+     "detail": "4 assets",
+     "ok": true
+    },
+    {
+     "check": "equity from balances x final marks equals last equity point",
+     "detail": "derived=960.6161416204 reported=960.6161416204 (tolerance: 1e-8 per fill, mark rounding)",
+     "ok": true
+    },
+    {
+     "check": "reported total net P&L = last equity - starting cash",
+     "detail": "reported=-39.38385838 derived=-39.3838583796",
+     "ok": true
+    },
+    {
+     "check": "reported realised P&L = sum of fill realised P&L",
+     "detail": "reported=-39.10366865 fills=-39.10366865",
+     "ok": true
+    },
+    {
+     "check": "reported fees cover the quote-denominated fees in the fills",
+     "detail": "reported=48.15628070 quote-asset fills=24.07002092",
+     "ok": true
+    },
+    {
+     "check": "engine reconcile report is clean",
+     "detail": "",
+     "ok": true
+    }
+   ],
+   "audit_ok": true,
+   "counts": {
+    "equity_points": 26304,
+    "fills": 536,
+    "ledger_entries": 2951,
+    "orders": 805,
+    "risk_events": 1
+   },
+   "matches_original_run": true,
+   "net_pnl": "-39.38385838",
+   "original_result_checksum": "87a2fc30e3e3e57d54b61e940ee0a52c73f44c26c8f34fb77ef1b101d9406525",
+   "profitable_but_breached": false,
+   "repeat_identical": true,
+   "result_checksum": "87a2fc30e3e3e57d54b61e940ee0a52c73f44c26c8f34fb77ef1b101d9406525",
+   "risk_verdict": "BREACHED",
+   "status": "STOPPED_RISK_HALT",
+   "verdict_reported_with_return": true
+  }
+ }
+}

@@ -135,10 +135,11 @@ def test_parameter_selection_is_independent_of_everything_after_the_training_end
     dirty = walk_forward(base, bad, GRID, ws)
     assert clean.windows[0].chosen_key == dirty.windows[0].chosen_key
     assert clean.windows[0].trials == dirty.windows[0].trials  # every training score identical
-    assert clean.windows[0].train.result_checksum == dirty.windows[0].train.result_checksum
-    assert (
-        clean.windows[0].test.result_checksum != dirty.windows[0].test.result_checksum
-    )  # OOS did change
+    ctr, dtr = clean.windows[0].train, dirty.windows[0].train
+    cte, dte = clean.windows[0].test, dirty.windows[0].test
+    assert ctr is not None and dtr is not None and cte is not None and dte is not None
+    assert ctr.result_checksum == dtr.result_checksum
+    assert cte.result_checksum != dte.result_checksum  # OOS did change
 
 
 def test_out_of_sample_results_never_feed_selection_within_a_window():

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from decimal import Decimal as D
 from typing import Any
 
@@ -53,7 +53,7 @@ class Scripted(Strategy):
     strategy_id = "scripted"
     version = "0"
 
-    def __init__(self, script: dict[int, list[Action]]) -> None:
+    def __init__(self, script: Mapping[int, Sequence[Action]]) -> None:
         super().__init__(_NoParams())
         self.script = script
         self.ctx_log: list[StrategyContext] = []
@@ -82,7 +82,7 @@ def cfg(**kw: Any) -> EngineConfig:
     return EngineConfig(**base)
 
 
-def run(bars: Sequence[Bar], script: dict[int, list[Action]], **kw: Any) -> RunResult:
+def run(bars: Sequence[Bar], script: Mapping[int, Sequence[Action]], **kw: Any) -> RunResult:
     strategy = kw.pop("strategy", None) or Scripted(script)
     return Engine(cfg(**kw), {"BTC-USDT": bars}, strategy).run()
 

@@ -82,9 +82,3 @@ disallow_untyped_defs = false
 disallow_incomplete_defs = false
 disallow_untyped_calls = false
 check_untyped_defs = true
-
-# M1 research tests: heavily parametrised/Hypothesis helper code with loose numeric typing.
-# Product code (src/) remains fully strict; this relaxation is disclosed in docs/evidence/M1-acceptance.md.
-[[tool.mypy.overrides]]
-module = ["tests.research.*", "tests.integration.test_research_db"]
-ignore_errors = true

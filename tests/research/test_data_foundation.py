@@ -3,6 +3,7 @@ from datetime import UTC, datetime, timedelta
 from decimal import ROUND_DOWN, ROUND_HALF_EVEN, ROUND_UP
 from decimal import Decimal as D
 from pathlib import Path
+from typing import Any
 
 import pytest
 from hypothesis import given
@@ -36,7 +37,7 @@ def test_rounding_modes_are_explicit_and_conservative():
     assert quantize(D("0.000000005")) == D("0.00000000")  # banker's: .5 -> even (0)
     assert quantize(D("0.000000015")) == D("0.00000002")
     assert QUANTUM == D("1e-8")
-    assert ROUND_UP != ROUND_DOWN != ROUND_HALF_EVEN
+    assert len({ROUND_UP, ROUND_DOWN, ROUND_HALF_EVEN}) == 3
 
 
 @given(st.decimals(min_value=0, max_value=10**6, places=12, allow_nan=False, allow_infinity=False))
@@ -54,7 +55,7 @@ def test_decimal_context_has_no_float_leak():
 
 
 # ---------------- 2/3. import, validation, duplicates, missing ----------------
-def write_csv(tmp: Path, name: str, rows: list[str], meta: dict | None = None) -> Path:
+def write_csv(tmp: Path, name: str, rows: list[str], meta: dict[str, Any] | None = None) -> Path:
     p = tmp / name
     p.write_text(
         "open_time,open,high,low,close,volume\n" + "\n".join(rows) + "\n", encoding="utf-8"
@@ -113,7 +114,8 @@ def test_naive_timestamp_rejected(tmp_path):
     rows = ["2024-01-01T00:00:00,100,101,99,100,10", "2024-01-01T01:00:00+00:00,100,101,99,100,10"]
     r = import_candles_file(write_csv(tmp_path, "tz.csv", rows))
     assert r.report.has("PARSE_ERROR") and r.report.status == Severity.REJECTED
-    assert any("timezone" in e for e in r.report.finding("PARSE_ERROR").examples)
+    pe = r.report.finding("PARSE_ERROR")
+    assert pe is not None and any("timezone" in e for e in pe.examples)
 
 
 def test_non_utc_offset_rejected_but_utc_z_and_offset_zero_accepted(tmp_path):
@@ -174,7 +176,8 @@ def test_quality_empty_duplicates_order_alignment():
     assert validate_bars([], Timeframe.H1, "BINANCE", "BTC-USDT").status == Severity.REJECTED
     b = flat_bars(3)
     dup = validate_bars([b[0], b[1], b[1], b[2]], Timeframe.H1, "BINANCE", "BTC-USDT")
-    assert dup.status == Severity.REJECTED and dup.finding("DUPLICATE").count == 1
+    dd = dup.finding("DUPLICATE")
+    assert dup.status == Severity.REJECTED and dd is not None and dd.count == 1
     back = validate_bars([b[0], b[2], b[1]], Timeframe.H1, "BINANCE", "BTC-USDT")
     assert back.has("NON_MONOTONIC") and back.status == Severity.REJECTED
     shifted = [
@@ -210,11 +213,13 @@ def gapped(n: int, drop: set[int]):
 
 def test_missing_candle_policy_warning_vs_rejected():
     ok = validate_bars(gapped(1000, {10}), Timeframe.H1, "BINANCE", "BTC-USDT")
-    assert ok.status == Severity.WARNING and ok.finding("GAPS").count == 1
+    g1 = ok.finding("GAPS")
+    assert ok.status == Severity.WARNING and g1 is not None and g1.count == 1
     assert ok.stats["missing_rows"] == 1 and ok.stats["max_missing_run"] == 1
     many = validate_bars(gapped(1000, set(range(100, 110))), Timeframe.H1, "BINANCE", "BTC-USDT")
     # 10 of 1000 = 1.0 % > the 0.5 % limit -> REJECTED
-    assert many.stats["missing_rows"] == 10 and many.finding("GAPS").severity == Severity.REJECTED
+    g2 = many.finding("GAPS")
+    assert many.stats["missing_rows"] == 10 and g2 is not None and g2.severity == Severity.REJECTED
     assert many.status == Severity.REJECTED
 
 
@@ -317,7 +322,7 @@ def test_store_save_is_idempotent(tmp_path):
 
 
 # ---------------- resampling: derive coarser only, never fabricate ----------------
-def m5_bars(n: int, skip: set[int] = frozenset()):
+def m5_bars(n: int, skip: frozenset[int] | set[int] = frozenset()):
     return [
         Bar(
             T0 + timedelta(minutes=5 * i),

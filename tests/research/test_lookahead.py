@@ -3,6 +3,7 @@ exists, is truncated, or is corrupted. Also: the context cannot reach future bar
 
 from datetime import timedelta
 from decimal import Decimal as D
+from typing import Any
 
 import pytest
 
@@ -175,7 +176,7 @@ def test_context_exposes_no_future_and_history_grows_one_bar_per_step():
 
 def test_strategy_receives_bars_only_after_they_close():
     bars = generate_bars(T0, Timeframe.H1, [seg(UPTREND, 10)], 5, D("100"))
-    seen: list[tuple] = []
+    seen: list[tuple[Any, ...]] = []
 
     class Probe(Peeker):
         def on_bar(self, ctx):
