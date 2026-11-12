@@ -1,0 +1,520 @@
+{
+ "advisory": {
+  "hypotheses": "HYPOTHESIS: widen the search range for the edge parameter, then re-validate in a NEW cycle. All hypotheses need a new validation cycle on fresh data.",
+  "summary": "Evidence level: NONE. Out-of-sample windows: 1 with parameters, 1 positive; pooled net P&L 67.56287640. Reasons: fewer than 4 out-of-sample windows with parameters. Profitability is NOT established."
+ },
+ "in_vs_out_of_sample": {
+  "pooled": {
+   "is_mean_return": "0.11657071",
+   "oos_mean_return": "0.06756288",
+   "oos_net_pnl_sum": "67.56287640",
+   "oos_net_return_compounded": "0.06756288",
+   "oos_positive_windows": "1",
+   "oos_risk_breached_windows": "0",
+   "windows": "7",
+   "windows_with_params": "1"
+  },
+  "rows": [
+   {
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "window": 0
+   },
+   {
+    "chosen_key": "1d95721277ee",
+    "in_sample_return": "0.11657071",
+    "oos_over_is_ratio": "0.5795871021116711050314440051",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "0.06756288",
+    "window": 1
+   },
+   {
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "window": 2
+   },
+   {
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "window": 3
+   },
+   {
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "window": 4
+   },
+   {
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "window": 5
+   },
+   {
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "window": 6
+   }
+  ],
+  "warnings": [
+   "chosen parameters sit on the edge of the search range in half the windows",
+   "some windows had no risk-admissible parameters (no trading in those windows)",
+   "later training windows include earlier test windows (forward-chaining protocol)"
+  ]
+ },
+ "report": {
+  "cycle": 1,
+  "grid_size": 9,
+  "oos_reused": false,
+  "pooled": {
+   "is_mean_return": "0.11657071",
+   "oos_mean_return": "0.06756288",
+   "oos_net_pnl_sum": "67.56287640",
+   "oos_net_return_compounded": "0.06756288",
+   "oos_positive_windows": 1,
+   "oos_risk_breached_windows": 0,
+   "windows": 7,
+   "windows_with_params": 1
+  },
+  "strategy_id": "sma_cross",
+  "warnings": [
+   "chosen parameters sit on the edge of the search range in half the windows",
+   "some windows had no risk-admissible parameters (no trading in those windows)",
+   "later training windows include earlier test windows (forward-chaining protocol)"
+  ],
+  "windows": [
+   {
+    "chosen_key": null,
+    "chosen_params": null,
+    "index": 0,
+    "selection_data_end": "2024-07-28T00:00:00+00:00",
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "test": [
+     "2024-07-28T00:00:00+00:00",
+     "2024-10-26T00:00:00+00:00"
+    ],
+    "test_summary": null,
+    "train": [
+     "2023-11-01T00:00:00+00:00",
+     "2024-07-28T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": false,
+    "train_summary": null,
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      null
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      null
+     ]
+    ]
+   },
+   {
+    "chosen_key": "1d95721277ee",
+    "chosen_params": {
+     "fast": 10,
+     "slow": 100,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 1,
+    "selection_data_end": "2024-10-26T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2024-10-26T00:00:00+00:00",
+     "2025-01-24T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "37570c3cf0877e60ccf3562a81d8f01bf902ae13ccfedbedae5bd91006152900",
+     "ending_equity": "1067.56287640",
+     "fees": "10.04524533",
+     "fills": 111,
+     "label": "test w1",
+     "liquidation_equity": "1067.41854560",
+     "max_drawdown_pct": "0.04089126",
+     "net_pnl": "67.56287640",
+     "net_return_pct": "0.06756288",
+     "period_end": "2025-01-24T00:00:00+00:00",
+     "period_start": "2024-10-26T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "14de35d4cba28ed7020de7adb9b4cc3c554f765e014479f00c8ef59b9bd4bc87",
+     "risk_verdict": "PASSED",
+     "round_trips": 55,
+     "sharpe": "2.22270643",
+     "slippage": "5.87591300",
+     "sortino": "4.25421494",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-01-30T00:00:00+00:00",
+     "2024-10-26T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": false,
+    "train_summary": {
+     "config_hash": "909398318a85d3836aaf39ac4688079c9f7ee559e7f86e549495f661815769f8",
+     "ending_equity": "1116.57070886",
+     "fees": "28.08294453",
+     "fills": 311,
+     "label": "train w1",
+     "liquidation_equity": "1116.42863043",
+     "max_drawdown_pct": "0.04978011",
+     "net_pnl": "116.57070886",
+     "net_return_pct": "0.11657071",
+     "period_end": "2024-10-26T00:00:00+00:00",
+     "period_start": "2024-01-30T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "d5e397cd16c2a4b15cf9dcbe5d4ade0ada3a4aca87c1e6a2d91b2ea1e93abe4b",
+     "risk_verdict": "PASSED",
+     "round_trips": 155,
+     "sharpe": "1.57473056",
+     "slippage": "16.18783270",
+     "sortino": "2.94581110",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      "0.11657071"
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      "0.11191574"
+     ]
+    ]
+   },
+   {
+    "chosen_key": null,
+    "chosen_params": null,
+    "index": 2,
+    "selection_data_end": "2025-01-24T00:00:00+00:00",
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "test": [
+     "2025-01-24T00:00:00+00:00",
+     "2025-04-24T00:00:00+00:00"
+    ],
+    "test_summary": null,
+    "train": [
+     "2024-04-29T00:00:00+00:00",
+     "2025-01-24T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": null,
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      null
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      null
+     ]
+    ]
+   },
+   {
+    "chosen_key": null,
+    "chosen_params": null,
+    "index": 3,
+    "selection_data_end": "2025-04-24T00:00:00+00:00",
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "test": [
+     "2025-04-24T00:00:00+00:00",
+     "2025-07-23T00:00:00+00:00"
+    ],
+    "test_summary": null,
+    "train": [
+     "2024-07-28T00:00:00+00:00",
+     "2025-04-24T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": null,
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      null
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      null
+     ]
+    ]
+   },
+   {
+    "chosen_key": null,
+    "chosen_params": null,
+    "index": 4,
+    "selection_data_end": "2025-07-23T00:00:00+00:00",
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "test": [
+     "2025-07-23T00:00:00+00:00",
+     "2025-10-21T00:00:00+00:00"
+    ],
+    "test_summary": null,
+    "train": [
+     "2024-10-26T00:00:00+00:00",
+     "2025-07-23T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": null,
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      null
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      null
+     ]
+    ]
+   },
+   {
+    "chosen_key": null,
+    "chosen_params": null,
+    "index": 5,
+    "selection_data_end": "2025-10-21T00:00:00+00:00",
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "test": [
+     "2025-10-21T00:00:00+00:00",
+     "2026-01-19T00:00:00+00:00"
+    ],
+    "test_summary": null,
+    "train": [
+     "2025-01-24T00:00:00+00:00",
+     "2025-10-21T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": false,
+    "train_summary": null,
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      null
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      null
+     ]
+    ]
+   },
+   {
+    "chosen_key": null,
+    "chosen_params": null,
+    "index": 6,
+    "selection_data_end": "2026-01-19T00:00:00+00:00",
+    "status": "NO_ADMISSIBLE_PARAMETERS",
+    "test": [
+     "2026-01-19T00:00:00+00:00",
+     "2026-04-19T00:00:00+00:00"
+    ],
+    "test_summary": null,
+    "train": [
+     "2025-04-24T00:00:00+00:00",
+     "2026-01-19T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": false,
+    "train_summary": null,
+    "trials": [
+     [
+      "949d1345ec1e",
+      null
+     ],
+     [
+      "1d95721277ee",
+      null
+     ],
+     [
+      "6efa578132c3",
+      null
+     ],
+     [
+      "b723da3744d1",
+      null
+     ],
+     [
+      "0e61d6733ff4",
+      null
+     ],
+     [
+      "3f4cf4bac133",
+      null
+     ],
+     [
+      "38243a41bd40",
+      null
+     ],
+     [
+      "62f94290f452",
+      null
+     ],
+     [
+      "b32fa8c902a4",
+      null
+     ]
+    ]
+   }
+  ]
+ }
+}

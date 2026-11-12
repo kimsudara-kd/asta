@@ -1,0 +1,780 @@
+{
+ "advisory": {
+  "hypotheses": "HYPOTHESIS: add a regime filter or a higher minimum-edge threshold; re-validate. All hypotheses need a new validation cycle on fresh data.",
+  "summary": "Evidence level: NONE. Out-of-sample windows: 7 with parameters, 2 positive; pooled net P&L -35.36991093. Reasons: pooled out-of-sample net P&L is not positive; only 2/7 out-of-sample windows are positive (< 60 %); 5 overfitting/robustness warning(s) outstanding. Profitability is NOT established."
+ },
+ "in_vs_out_of_sample": {
+  "pooled": {
+   "is_mean_return": "0.009316861428571428571428571429",
+   "oos_mean_return": "-0.005052844285714285714285714286",
+   "oos_net_pnl_sum": "-35.36991093",
+   "oos_net_return_compounded": "-0.0356144611219573064860725702",
+   "oos_positive_windows": "2",
+   "oos_risk_breached_windows": "0",
+   "windows": "7",
+   "windows_with_params": "7"
+  },
+  "rows": [
+   {
+    "chosen_key": "2eec98abfc17",
+    "in_sample_return": "0.03015780",
+    "oos_over_is_ratio": "-0.2216637155230156045865414586",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.00668489",
+    "window": 0
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "in_sample_return": "0.01874773",
+    "oos_over_is_ratio": "1.023722872049042737440746160",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "0.01919248",
+    "window": 1
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "in_sample_return": "0.02880019",
+    "oos_over_is_ratio": "-0.8574755930429625637886416722",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.02469546",
+    "window": 2
+   },
+   {
+    "chosen_key": "0007c458a12e",
+    "in_sample_return": "-0.00028430",
+    "oos_over_is_ratio": null,
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "0.01568717",
+    "window": 3
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "in_sample_return": "0.00797144",
+    "oos_over_is_ratio": "-1.399806057625723834087693064",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.01115847",
+    "window": 4
+   },
+   {
+    "chosen_key": "48ca18cb9a6d",
+    "in_sample_return": "-0.01613187",
+    "oos_over_is_ratio": null,
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.01510879",
+    "window": 5
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "in_sample_return": "-0.00404296",
+    "oos_over_is_ratio": null,
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.01260195",
+    "window": 6
+   }
+  ],
+  "warnings": [
+   "window 0: in-sample positive but out-of-sample non-positive",
+   "window 2: in-sample positive but out-of-sample non-positive",
+   "window 4: in-sample positive but out-of-sample non-positive",
+   "out-of-sample mean return is less than half the in-sample mean (overfitting risk)",
+   "later training windows include earlier test windows (forward-chaining protocol)"
+  ]
+ },
+ "report": {
+  "cycle": 1,
+  "grid_size": 8,
+  "oos_reused": false,
+  "pooled": {
+   "is_mean_return": "0.009316861428571428571428571429",
+   "oos_mean_return": "-0.005052844285714285714285714286",
+   "oos_net_pnl_sum": "-35.36991093",
+   "oos_net_return_compounded": "-0.0356144611219573064860725702",
+   "oos_positive_windows": 2,
+   "oos_risk_breached_windows": 0,
+   "windows": 7,
+   "windows_with_params": 7
+  },
+  "strategy_id": "regime_grid",
+  "warnings": [
+   "window 0: in-sample positive but out-of-sample non-positive",
+   "window 2: in-sample positive but out-of-sample non-positive",
+   "window 4: in-sample positive but out-of-sample non-positive",
+   "out-of-sample mean return is less than half the in-sample mean (overfitting risk)",
+   "later training windows include earlier test windows (forward-chaining protocol)"
+  ],
+  "windows": [
+   {
+    "chosen_key": "2eec98abfc17",
+    "chosen_params": {
+     "levels": 6,
+     "min_net_profit_bps": "40",
+     "range_pct": "0.10"
+    },
+    "index": 0,
+    "selection_data_end": "2024-07-28T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2024-07-28T00:00:00+00:00",
+     "2024-10-26T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "1ae35f1c359997289f3b3480fbcc57e981cf9280fbea489c16af38b719626004",
+     "ending_equity": "993.31511369",
+     "fees": "3.21612021",
+     "fills": 170,
+     "label": "test w0",
+     "liquidation_equity": "993.16051429",
+     "max_drawdown_pct": "0.01494555",
+     "net_pnl": "-6.68488631",
+     "net_return_pct": "-0.00668489",
+     "period_end": "2024-10-26T00:00:00+00:00",
+     "period_start": "2024-07-28T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "a8b172679d81fe3642d1b22b3fda4c4d71dd2196cf408fc912441f2901396886",
+     "risk_verdict": "PASSED",
+     "round_trips": 12,
+     "sharpe": "-1.30563900",
+     "slippage": "0.23209430",
+     "sortino": "-1.57203432",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2023-11-01T00:00:00+00:00",
+     "2024-07-28T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": false,
+    "train_summary": {
+     "config_hash": "b7487b18215c51d45b24018d6a9954af01989fd1d340b9292f44317eebf52180",
+     "ending_equity": "1030.15779686",
+     "fees": "9.47819281",
+     "fills": 508,
+     "label": "train w0",
+     "liquidation_equity": "1030.13823739",
+     "max_drawdown_pct": "0.00958272",
+     "net_pnl": "30.15779686",
+     "net_return_pct": "0.03015780",
+     "period_end": "2024-07-28T00:00:00+00:00",
+     "period_start": "2023-11-01T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "263bdacaa213a981499d70742cf6a4bc9c03f60e85a373456c0a3df207338d8e",
+     "risk_verdict": "PASSED",
+     "round_trips": 22,
+     "sharpe": "2.21672078",
+     "slippage": "0.76307340",
+     "sortino": "3.21266125",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "0.01238242"
+     ],
+     [
+      "33200d7248ef",
+      "0.01567647"
+     ],
+     [
+      "b94afe93edcc",
+      "0.01238242"
+     ],
+     [
+      "0007c458a12e",
+      "0.01567647"
+     ],
+     [
+      "48ca18cb9a6d",
+      "0.00382387"
+     ],
+     [
+      "86f59ff92c4f",
+      "0.03015780"
+     ],
+     [
+      "6137ad82604e",
+      "0.00382387"
+     ],
+     [
+      "2eec98abfc17",
+      "0.03015780"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "chosen_params": {
+     "levels": 6,
+     "min_net_profit_bps": "40",
+     "range_pct": "0.10"
+    },
+    "index": 1,
+    "selection_data_end": "2024-10-26T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2024-10-26T00:00:00+00:00",
+     "2025-01-24T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "45dafaa990fafc47a4069de7b8fca1461156edfdf450a68b8902137f8f1059c0",
+     "ending_equity": "1019.19248250",
+     "fees": "3.43178364",
+     "fills": 190,
+     "label": "test w1",
+     "liquidation_equity": "1019.13874899",
+     "max_drawdown_pct": "0.00482835",
+     "net_pnl": "19.19248250",
+     "net_return_pct": "0.01919248",
+     "period_end": "2025-01-24T00:00:00+00:00",
+     "period_start": "2024-10-26T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "151c6fbe6f7cdc957e0aff8ff55fc345d3feb800077708821b66e35d755ff21a",
+     "risk_verdict": "PASSED",
+     "round_trips": 7,
+     "sharpe": "4.42098372",
+     "slippage": "0.17759630",
+     "sortino": "7.94724772",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-01-30T00:00:00+00:00",
+     "2024-10-26T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "cdc4e2ad3ade0375b284e0e1a06d03038be11965141bf41a3725ac061a5bb74b",
+     "ending_equity": "1018.74773259",
+     "fees": "8.04529459",
+     "fills": 434,
+     "label": "train w1",
+     "liquidation_equity": "1018.59206782",
+     "max_drawdown_pct": "0.01297634",
+     "net_pnl": "18.74773259",
+     "net_return_pct": "0.01874773",
+     "period_end": "2024-10-26T00:00:00+00:00",
+     "period_start": "2024-01-30T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "413458630bba31aa9203feedede666477c8d63d071251273758d4871f529fb21",
+     "risk_verdict": "PASSED",
+     "round_trips": 21,
+     "sharpe": "1.72718391",
+     "slippage": "0.52543900",
+     "sortino": "2.35251404",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "0.01238350"
+     ],
+     [
+      "33200d7248ef",
+      "0.01282379"
+     ],
+     [
+      "b94afe93edcc",
+      "0.01238350"
+     ],
+     [
+      "0007c458a12e",
+      "0.01282379"
+     ],
+     [
+      "48ca18cb9a6d",
+      "0.00358367"
+     ],
+     [
+      "86f59ff92c4f",
+      "0.01874773"
+     ],
+     [
+      "6137ad82604e",
+      "0.00358367"
+     ],
+     [
+      "2eec98abfc17",
+      "0.01874773"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "chosen_params": {
+     "levels": 6,
+     "min_net_profit_bps": "40",
+     "range_pct": "0.10"
+    },
+    "index": 2,
+    "selection_data_end": "2025-01-24T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-01-24T00:00:00+00:00",
+     "2025-04-24T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "9c1641366e0ea36dc0c8967dbe72fcaabcd94a5d5ef87f90360ea5759dd4edd8",
+     "ending_equity": "975.30453508",
+     "fees": "4.09965890",
+     "fills": 211,
+     "label": "test w2",
+     "liquidation_equity": "975.29210885",
+     "max_drawdown_pct": "0.03280281",
+     "net_pnl": "-24.69546492",
+     "net_return_pct": "-0.02469546",
+     "period_end": "2025-04-24T00:00:00+00:00",
+     "period_start": "2025-01-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "3cce653684115067209b7ce1f50dcf05c26c901fbb9885d739a11a7c242a14ad",
+     "risk_verdict": "PASSED",
+     "round_trips": 18,
+     "sharpe": "-3.55548465",
+     "slippage": "0.42131510",
+     "sortino": "-3.82151724",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-04-29T00:00:00+00:00",
+     "2025-01-24T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "b62347671c1853d92d890600a694ddadf15e79b6ba2a89a8878c49796c205a71",
+     "ending_equity": "1028.80018666",
+     "fees": "8.96012578",
+     "fills": 488,
+     "label": "train w2",
+     "liquidation_equity": "1028.74720467",
+     "max_drawdown_pct": "0.01481513",
+     "net_pnl": "28.80018666",
+     "net_return_pct": "0.02880019",
+     "period_end": "2025-01-24T00:00:00+00:00",
+     "period_start": "2024-04-29T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "d24aa28aa1f67d62d8034361b781d03708420713bf44fd68306db72ec8fa5e20",
+     "risk_verdict": "PASSED",
+     "round_trips": 24,
+     "sharpe": "2.08532944",
+     "slippage": "0.51323450",
+     "sortino": "3.04947258",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "0.01584172"
+     ],
+     [
+      "33200d7248ef",
+      "0.02824690"
+     ],
+     [
+      "b94afe93edcc",
+      "0.01584172"
+     ],
+     [
+      "0007c458a12e",
+      "0.02824690"
+     ],
+     [
+      "48ca18cb9a6d",
+      "-0.00149766"
+     ],
+     [
+      "86f59ff92c4f",
+      "0.02880019"
+     ],
+     [
+      "6137ad82604e",
+      "-0.00149766"
+     ],
+     [
+      "2eec98abfc17",
+      "0.02880019"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "0007c458a12e",
+    "chosen_params": {
+     "levels": 4,
+     "min_net_profit_bps": "40",
+     "range_pct": "0.10"
+    },
+    "index": 3,
+    "selection_data_end": "2025-04-24T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-04-24T00:00:00+00:00",
+     "2025-07-23T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "95871c46018c51090566cb3ce9d439e0914e657c6229a43b59911e762d7e6cec",
+     "ending_equity": "1015.68717444",
+     "fees": "3.26457308",
+     "fills": 177,
+     "label": "test w3",
+     "liquidation_equity": "1015.63240097",
+     "max_drawdown_pct": "0.01142198",
+     "net_pnl": "15.68717444",
+     "net_return_pct": "0.01568717",
+     "period_end": "2025-07-23T00:00:00+00:00",
+     "period_start": "2025-04-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "55701377e6376ba178bd1fbce1563fc00c2fd5b269b50faba8e9d51cabb9ca7a",
+     "risk_verdict": "PASSED",
+     "round_trips": 10,
+     "sharpe": "2.60921614",
+     "slippage": "0.13962600",
+     "sortino": "3.69440156",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-07-28T00:00:00+00:00",
+     "2025-04-24T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "14c77a4c51bb87778261b6648781b74cc84cc27bd685927c3e0037b94f29ee28",
+     "ending_equity": "999.71569927",
+     "fees": "8.53072378",
+     "fills": 449,
+     "label": "train w3",
+     "liquidation_equity": "999.69485149",
+     "max_drawdown_pct": "0.03178580",
+     "net_pnl": "-0.28430073",
+     "net_return_pct": "-0.00028430",
+     "period_end": "2025-04-24T00:00:00+00:00",
+     "period_start": "2024-07-28T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "6231253a8034d7e412d2a8a59d91993b66ea56b0c8a0d0fc818c1307ad22c393",
+     "risk_verdict": "PASSED",
+     "round_trips": 35,
+     "sharpe": "-0.00210600",
+     "slippage": "0.68370420",
+     "sortino": "-0.00274936",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "-0.00700501"
+     ],
+     [
+      "33200d7248ef",
+      "-0.00028430"
+     ],
+     [
+      "b94afe93edcc",
+      "-0.00700501"
+     ],
+     [
+      "0007c458a12e",
+      "-0.00028430"
+     ],
+     [
+      "48ca18cb9a6d",
+      "-0.01711616"
+     ],
+     [
+      "86f59ff92c4f",
+      "-0.00809656"
+     ],
+     [
+      "6137ad82604e",
+      "-0.01711616"
+     ],
+     [
+      "2eec98abfc17",
+      "-0.00809656"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "chosen_params": {
+     "levels": 6,
+     "min_net_profit_bps": "40",
+     "range_pct": "0.10"
+    },
+    "index": 4,
+    "selection_data_end": "2025-07-23T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-07-23T00:00:00+00:00",
+     "2025-10-21T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "aa246aa3c231d1ee28d1acadf01806d2cd5f2d47a46b4a8917f7bc909d626562",
+     "ending_equity": "988.84152820",
+     "fees": "3.53580180",
+     "fills": 185,
+     "label": "test w4",
+     "liquidation_equity": "988.80982933",
+     "max_drawdown_pct": "0.01312780",
+     "net_pnl": "-11.15847180",
+     "net_return_pct": "-0.01115847",
+     "period_end": "2025-10-21T00:00:00+00:00",
+     "period_start": "2025-07-23T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "afcf46b6b6079d0e2c37454a6c3fab3df28f9aaf656203e686cf77359db916f1",
+     "risk_verdict": "PASSED",
+     "round_trips": 13,
+     "sharpe": "-1.79167599",
+     "slippage": "0.29837180",
+     "sortino": "-2.07812298",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-10-26T00:00:00+00:00",
+     "2025-07-23T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "3840369c477a7c1c5d4c36a86c95ade2b39e7e30e0aef17904dbc16896af8438",
+     "ending_equity": "1007.97144040",
+     "fees": "10.63388878",
+     "fills": 571,
+     "label": "train w4",
+     "liquidation_equity": "1007.91953825",
+     "max_drawdown_pct": "0.02867944",
+     "net_pnl": "7.97144040",
+     "net_return_pct": "0.00797144",
+     "period_end": "2025-07-23T00:00:00+00:00",
+     "period_start": "2024-10-26T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "1704234a1393c1ab4d103d2b1f53d2ab99a5b442c426b25c1d09ef160c03133f",
+     "risk_verdict": "PASSED",
+     "round_trips": 31,
+     "sharpe": "0.53177711",
+     "slippage": "0.71504840",
+     "sortino": "0.66306465",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "0.00492031"
+     ],
+     [
+      "33200d7248ef",
+      "0.00417601"
+     ],
+     [
+      "b94afe93edcc",
+      "0.00492031"
+     ],
+     [
+      "0007c458a12e",
+      "0.00417601"
+     ],
+     [
+      "48ca18cb9a6d",
+      "-0.00475406"
+     ],
+     [
+      "86f59ff92c4f",
+      "0.00797144"
+     ],
+     [
+      "6137ad82604e",
+      "-0.00475406"
+     ],
+     [
+      "2eec98abfc17",
+      "0.00797144"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "48ca18cb9a6d",
+    "chosen_params": {
+     "levels": 6,
+     "min_net_profit_bps": "20",
+     "range_pct": "0.06"
+    },
+    "index": 5,
+    "selection_data_end": "2025-10-21T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-10-21T00:00:00+00:00",
+     "2026-01-19T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "62eeaf7240b08f4d78fd1d9dbb8a4902aac2d84f1f0e5fb2d0b9a7e6d920c0f3",
+     "ending_equity": "984.89120871",
+     "fees": "4.48729453",
+     "fills": 227,
+     "label": "test w5",
+     "liquidation_equity": "984.84079841",
+     "max_drawdown_pct": "0.02209924",
+     "net_pnl": "-15.10879129",
+     "net_return_pct": "-0.01510879",
+     "period_end": "2026-01-19T00:00:00+00:00",
+     "period_start": "2025-10-21T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "6eee407404c40538c693d313a4930c6636696251133f34a32a0ff495b40b9789",
+     "risk_verdict": "PASSED",
+     "round_trips": 13,
+     "sharpe": "-3.64429026",
+     "slippage": "0.48232310",
+     "sortino": "-3.92183042",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2025-01-24T00:00:00+00:00",
+     "2025-10-21T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "a2e336f4ed313e39216ea57a1da67f0ca96a5732d29a80a79823d5982f146103",
+     "ending_equity": "983.86812962",
+     "fees": "12.23059428",
+     "fills": 640,
+     "label": "train w5",
+     "liquidation_equity": "983.79966981",
+     "max_drawdown_pct": "0.02780240",
+     "net_pnl": "-16.13187038",
+     "net_return_pct": "-0.01613187",
+     "period_end": "2025-10-21T00:00:00+00:00",
+     "period_start": "2025-01-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "2766b1ff974495cdc90256ba28c33a25f6ea89a2e97f5dc4e72e4913cfa03c84",
+     "risk_verdict": "PASSED",
+     "round_trips": 36,
+     "sharpe": "-0.99603532",
+     "slippage": "1.05530000",
+     "sortino": "-1.13955850",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "-0.01742054"
+     ],
+     [
+      "33200d7248ef",
+      "-0.03198672"
+     ],
+     [
+      "b94afe93edcc",
+      "-0.01742054"
+     ],
+     [
+      "0007c458a12e",
+      "-0.03198672"
+     ],
+     [
+      "48ca18cb9a6d",
+      "-0.01613187"
+     ],
+     [
+      "86f59ff92c4f",
+      "-0.02154296"
+     ],
+     [
+      "6137ad82604e",
+      "-0.01613187"
+     ],
+     [
+      "2eec98abfc17",
+      "-0.02154296"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "2eec98abfc17",
+    "chosen_params": {
+     "levels": 6,
+     "min_net_profit_bps": "40",
+     "range_pct": "0.10"
+    },
+    "index": 6,
+    "selection_data_end": "2026-01-19T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2026-01-19T00:00:00+00:00",
+     "2026-04-19T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "6f942e428f1d43f3d49683c2eb325df84d8ccbabc578af7bc1fdca563cb4ba34",
+     "ending_equity": "987.39804645",
+     "fees": "2.72963821",
+     "fills": 143,
+     "label": "test w6",
+     "liquidation_equity": "987.38463795",
+     "max_drawdown_pct": "0.02012132",
+     "net_pnl": "-12.60195355",
+     "net_return_pct": "-0.01260195",
+     "period_end": "2026-04-19T00:00:00+00:00",
+     "period_start": "2026-01-19T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "cf20ecab91bde961415ff6b1c09ea8bd7f000b289eef2f2f36aef61025d890d4",
+     "risk_verdict": "PASSED",
+     "round_trips": 14,
+     "sharpe": "-2.51774819",
+     "slippage": "0.23296400",
+     "sortino": "-2.90742638",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2025-04-24T00:00:00+00:00",
+     "2026-01-19T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "b0eb6d9d4ffa95c1969170d5af083a447a65e5a714ee76f92573ac38ef85166b",
+     "ending_equity": "995.95704476",
+     "fees": "9.32144303",
+     "fills": 498,
+     "label": "train w6",
+     "liquidation_equity": "995.89660146",
+     "max_drawdown_pct": "0.02866774",
+     "net_pnl": "-4.04295524",
+     "net_return_pct": "-0.00404296",
+     "period_end": "2026-01-19T00:00:00+00:00",
+     "period_start": "2025-04-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "ac0b292c9488a457594f0f0d6a84115899acddf4bd3f79fb1d9fae4cd77d83bd",
+     "risk_verdict": "PASSED",
+     "round_trips": 27,
+     "sharpe": "-0.26216366",
+     "slippage": "0.57681870",
+     "sortino": "-0.31646603",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "f40d6a3e3ef6",
+      "-0.01344115"
+     ],
+     [
+      "33200d7248ef",
+      "-0.00416986"
+     ],
+     [
+      "b94afe93edcc",
+      "-0.01344115"
+     ],
+     [
+      "0007c458a12e",
+      "-0.00416986"
+     ],
+     [
+      "48ca18cb9a6d",
+      "-0.03023846"
+     ],
+     [
+      "86f59ff92c4f",
+      "-0.00404296"
+     ],
+     [
+      "6137ad82604e",
+      "-0.03023846"
+     ],
+     [
+      "2eec98abfc17",
+      "-0.00404296"
+     ]
+    ]
+   }
+  ]
+ }
+}

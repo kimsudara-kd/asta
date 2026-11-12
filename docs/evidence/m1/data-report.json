@@ -1,0 +1,155 @@
+{
+ "assumptions": [
+  "Binance rules are the CURRENT exchangeInfo snapshot applied to history (assumption, unverified).",
+  "Fees are standard base-tier assumptions, not account-specific (unverified).",
+  "OKX data/rules are unreachable from this network (residual R-1); no OKX results exist."
+ ],
+ "datasets": {
+  "BTC-USDT": {
+   "accepted_for_research": true,
+   "checksum": "f47d6c472e787065965a09255b6d391b58b25853c31282016dc99f18dd620d38",
+   "parents": [
+    "0fae9b2b76707269d26712e825046576647a891649939d0de4507c3af6edf0cb"
+   ],
+   "period": [
+    "2023-11-01T00:00:00+00:00",
+    "2026-11-01T00:00:00+00:00"
+   ],
+   "provenance": {
+    "derived_from": "0fae9b2b76707269d26712e825046576647a891649939d0de4507c3af6edf0cb",
+    "dropped_incomplete_buckets": 0,
+    "method": "OHLCV aggregation of complete buckets only",
+    "parent_source": "https://data-api.binance.vision/api/v3/klines (public market data)",
+    "parent_timeframe": "5m",
+    "root_source_type": "EXCHANGE_HISTORICAL"
+   },
+   "rows": 26304,
+   "source_type": "DERIVED",
+   "timeframe": "1h",
+   "validation": "PASS"
+  },
+  "ETH-USDT": {
+   "accepted_for_research": true,
+   "checksum": "a94f2dc1f39dbcd9fe6e3b26cf4a5d6dd0060a2d2e4e86824d866cd7dc292361",
+   "parents": [
+    "449f9b482a7c6157947e3afa746812c8d25f7dbe7f98e4408cf3dee70dc82aec"
+   ],
+   "period": [
+    "2023-11-01T00:00:00+00:00",
+    "2026-11-01T00:00:00+00:00"
+   ],
+   "provenance": {
+    "derived_from": "449f9b482a7c6157947e3afa746812c8d25f7dbe7f98e4408cf3dee70dc82aec",
+    "dropped_incomplete_buckets": 0,
+    "method": "OHLCV aggregation of complete buckets only",
+    "parent_source": "https://data-api.binance.vision/api/v3/klines (public market data)",
+    "parent_timeframe": "5m",
+    "root_source_type": "EXCHANGE_HISTORICAL"
+   },
+   "rows": 26304,
+   "source_type": "DERIVED",
+   "timeframe": "1h",
+   "validation": "PASS"
+  },
+  "SOL-USDT": {
+   "accepted_for_research": true,
+   "checksum": "ee1c9ba76bcec9f2dd99eb74b9ff534c2732b416669cd27b20cfbbbfb667a244",
+   "parents": [
+    "040f4f021ebe22f6c2ee3bac0db4acd1e4b381f3bbaed33d89178f3c9d825420"
+   ],
+   "period": [
+    "2023-11-01T00:00:00+00:00",
+    "2026-11-01T00:00:00+00:00"
+   ],
+   "provenance": {
+    "derived_from": "040f4f021ebe22f6c2ee3bac0db4acd1e4b381f3bbaed33d89178f3c9d825420",
+    "dropped_incomplete_buckets": 0,
+    "method": "OHLCV aggregation of complete buckets only",
+    "parent_source": "https://data-api.binance.vision/api/v3/klines (public market data)",
+    "parent_timeframe": "5m",
+    "root_source_type": "EXCHANGE_HISTORICAL"
+   },
+   "rows": 26304,
+   "source_type": "DERIVED",
+   "timeframe": "1h",
+   "validation": "PASS"
+  }
+ },
+ "execution_model": {
+  "base_slippage_bps": "5",
+  "half_spread_bps": "1",
+  "impact_bps_per_pct": "2",
+  "maker_volume_share": "0.5",
+  "max_participation": "0.05",
+  "reserve_buffer_bps": "150",
+  "stop_slippage_multiplier": "2",
+  "through_ticks": 1,
+  "version": "exec-1"
+ },
+ "fees": {
+  "fee_asset": "RECEIVED_ASSET",
+  "maker_bps": "10",
+  "note": "not account-specific; BNB discount not modelled",
+  "schedule_id": "BINANCE-SPOT-BASE-ASSUMED-v1",
+  "source": "ASSUMPTION: standard base-tier 0.10 %/0.10 %; unverified",
+  "taker_bps": "10",
+  "venue": "BINANCE",
+  "verified": false
+ },
+ "labels": [
+  "SIMULATED",
+  "HISTORICAL DATA",
+  "ESTIMATED FILLS",
+  "NOT LIVE TRADING"
+ ],
+ "risk_limits": {
+  "daily_loss_pct": "0.02",
+  "label": "RISK_COMPLIANT",
+  "max_asset_pct": "0.10",
+  "max_drawdown_pct": "0.05",
+  "max_total_pct": "0.30",
+  "starting_equity": "1000",
+  "version": "sim-risk-1"
+ },
+ "rules": [
+  {
+   "min_notional": "5.00000000",
+   "min_qty": "0.00001000",
+   "note": "CURRENT rules fetched from public exchangeInfo; applying them to history is an assumption",
+   "profile_id": "BINANCE:BTC-USDT:2026-11-12:v1",
+   "retrieved_at": "2026-11-12T10:37:30.480055+00:00",
+   "source": "LIVE: exchange rules snapshot",
+   "step_size": "0.00001000",
+   "symbol": "BTC-USDT",
+   "tick_size": "0.01000000",
+   "venue": "BINANCE",
+   "verified": false
+  },
+  {
+   "min_notional": "5.00000000",
+   "min_qty": "0.00010000",
+   "note": "CURRENT rules fetched from public exchangeInfo; applying them to history is an assumption",
+   "profile_id": "BINANCE:ETH-USDT:2026-11-12:v1",
+   "retrieved_at": "2026-11-12T10:37:30.480055+00:00",
+   "source": "LIVE: exchange rules snapshot",
+   "step_size": "0.00010000",
+   "symbol": "ETH-USDT",
+   "tick_size": "0.01000000",
+   "venue": "BINANCE",
+   "verified": false
+  },
+  {
+   "min_notional": "5.00000000",
+   "min_qty": "0.00100000",
+   "note": "CURRENT rules fetched from public exchangeInfo; applying them to history is an assumption",
+   "profile_id": "BINANCE:SOL-USDT:2026-11-12:v1",
+   "retrieved_at": "2026-11-12T10:37:30.480055+00:00",
+   "source": "LIVE: exchange rules snapshot",
+   "step_size": "0.00100000",
+   "symbol": "SOL-USDT",
+   "tick_size": "0.01000000",
+   "venue": "BINANCE",
+   "verified": false
+  }
+ ]
+}

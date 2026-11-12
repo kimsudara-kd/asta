@@ -1,0 +1,509 @@
+{
+ "holdout": {
+  "regime_grid": {
+   "holdout_performance": {
+    "meta": {
+     "bars_processed": 4620,
+     "labels": [
+      "SIMULATED",
+      "HISTORICAL DATA",
+      "ESTIMATED FILLS",
+      "NOT LIVE TRADING"
+     ],
+     "reconciled": true,
+     "risk_verdict": "PASSED",
+     "status": "COMPLETED",
+     "warmup_bars": 300
+    },
+    "portfolio": {
+     "avg_exposure_over_equity": "0.11082129",
+     "avg_inventory_value_over_equity": "0.03686559",
+     "by_asset": {
+      "BTC": {
+       "contribution": "-2.04783843",
+       "final_qty": "0.00008512",
+       "final_value": "6.60378154",
+       "realized_pnl": "-3.17777758",
+       "unrealized_pnl": "1.12993915"
+      },
+      "ETH": {
+       "contribution": "-0.31698106",
+       "final_qty": "0.0077109",
+       "final_value": "17.39316869",
+       "realized_pnl": "0.36541192",
+       "unrealized_pnl": "-0.68239298"
+      },
+      "SOL": {
+       "contribution": "-12.04431504",
+       "final_qty": "0.00085",
+       "final_value": "0.081209",
+       "realized_pnl": "-12.03827245",
+       "unrealized_pnl": "-0.00604259"
+      }
+     },
+     "concentration_hhi": "0.59704047",
+     "inventory_accumulation_note": "final inventory is marked at the last close, not liquidated",
+     "max_asset_share": "0.72236289",
+     "max_exposure_over_equity": "0.27255799",
+     "unrealized_pnl_total": "0.44150359"
+    },
+    "returns": {
+     "annualized_return": "-0.02900881",
+     "daily_return_observations": 180,
+     "ending_equity_liquidation_adjusted": "985.55234041",
+     "ending_equity_marked": "985.59086548",
+     "gross_trading_pnl": "-9.60713996",
+     "monthly_returns": {
+      "2026-05": "-0.01125705",
+      "2026-06": "-0.00867443",
+      "2026-07": "0.0033556",
+      "2026-08": "0.00789685",
+      "2026-09": "0.00204236",
+      "2026-10": "-0.00770704"
+     },
+     "net_return_pct": "-0.01440913",
+     "note": "marked-to-market simulated equity; NOT realised cash profit",
+     "realized_pnl": "-14.85063811",
+     "starting_equity": "1000",
+     "total_fees_quote_equivalent": "4.47231296",
+     "total_net_pnl": "-14.40913452",
+     "total_slippage_cost": "0.3296816",
+     "unrealized_pnl": "0.44150359"
+    },
+    "risk": {
+     "avg_drawdown_pct": "0.01241172",
+     "avg_underwater_depth_pct": "0.01247235",
+     "daily_return_p05": "-0.00202342",
+     "days_loss_ge_1pct": 0,
+     "days_loss_ge_2pct": 0,
+     "downside_deviation_daily": "0.00078162",
+     "longest_drawdown_bars": 4118,
+     "longest_drawdown_hours": "4118.0",
+     "max_drawdown_abs": "21.54607837",
+     "max_drawdown_pct": "0.02151945",
+     "recovered_at_end": false,
+     "risk_events": {
+      "DAILY_LOSS_TRIP": 0,
+      "DAILY_RESET": 0,
+      "DRAWDOWN_HALT": 0,
+      "ORDER_REJECTED": 1
+     },
+     "sharpe": "-1.62372752",
+     "sortino": "-1.95999079",
+     "time_at_exposure": {
+      "0-10%": "0.49583333",
+      "10-20%": "0.26180556",
+      "20-30%": "0.19027778",
+      "flat(<0.1%)": "0.05208333"
+     },
+     "volatility_annualized": "0.01802532",
+     "worst_day_return": "-0.00395377"
+    },
+    "trading": {
+     "avg_holding_hours": "375.05",
+     "avg_loss": "-1.93114143",
+     "avg_net_pnl_per_trade": "-0.86364645",
+     "avg_win": "1.11884423",
+     "closed_round_trips": 20,
+     "fee_to_gross_profit_ratio": {
+      "na_reason": "gross trading P&L is not positive",
+      "value": null
+     },
+     "fills": 231,
+     "gross_traded_notional": "4472.3127324",
+     "maker_fill_share": "0.93073593",
+     "maker_share_note": "ESTIMATED: candle-only data cannot support queue-position claims",
+     "orders_rejected": 1,
+     "orders_total": 616,
+     "orders_unfilled": 384,
+     "profit_factor": "0.31196813",
+     "rejections_by_reason": {
+      "INSUFFICIENT_INVENTORY": 1
+     },
+     "taker_fill_share": "0.06926407",
+     "turnover_x_start_equity": "4.47231273",
+     "win_rate": "0.35"
+    }
+   },
+   "holdout_summary": {
+    "config_hash": "aab81429fcf3c1bfea78be4f254d08fd0a7f3f99c3164603903f48bd9c4322d6",
+    "ending_equity": "985.59086548",
+    "fees": "4.47231296",
+    "fills": 231,
+    "label": "regime_grid holdout",
+    "liquidation_equity": "985.55234041",
+    "max_drawdown_pct": "0.02151945",
+    "net_pnl": "-14.40913452",
+    "net_return_pct": "-0.01440913",
+    "period_end": "2026-11-01T00:00:00+00:00",
+    "period_start": "2026-05-05T00:00:00+00:00",
+    "research_grade": true,
+    "result_checksum": "8f421e42a875e5a6ff5bc71e707ac0802720689d8f727a46470e6bff9f187020",
+    "risk_verdict": "PASSED",
+    "round_trips": 20,
+    "sharpe": "-1.62372752",
+    "slippage": "0.32968160",
+    "sortino": "-1.95999079",
+    "status": "COMPLETED"
+   },
+   "holdout_window": [
+    "2026-05-05T00:00:00+00:00",
+    "2026-11-01T00:00:00+00:00"
+   ],
+   "selected_params": {
+    "levels": 6,
+    "min_net_profit_bps": "20",
+    "range_pct": "0.10"
+   },
+   "selection_score_net_return": "-0.02145058",
+   "selection_window": [
+    "2025-05-05T00:00:00+00:00",
+    "2026-05-05T00:00:00+00:00"
+   ]
+  },
+  "sma_cross": {
+   "holdout_performance": {
+    "meta": {
+     "bars_processed": 4620,
+     "labels": [
+      "SIMULATED",
+      "HISTORICAL DATA",
+      "ESTIMATED FILLS",
+      "NOT LIVE TRADING"
+     ],
+     "reconciled": true,
+     "risk_verdict": "PASSED",
+     "status": "COMPLETED",
+     "warmup_bars": 300
+    },
+    "portfolio": {
+     "avg_exposure_over_equity": "0.13466556",
+     "avg_inventory_value_over_equity": "0.13466556",
+     "by_asset": {
+      "BTC": {
+       "contribution": "-6.13788855",
+       "final_qty": "0.00115349",
+       "final_value": "89.49008425",
+       "realized_pnl": "-5.86583967",
+       "unrealized_pnl": "-0.27204888"
+      },
+      "ETH": {
+       "contribution": "-4.91710057",
+       "final_qty": "0.039772",
+       "final_value": "89.71210952",
+       "realized_pnl": "-4.7688374",
+       "unrealized_pnl": "-0.14826317"
+      },
+      "SOL": {
+       "contribution": "20.65558814",
+       "final_qty": "0.000525",
+       "final_value": "0.0501585",
+       "realized_pnl": "20.65874433",
+       "unrealized_pnl": "-0.00315619"
+      }
+     },
+     "concentration_hhi": "0.49972106",
+     "inventory_accumulation_note": "final inventory is marked at the last close, not liquidated",
+     "max_asset_share": "0.5004794",
+     "max_exposure_over_equity": "0.33028026",
+     "unrealized_pnl_total": "-0.42346824"
+    },
+    "returns": {
+     "annualized_return": "0.01956851",
+     "daily_return_observations": 180,
+     "ending_equity_liquidation_adjusted": "1009.31379524",
+     "ending_equity_marked": "1009.60059902",
+     "gross_trading_pnl": "59.30883577",
+     "monthly_returns": {
+      "2026-05": "-0.01174309",
+      "2026-06": "-0.00095056",
+      "2026-07": "0.00272121",
+      "2026-08": "0.04774199",
+      "2026-09": "0.00645129",
+      "2026-10": "-0.03291321"
+     },
+     "net_return_pct": "0.0096006",
+     "note": "marked-to-market simulated equity; NOT realised cash profit",
+     "realized_pnl": "10.02406726",
+     "starting_equity": "1000",
+     "total_fees_quote_equivalent": "32.01111945",
+     "total_net_pnl": "9.60059902",
+     "total_slippage_cost": "17.6971173",
+     "unrealized_pnl": "-0.42346824"
+    },
+    "risk": {
+     "avg_drawdown_pct": "0.02019339",
+     "avg_underwater_depth_pct": "0.02038688",
+     "daily_return_p05": "-0.00583272",
+     "days_loss_ge_1pct": 0,
+     "days_loss_ge_2pct": 0,
+     "downside_deviation_daily": "0.00241105",
+     "longest_drawdown_bars": 2421,
+     "longest_drawdown_hours": "2422.0",
+     "max_drawdown_abs": "49.91827063",
+     "max_drawdown_pct": "0.04712991",
+     "recovered_at_end": false,
+     "risk_events": {
+      "DAILY_LOSS_TRIP": 0,
+      "DAILY_RESET": 0,
+      "DRAWDOWN_HALT": 0,
+      "ORDER_REJECTED": 0
+     },
+     "sharpe": "0.25450373",
+     "sortino": "0.51269569",
+     "time_at_exposure": {
+      "0-10%": "0.11481481",
+      "10-20%": "0.11666667",
+      "20-30%": "0.35972222",
+      ">30%": "0.01805556",
+      "flat(<0.1%)": "0.39074074"
+     },
+     "volatility_annualized": "0.09279351",
+     "worst_day_return": "-0.00983506"
+    },
+    "trading": {
+     "avg_holding_hours": "36.06779661",
+     "avg_loss": "-1.18618866",
+     "avg_net_pnl_per_trade": "0.05663315",
+     "avg_win": "3.39671677",
+     "closed_round_trips": 177,
+     "fee_to_gross_profit_ratio": "0.5397361",
+     "fills": 356,
+     "gross_traded_notional": "32011.1189454",
+     "maker_fill_share": "0",
+     "maker_share_note": "ESTIMATED: candle-only data cannot support queue-position claims",
+     "orders_rejected": 0,
+     "orders_total": 356,
+     "orders_unfilled": 0,
+     "profit_factor": "1.06550893",
+     "rejections_by_reason": {},
+     "taker_fill_share": "1",
+     "turnover_x_start_equity": "32.01111895",
+     "win_rate": "0.27118644"
+    }
+   },
+   "holdout_summary": {
+    "config_hash": "5eca6d9d50e76c39256a069d02f90202e69386c0773583643035c07047ca6d19",
+    "ending_equity": "1009.60059902",
+    "fees": "32.01111945",
+    "fills": 356,
+    "label": "sma_cross holdout",
+    "liquidation_equity": "1009.31379524",
+    "max_drawdown_pct": "0.04712991",
+    "net_pnl": "9.60059902",
+    "net_return_pct": "0.00960060",
+    "period_end": "2026-11-01T00:00:00+00:00",
+    "period_start": "2026-05-05T00:00:00+00:00",
+    "research_grade": true,
+    "result_checksum": "8f562b96cee85c0fc2684dfe77cce54ba2823cb46f251aa3876b8451ed68f6d6",
+    "risk_verdict": "PASSED",
+    "round_trips": 177,
+    "sharpe": "0.25450373",
+    "slippage": "17.69711730",
+    "sortino": "0.51269569",
+    "status": "COMPLETED"
+   },
+   "holdout_window": [
+    "2026-05-05T00:00:00+00:00",
+    "2026-11-01T00:00:00+00:00"
+   ],
+   "selected_params": {
+    "fast": 10,
+    "slow": 50,
+    "symbols": [
+     "BTC-USDT",
+     "ETH-USDT",
+     "SOL-USDT"
+    ]
+   },
+   "selection_score_net_return": "0.03822341",
+   "selection_window": [
+    "2025-05-05T00:00:00+00:00",
+    "2026-05-05T00:00:00+00:00"
+   ]
+  },
+  "trend_pullback": {
+   "holdout_performance": {
+    "meta": {
+     "bars_processed": 4620,
+     "labels": [
+      "SIMULATED",
+      "HISTORICAL DATA",
+      "ESTIMATED FILLS",
+      "NOT LIVE TRADING"
+     ],
+     "reconciled": true,
+     "risk_verdict": "BREACHED",
+     "status": "STOPPED_RISK_HALT",
+     "warmup_bars": 300
+    },
+    "portfolio": {
+     "avg_exposure_over_equity": "0.02624648",
+     "avg_inventory_value_over_equity": "0.02624648",
+     "by_asset": {
+      "BTC": {
+       "contribution": "-11.34455419",
+       "final_qty": "0.0000098",
+       "final_value": "0.7603038",
+       "realized_pnl": "-11.31222138",
+       "unrealized_pnl": "-0.03233281"
+      },
+      "ETH": {
+       "contribution": "-15.14924462",
+       "final_qty": "0.0000931",
+       "final_value": "0.21000195",
+       "realized_pnl": "-15.13059473",
+       "unrealized_pnl": "-0.01864989"
+      },
+      "SOL": {
+       "contribution": "-10.61858155",
+       "final_qty": "0.000823",
+       "final_value": "0.07862942",
+       "realized_pnl": "-10.6090201",
+       "unrealized_pnl": "-0.00956145"
+      }
+     },
+     "concentration_hhi": "0.5710854",
+     "inventory_accumulation_note": "final inventory is marked at the last close, not liquidated",
+     "max_asset_share": "0.72483393",
+     "max_exposure_over_equity": "0.27568582",
+     "unrealized_pnl_total": "-0.06054416"
+    },
+    "returns": {
+     "annualized_return": "-0.07383735",
+     "daily_return_observations": 180,
+     "ending_equity_liquidation_adjusted": "962.88594132",
+     "ending_equity_marked": "962.88761963",
+     "gross_trading_pnl": "-12.15882887",
+     "monthly_returns": {
+      "2026-05": "0.00052193",
+      "2026-06": "0.00250641",
+      "2026-07": "-0.01249356",
+      "2026-08": "-0.00436591",
+      "2026-09": "-0.00840992",
+      "2026-10": "-0.01533168"
+     },
+     "net_return_pct": "-0.03711238",
+     "note": "marked-to-market simulated equity; NOT realised cash profit",
+     "realized_pnl": "-37.05183621",
+     "starting_equity": "1000",
+     "total_fees_quote_equivalent": "15.0714577",
+     "total_net_pnl": "-37.11238037",
+     "total_slippage_cost": "9.8820938",
+     "unrealized_pnl": "-0.06054416"
+    },
+    "risk": {
+     "avg_drawdown_pct": "0.02111278",
+     "avg_underwater_depth_pct": "0.02139507",
+     "daily_return_p05": "-0.00350295",
+     "days_loss_ge_1pct": 0,
+     "days_loss_ge_2pct": 0,
+     "downside_deviation_daily": "0.00123081",
+     "longest_drawdown_bars": 3270,
+     "longest_drawdown_hours": "3270.0",
+     "max_drawdown_abs": "50.87110172",
+     "max_drawdown_pct": "0.05018138",
+     "recovered_at_end": false,
+     "risk_events": {
+      "DAILY_LOSS_TRIP": 0,
+      "DAILY_RESET": 0,
+      "DRAWDOWN_HALT": 1,
+      "ORDER_REJECTED": 0
+     },
+     "sharpe": "-2.76046109",
+     "sortino": "-3.24476012",
+     "time_at_exposure": {
+      "0-10%": "0.15972222",
+      "10-20%": "0.05208333",
+      "20-30%": "0.01550926",
+      "flat(<0.1%)": "0.77268519"
+     },
+     "volatility_annualized": "0.02764007",
+     "worst_day_return": "-0.00524025"
+    },
+    "trading": {
+     "avg_holding_hours": "14.58333333",
+     "avg_loss": "-1.49021697",
+     "avg_net_pnl_per_trade": "-0.44109329",
+     "avg_win": "1.89925954",
+     "closed_round_trips": 84,
+     "fee_to_gross_profit_ratio": {
+      "na_reason": "gross trading P&L is not positive",
+      "value": null
+     },
+     "fills": 168,
+     "gross_traded_notional": "15071.4574272",
+     "maker_fill_share": "0.1547619",
+     "maker_share_note": "ESTIMATED: candle-only data cannot support queue-position claims",
+     "orders_rejected": 0,
+     "orders_total": 253,
+     "orders_unfilled": 85,
+     "profit_factor": "0.57132097",
+     "rejections_by_reason": {},
+     "taker_fill_share": "0.8452381",
+     "turnover_x_start_equity": "15.07145743",
+     "win_rate": "0.30952381"
+    }
+   },
+   "holdout_summary": {
+    "config_hash": "48da43b10deb22a8f0d6748f0afe7f84a01e4e683165bf7ca3e969dbd5e583d1",
+    "ending_equity": "962.88761963",
+    "fees": "15.07145770",
+    "fills": 168,
+    "label": "trend_pullback holdout",
+    "liquidation_equity": "962.88594132",
+    "max_drawdown_pct": "0.05018138",
+    "net_pnl": "-37.11238037",
+    "net_return_pct": "-0.03711238",
+    "period_end": "2026-11-01T00:00:00+00:00",
+    "period_start": "2026-05-05T00:00:00+00:00",
+    "research_grade": true,
+    "result_checksum": "12decd402531fbe29b5cf3d8212410c97a0219bd3bfef3b61f04ee75bb217221",
+    "risk_verdict": "BREACHED",
+    "round_trips": 84,
+    "sharpe": "-2.76046109",
+    "slippage": "9.88209380",
+    "sortino": "-3.24476012",
+    "status": "STOPPED_RISK_HALT"
+   },
+   "holdout_window": [
+    "2026-05-05T00:00:00+00:00",
+    "2026-11-01T00:00:00+00:00"
+   ],
+   "selected_params": {
+    "pullback_atr": "0.3",
+    "sl_atr": "2",
+    "tp_atr": "3"
+   },
+   "selection_score_net_return": "-0.02625383",
+   "selection_window": [
+    "2025-05-05T00:00:00+00:00",
+    "2026-05-05T00:00:00+00:00"
+   ]
+  }
+ },
+ "note": "evaluated exactly once; the holdout window is consumed (any reuse needs a new validation cycle)",
+ "registry": [
+  {
+   "cycle": 1,
+   "end": "2026-11-01T00:00:00+00:00",
+   "key": "regime_grid:holdout",
+   "kind": "FINAL_HOLDOUT",
+   "start": "2026-05-05T00:00:00+00:00"
+  },
+  {
+   "cycle": 1,
+   "end": "2026-11-01T00:00:00+00:00",
+   "key": "trend_pullback:holdout",
+   "kind": "FINAL_HOLDOUT",
+   "start": "2026-05-05T00:00:00+00:00"
+  },
+  {
+   "cycle": 1,
+   "end": "2026-11-01T00:00:00+00:00",
+   "key": "sma_cross:holdout",
+   "kind": "FINAL_HOLDOUT",
+   "start": "2026-05-05T00:00:00+00:00"
+  }
+ ]
+}

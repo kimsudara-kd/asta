@@ -1,0 +1,844 @@
+{
+ "advisory": {
+  "hypotheses": "HYPOTHESIS: add a regime filter or a higher minimum-edge threshold; re-validate. HYPOTHESIS: constrain the parameter space (fewer free parameters) and re-validate. HYPOTHESIS: widen the search range for the edge parameter, then re-validate in a NEW cycle. All hypotheses need a new validation cycle on fresh data.",
+  "summary": "Evidence level: NONE. Out-of-sample windows: 7 with parameters, 2 positive; pooled net P&L -11.78632093. Reasons: 3 out-of-sample window(s) breached the risk budget; pooled out-of-sample net P&L is not positive; only 2/7 out-of-sample windows are positive (< 60 %); 9 overfitting/robustness warning(s) outstanding. Profitability is NOT established."
+ },
+ "in_vs_out_of_sample": {
+  "pooled": {
+   "is_mean_return": "0.05928698428571428571428571429",
+   "oos_mean_return": "-0.001683758571428571428571428571",
+   "oos_net_pnl_sum": "-11.78632093",
+   "oos_net_return_compounded": "-0.0189597381255588027461560381",
+   "oos_positive_windows": "2",
+   "oos_risk_breached_windows": "3",
+   "windows": "7",
+   "windows_with_params": "7"
+  },
+  "rows": [
+   {
+    "chosen_key": "b723da3744d1",
+    "in_sample_return": "0.16001128",
+    "oos_over_is_ratio": "-0.001838745368451524167546187994",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.00029422",
+    "window": 0
+   },
+   {
+    "chosen_key": "1d95721277ee",
+    "in_sample_return": "0.11657071",
+    "oos_over_is_ratio": "0.5795871021116711050314440051",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "0.06756288",
+    "window": 1
+   },
+   {
+    "chosen_key": "6efa578132c3",
+    "in_sample_return": "0.01012022",
+    "oos_over_is_ratio": "-4.912241038238299167409404143",
+    "oos_risk_verdict": "BREACHED",
+    "out_of_sample_return": "-0.04971296",
+    "window": 2
+   },
+   {
+    "chosen_key": "949d1345ec1e",
+    "in_sample_return": "0.08475081",
+    "oos_over_is_ratio": "0.7290468374284564359915852132",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "0.06178731",
+    "window": 3
+   },
+   {
+    "chosen_key": "949d1345ec1e",
+    "in_sample_return": "0.06949201",
+    "oos_over_is_ratio": "-0.02882288193995252116034634773",
+    "oos_risk_verdict": "PASSED",
+    "out_of_sample_return": "-0.00200296",
+    "window": 4
+   },
+   {
+    "chosen_key": "0e61d6733ff4",
+    "in_sample_return": "-0.04732570",
+    "oos_over_is_ratio": null,
+    "oos_risk_verdict": "BREACHED",
+    "out_of_sample_return": "-0.04153094",
+    "window": 5
+   },
+   {
+    "chosen_key": "949d1345ec1e",
+    "in_sample_return": "0.02138956",
+    "oos_over_is_ratio": "-2.225170597244637103334523945",
+    "oos_risk_verdict": "BREACHED",
+    "out_of_sample_return": "-0.04759542",
+    "window": 6
+   }
+  ],
+  "warnings": [
+   "window 0: in-sample positive but out-of-sample non-positive",
+   "window 2: in-sample positive but out-of-sample non-positive",
+   "window 4: in-sample positive but out-of-sample non-positive",
+   "window 6: in-sample positive but out-of-sample non-positive",
+   "out-of-sample mean return is less than half the in-sample mean (overfitting risk)",
+   "selected parameters change in most windows (unstable optimum)",
+   "chosen parameters sit on the edge of the search range in half the windows",
+   "some out-of-sample windows breached the risk budget (reported as failures)",
+   "later training windows include earlier test windows (forward-chaining protocol)"
+  ]
+ },
+ "report": {
+  "cycle": 1,
+  "grid_size": 9,
+  "oos_reused": false,
+  "pooled": {
+   "is_mean_return": "0.05928698428571428571428571429",
+   "oos_mean_return": "-0.001683758571428571428571428571",
+   "oos_net_pnl_sum": "-11.78632093",
+   "oos_net_return_compounded": "-0.0189597381255588027461560381",
+   "oos_positive_windows": 2,
+   "oos_risk_breached_windows": 3,
+   "windows": 7,
+   "windows_with_params": 7
+  },
+  "strategy_id": "sma_cross",
+  "warnings": [
+   "window 0: in-sample positive but out-of-sample non-positive",
+   "window 2: in-sample positive but out-of-sample non-positive",
+   "window 4: in-sample positive but out-of-sample non-positive",
+   "window 6: in-sample positive but out-of-sample non-positive",
+   "out-of-sample mean return is less than half the in-sample mean (overfitting risk)",
+   "selected parameters change in most windows (unstable optimum)",
+   "chosen parameters sit on the edge of the search range in half the windows",
+   "some out-of-sample windows breached the risk budget (reported as failures)",
+   "later training windows include earlier test windows (forward-chaining protocol)"
+  ],
+  "windows": [
+   {
+    "chosen_key": "b723da3744d1",
+    "chosen_params": {
+     "fast": 20,
+     "slow": 50,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 0,
+    "selection_data_end": "2024-07-28T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2024-07-28T00:00:00+00:00",
+     "2024-10-26T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "1d55aaf5f9fb5a1ceb6eb354c9918bbc60ea14fb152b29cfd2ab1cb0ca32cdc1",
+     "ending_equity": "999.70578021",
+     "fees": "13.04006506",
+     "fills": 145,
+     "label": "test w0",
+     "liquidation_equity": "999.56472169",
+     "max_drawdown_pct": "0.04306835",
+     "net_pnl": "-0.29421979",
+     "net_return_pct": "-0.00029422",
+     "period_end": "2024-10-26T00:00:00+00:00",
+     "period_start": "2024-07-28T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "794ebabf716e8f3eb897b52c51d7b7dcac2b6ffe146dde359ea82b1283b5e82f",
+     "risk_verdict": "PASSED",
+     "round_trips": 72,
+     "sharpe": "0.03392433",
+     "slippage": "7.61265630",
+     "sortino": "0.05542934",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2023-11-01T00:00:00+00:00",
+     "2024-07-28T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": false,
+    "train_summary": {
+     "config_hash": "044173d50f430efb5b72c78b8e729691d37366c06d97151e5dd7d21637acd3bb",
+     "ending_equity": "1160.01128247",
+     "fees": "25.70256157",
+     "fills": 284,
+     "label": "train w0",
+     "liquidation_equity": "1160.00971958",
+     "max_drawdown_pct": "0.05408025",
+     "net_pnl": "160.01128247",
+     "net_return_pct": "0.16001128",
+     "period_end": "2024-07-28T00:00:00+00:00",
+     "period_start": "2023-11-01T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "eb97b9783070c21ea5224ac8944bf9eca71a0d32e7a7b3a3dac2dfde7f44bc0f",
+     "risk_verdict": "BREACHED",
+     "round_trips": 142,
+     "sharpe": "2.26219759",
+     "slippage": "14.99711540",
+     "sortino": "3.82897827",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "0.12945234"
+     ],
+     [
+      "1d95721277ee",
+      "0.00958404"
+     ],
+     [
+      "6efa578132c3",
+      "0.02275986"
+     ],
+     [
+      "b723da3744d1",
+      "0.16001128"
+     ],
+     [
+      "0e61d6733ff4",
+      "0.12577532"
+     ],
+     [
+      "3f4cf4bac133",
+      "0.02930334"
+     ],
+     [
+      "38243a41bd40",
+      "0.05910791"
+     ],
+     [
+      "62f94290f452",
+      "0.15022901"
+     ],
+     [
+      "b32fa8c902a4",
+      "0.03941957"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "1d95721277ee",
+    "chosen_params": {
+     "fast": 10,
+     "slow": 100,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 1,
+    "selection_data_end": "2024-10-26T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2024-10-26T00:00:00+00:00",
+     "2025-01-24T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "37570c3cf0877e60ccf3562a81d8f01bf902ae13ccfedbedae5bd91006152900",
+     "ending_equity": "1067.56287640",
+     "fees": "10.04524533",
+     "fills": 111,
+     "label": "test w1",
+     "liquidation_equity": "1067.41854560",
+     "max_drawdown_pct": "0.04089126",
+     "net_pnl": "67.56287640",
+     "net_return_pct": "0.06756288",
+     "period_end": "2025-01-24T00:00:00+00:00",
+     "period_start": "2024-10-26T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "14de35d4cba28ed7020de7adb9b4cc3c554f765e014479f00c8ef59b9bd4bc87",
+     "risk_verdict": "PASSED",
+     "round_trips": 55,
+     "sharpe": "2.22270643",
+     "slippage": "5.87591300",
+     "sortino": "4.25421494",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-01-30T00:00:00+00:00",
+     "2024-10-26T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "909398318a85d3836aaf39ac4688079c9f7ee559e7f86e549495f661815769f8",
+     "ending_equity": "1116.57070886",
+     "fees": "28.08294453",
+     "fills": 311,
+     "label": "train w1",
+     "liquidation_equity": "1116.42863043",
+     "max_drawdown_pct": "0.04978011",
+     "net_pnl": "116.57070886",
+     "net_return_pct": "0.11657071",
+     "period_end": "2024-10-26T00:00:00+00:00",
+     "period_start": "2024-01-30T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "d5e397cd16c2a4b15cf9dcbe5d4ade0ada3a4aca87c1e6a2d91b2ea1e93abe4b",
+     "risk_verdict": "PASSED",
+     "round_trips": 155,
+     "sharpe": "1.57473056",
+     "slippage": "16.18783270",
+     "sortino": "2.94581110",
+     "status": "COMPLETED"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "0.03212197"
+     ],
+     [
+      "1d95721277ee",
+      "0.11657071"
+     ],
+     [
+      "6efa578132c3",
+      "0.08057008"
+     ],
+     [
+      "b723da3744d1",
+      "0.07053076"
+     ],
+     [
+      "0e61d6733ff4",
+      "0.07435241"
+     ],
+     [
+      "3f4cf4bac133",
+      "0.08977118"
+     ],
+     [
+      "38243a41bd40",
+      "0.06627325"
+     ],
+     [
+      "62f94290f452",
+      "0.07874782"
+     ],
+     [
+      "b32fa8c902a4",
+      "0.11191574"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "6efa578132c3",
+    "chosen_params": {
+     "fast": 10,
+     "slow": 150,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 2,
+    "selection_data_end": "2025-01-24T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-01-24T00:00:00+00:00",
+     "2025-04-24T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "c7d4748b7773986df56341451ccd096ca6cb8a45e7b2ecaf4b4378b63244fa4d",
+     "ending_equity": "950.28703569",
+     "fees": "3.36394721",
+     "fills": 38,
+     "label": "test w2",
+     "liquidation_equity": "950.28593517",
+     "max_drawdown_pct": "0.05071411",
+     "net_pnl": "-49.71296431",
+     "net_return_pct": "-0.04971296",
+     "period_end": "2025-04-24T00:00:00+00:00",
+     "period_start": "2025-01-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "b695ea88f07d486c5abd633816878aba4708a6fa57b90e40186a76247572e90f",
+     "risk_verdict": "BREACHED",
+     "round_trips": 19,
+     "sharpe": "-6.22310337",
+     "slippage": "1.93809090",
+     "sortino": "-5.96518811",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "train": [
+     "2024-04-29T00:00:00+00:00",
+     "2025-01-24T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "03cde897a8d53bd66cb84da92ec80de9ca807a83a9bd040fe76a235eb13883c7",
+     "ending_equity": "1010.12022442",
+     "fees": "10.08186035",
+     "fills": 112,
+     "label": "train w2",
+     "liquidation_equity": "1010.11902023",
+     "max_drawdown_pct": "0.05028775",
+     "net_pnl": "10.12022442",
+     "net_return_pct": "0.01012022",
+     "period_end": "2025-01-24T00:00:00+00:00",
+     "period_start": "2024-04-29T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "d1f56d20f5cd3ac857350b60c678135cb91b663169fab0ec0dcbea5493ddc737",
+     "risk_verdict": "BREACHED",
+     "round_trips": 56,
+     "sharpe": "0.22282791",
+     "slippage": "5.77479470",
+     "sortino": "0.42313585",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "-0.02510953"
+     ],
+     [
+      "1d95721277ee",
+      "-0.01211937"
+     ],
+     [
+      "6efa578132c3",
+      "0.01012022"
+     ],
+     [
+      "b723da3744d1",
+      "-0.03049109"
+     ],
+     [
+      "0e61d6733ff4",
+      "-0.01842029"
+     ],
+     [
+      "3f4cf4bac133",
+      "0.00087735"
+     ],
+     [
+      "38243a41bd40",
+      "-0.03115943"
+     ],
+     [
+      "62f94290f452",
+      "-0.01291387"
+     ],
+     [
+      "b32fa8c902a4",
+      "-0.00468076"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "949d1345ec1e",
+    "chosen_params": {
+     "fast": 10,
+     "slow": 50,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 3,
+    "selection_data_end": "2025-04-24T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-04-24T00:00:00+00:00",
+     "2025-07-23T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "4c46396bebae9ed63ad86f9eaeb60fa8ef175c48c01e8f9f22114351d101dc31",
+     "ending_equity": "1061.78730782",
+     "fees": "16.40317083",
+     "fills": 182,
+     "label": "test w3",
+     "liquidation_equity": "1061.47856453",
+     "max_drawdown_pct": "0.04307222",
+     "net_pnl": "61.78730782",
+     "net_return_pct": "0.06178731",
+     "period_end": "2025-07-23T00:00:00+00:00",
+     "period_start": "2025-04-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "02d3df1d93d5d89680c181957d57532e652ba90749f55930692801e5a1f91a3c",
+     "risk_verdict": "PASSED",
+     "round_trips": 90,
+     "sharpe": "2.08496559",
+     "slippage": "9.23530540",
+     "sortino": "4.65255624",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-07-28T00:00:00+00:00",
+     "2025-04-24T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "1e4fb2207e39c71ce05a18b80dc424d906edd563b55017d61340f0feb1260904",
+     "ending_equity": "1084.75080848",
+     "fees": "30.63442418",
+     "fills": 340,
+     "label": "train w3",
+     "liquidation_equity": "1084.74911225",
+     "max_drawdown_pct": "0.05497679",
+     "net_pnl": "84.75080848",
+     "net_return_pct": "0.08475081",
+     "period_end": "2025-04-24T00:00:00+00:00",
+     "period_start": "2024-07-28T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "8ab207dfc29a4389692649239e00ab979da224cda1527be9c2f5bf65633ffc82",
+     "risk_verdict": "BREACHED",
+     "round_trips": 170,
+     "sharpe": "1.29898012",
+     "slippage": "18.02351430",
+     "sortino": "2.46673703",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "0.08475081"
+     ],
+     [
+      "1d95721277ee",
+      "0.06778975"
+     ],
+     [
+      "6efa578132c3",
+      "-0.04042236"
+     ],
+     [
+      "b723da3744d1",
+      "0.03367614"
+     ],
+     [
+      "0e61d6733ff4",
+      "0.07030143"
+     ],
+     [
+      "3f4cf4bac133",
+      "-0.04422837"
+     ],
+     [
+      "38243a41bd40",
+      "0.02576873"
+     ],
+     [
+      "62f94290f452",
+      "0.05596328"
+     ],
+     [
+      "b32fa8c902a4",
+      "0.01849811"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "949d1345ec1e",
+    "chosen_params": {
+     "fast": 10,
+     "slow": 50,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 4,
+    "selection_data_end": "2025-07-23T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-07-23T00:00:00+00:00",
+     "2025-10-21T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "b51e9f63f07ecc1a4b8de152269b40415920e69edf78d498e3caced54b0cd031",
+     "ending_equity": "997.99704173",
+     "fees": "14.44072662",
+     "fills": 161,
+     "label": "test w4",
+     "liquidation_equity": "997.55323312",
+     "max_drawdown_pct": "0.03409997",
+     "net_pnl": "-2.00295827",
+     "net_return_pct": "-0.00200296",
+     "period_end": "2025-10-21T00:00:00+00:00",
+     "period_start": "2025-07-23T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "e8ad2091b57750656bd12026dcdcf2651205b069e998dbb85f34413a0bc57542",
+     "risk_verdict": "PASSED",
+     "round_trips": 79,
+     "sharpe": "-0.03394974",
+     "slippage": "8.03090400",
+     "sortino": "-0.05015638",
+     "status": "COMPLETED"
+    },
+    "train": [
+     "2024-10-26T00:00:00+00:00",
+     "2025-07-23T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "5326d277ca9650a5553e45375ac7cb9594551f398af5344bb40fe2775e073ecd",
+     "ending_equity": "1069.49201153",
+     "fees": "15.51491459",
+     "fills": 172,
+     "label": "train w4",
+     "liquidation_equity": "1069.49135751",
+     "max_drawdown_pct": "0.05424211",
+     "net_pnl": "69.49201153",
+     "net_return_pct": "0.06949201",
+     "period_end": "2025-07-23T00:00:00+00:00",
+     "period_start": "2024-10-26T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "6b853287ed2529ec3d999f99680ced8df453f9d82565fc11413c7d76812e6248",
+     "risk_verdict": "BREACHED",
+     "round_trips": 86,
+     "sharpe": "1.35499837",
+     "slippage": "9.13315970",
+     "sortino": "2.71887953",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "0.06949201"
+     ],
+     [
+      "1d95721277ee",
+      "0.04992016"
+     ],
+     [
+      "6efa578132c3",
+      "0.05132462"
+     ],
+     [
+      "b723da3744d1",
+      "0.03414710"
+     ],
+     [
+      "0e61d6733ff4",
+      "0.05426775"
+     ],
+     [
+      "3f4cf4bac133",
+      "0.02608014"
+     ],
+     [
+      "38243a41bd40",
+      "0.01924238"
+     ],
+     [
+      "62f94290f452",
+      "0.03876263"
+     ],
+     [
+      "b32fa8c902a4",
+      "0.02675856"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "0e61d6733ff4",
+    "chosen_params": {
+     "fast": 20,
+     "slow": 100,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 5,
+    "selection_data_end": "2025-10-21T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2025-10-21T00:00:00+00:00",
+     "2026-01-19T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "4564b5aa465692760b4f103a219d3106af2aaa08e2a2719adfb33fd6fac81b4b",
+     "ending_equity": "958.46905710",
+     "fees": "4.45289544",
+     "fills": 50,
+     "label": "test w5",
+     "liquidation_equity": "958.46849286",
+     "max_drawdown_pct": "0.05198840",
+     "net_pnl": "-41.53094290",
+     "net_return_pct": "-0.04153094",
+     "period_end": "2026-01-19T00:00:00+00:00",
+     "period_start": "2025-10-21T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "a9060bc73befc4323c7e3cecd62632d1b74ae34839223069f476244077050efe",
+     "risk_verdict": "BREACHED",
+     "round_trips": 25,
+     "sharpe": "-2.49065088",
+     "slippage": "2.57146800",
+     "sortino": "-3.15190064",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "train": [
+     "2025-01-24T00:00:00+00:00",
+     "2025-10-21T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "2b1bd32831576f12d97541e9ca82548aa5b23ccc0908d8e0739195c4f0140a7a",
+     "ending_equity": "952.67430019",
+     "fees": "2.46491420",
+     "fills": 28,
+     "label": "train w5",
+     "liquidation_equity": "952.67286383",
+     "max_drawdown_pct": "0.05071484",
+     "net_pnl": "-47.32569981",
+     "net_return_pct": "-0.04732570",
+     "period_end": "2025-10-21T00:00:00+00:00",
+     "period_start": "2025-01-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "96d00735811beac1d6133cdb7088e327cb2c051395f95796c410be71796a0f95",
+     "risk_verdict": "BREACHED",
+     "round_trips": 14,
+     "sharpe": "-3.37584965",
+     "slippage": "1.44017460",
+     "sortino": "-3.35204202",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "-0.04809676"
+     ],
+     [
+      "1d95721277ee",
+      "-0.04991401"
+     ],
+     [
+      "6efa578132c3",
+      "-0.04942042"
+     ],
+     [
+      "b723da3744d1",
+      "-0.04846750"
+     ],
+     [
+      "0e61d6733ff4",
+      "-0.04732570"
+     ],
+     [
+      "3f4cf4bac133",
+      "-0.04853009"
+     ],
+     [
+      "38243a41bd40",
+      "-0.05249086"
+     ],
+     [
+      "62f94290f452",
+      "-0.05116269"
+     ],
+     [
+      "b32fa8c902a4",
+      "-0.07415083"
+     ]
+    ]
+   },
+   {
+    "chosen_key": "949d1345ec1e",
+    "chosen_params": {
+     "fast": 10,
+     "slow": 50,
+     "symbols": [
+      "BTC-USDT",
+      "ETH-USDT",
+      "SOL-USDT"
+     ]
+    },
+    "index": 6,
+    "selection_data_end": "2026-01-19T00:00:00+00:00",
+    "status": "OK",
+    "test": [
+     "2026-01-19T00:00:00+00:00",
+     "2026-04-19T00:00:00+00:00"
+    ],
+    "test_summary": {
+     "config_hash": "915cde5f73ca3b148f39a20bc7487bb2b261ff5ad421e99721c4a3cc0f3b7056",
+     "ending_equity": "952.40458012",
+     "fees": "7.32733549",
+     "fills": 82,
+     "label": "test w6",
+     "liquidation_equity": "952.40359938",
+     "max_drawdown_pct": "0.05005343",
+     "net_pnl": "-47.59541988",
+     "net_return_pct": "-0.04759542",
+     "period_end": "2026-04-19T00:00:00+00:00",
+     "period_start": "2026-01-19T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "54d605a13b0fd8044cb069a9818a8b359c6828d01876343ec99f13f6f60f6fce",
+     "risk_verdict": "BREACHED",
+     "round_trips": 41,
+     "sharpe": "-2.95356089",
+     "slippage": "4.36772770",
+     "sortino": "-4.08444799",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "train": [
+     "2025-04-24T00:00:00+00:00",
+     "2026-01-19T00:00:00+00:00"
+    ],
+    "train_overlaps_prior_oos": true,
+    "train_summary": {
+     "config_hash": "791f883e8bf622effcbc76f4a7c1edadf4dc6ed6bc55d238d42bbf8b4b4ad887",
+     "ending_equity": "1021.38956270",
+     "fees": "35.40514518",
+     "fills": 394,
+     "label": "train w6",
+     "liquidation_equity": "1021.38850047",
+     "max_drawdown_pct": "0.05764356",
+     "net_pnl": "21.38956270",
+     "net_return_pct": "0.02138956",
+     "period_end": "2026-01-19T00:00:00+00:00",
+     "period_start": "2025-04-24T00:00:00+00:00",
+     "research_grade": true,
+     "result_checksum": "74fb2a32b77fb136a16e8a7da4a7f8e1736892bef51b984acfe8e66591e73c15",
+     "risk_verdict": "BREACHED",
+     "round_trips": 197,
+     "sharpe": "0.35624564",
+     "slippage": "19.65306320",
+     "sortino": "0.60955133",
+     "status": "STOPPED_RISK_HALT"
+    },
+    "trials": [
+     [
+      "949d1345ec1e",
+      "0.02138956"
+     ],
+     [
+      "1d95721277ee",
+      "-0.00751851"
+     ],
+     [
+      "6efa578132c3",
+      "-0.00461369"
+     ],
+     [
+      "b723da3744d1",
+      "-0.00961792"
+     ],
+     [
+      "0e61d6733ff4",
+      "-0.00751262"
+     ],
+     [
+      "3f4cf4bac133",
+      "-0.00126859"
+     ],
+     [
+      "38243a41bd40",
+      "0.01463805"
+     ],
+     [
+      "62f94290f452",
+      "0.00556729"
+     ],
+     [
+      "b32fa8c902a4",
+      "0.00434788"
+     ]
+    ]
+   }
+  ]
+ }
+}
