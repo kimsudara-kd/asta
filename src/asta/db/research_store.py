@@ -7,7 +7,7 @@ import hashlib
 import inspect
 import json
 import uuid
-from collections.abc import Iterable, Sequence
+from collections.abc import Sequence
 from typing import Any
 
 from sqlalchemy import func, insert, select, update
@@ -40,7 +40,6 @@ from asta.research.strategies.registry import REGISTRY, default_params_json
 from asta.research.validation.holdout import ConsumedWindow, HoldoutRegistry
 
 TERMINAL = ("COMPLETED", "FAILED", "CANCELLED")
-CHUNK = 4000
 
 
 def _jsonify(obj: Any) -> Any:
@@ -295,9 +294,15 @@ def recover_interrupted(db: Session) -> int:
     return int(getattr(res, "rowcount", 0) or 0)
 
 
-def _chunks(rows: Sequence[dict[str, Any]]) -> Iterable[Sequence[dict[str, Any]]]:
-    for i in range(0, len(rows), CHUNK):
-        yield rows[i : i + CHUNK]
+def _bulk_insert(db: Session, model: Any, rows: Sequence[dict[str, Any]]) -> None:
+    """Multi-row INSERT ... VALUES batches. (The driver's executemany sends one round trip PER ROW,
+    which made persisting a 20k-bar run take minutes.) Batches stay well below the 65535-parameter
+    limit of one statement."""
+    if not rows:
+        return
+    per_stmt = max(1, 30000 // max(1, len(rows[0])))
+    for i in range(0, len(rows), per_stmt):
+        db.execute(insert(model).values(list(rows[i : i + per_stmt])))
 
 
 def save_result(db: Session, run_id: uuid.UUID, out: RunOutput) -> None:
@@ -381,8 +386,7 @@ def save_result(db: Session, run_id: uuid.UUID, out: RunOutput) -> None:
             (SimulatedLedgerEntry, ledger),
             (PortfolioEquitySnapshot, equity),
         ):
-            for chunk in _chunks(rows):
-                db.execute(insert(model), list(chunk))
+            _bulk_insert(db, model, rows)
     risk = [
         {
             "run_id": run_id,
@@ -395,8 +399,7 @@ def save_result(db: Session, run_id: uuid.UUID, out: RunOutput) -> None:
         for e in res.risk_events
         if e.kind != "ORDER_REJECTED"
     ]
-    for chunk in _chunks(risk):
-        db.execute(insert(RiskEventRow), list(chunk))
+    _bulk_insert(db, RiskEventRow, risk)
     db.flush()
     db.execute(
         update(BacktestRun)

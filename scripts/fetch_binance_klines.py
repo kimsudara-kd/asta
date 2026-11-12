@@ -33,7 +33,9 @@ def to_ms(day: str) -> int:
     return int(datetime.fromisoformat(day).replace(tzinfo=UTC).timestamp() * 1000)
 
 
-async def fetch_symbol(http: PublicHttp, symbol: str, tf: str, start: int, end: int) -> list[list[Any]]:
+async def fetch_symbol(
+    http: PublicHttp, symbol: str, tf: str, start: int, end: int
+) -> list[list[Any]]:
     native = BINANCE_ALLOWLIST.native(symbol)
     rows: list[list[Any]] = []
     cursor = start
@@ -41,7 +43,13 @@ async def fetch_symbol(http: PublicHttp, symbol: str, tf: str, start: int, end: 
     while cursor < end:
         batch = await http.get(
             "/api/v3/klines",
-            {"symbol": native, "interval": tf, "startTime": cursor, "endTime": end - 1, "limit": 1000},
+            {
+                "symbol": native,
+                "interval": tf,
+                "startTime": cursor,
+                "endTime": end - 1,
+                "limit": 1000,
+            },
         )
         if not batch:
             break
@@ -53,7 +61,9 @@ async def fetch_symbol(http: PublicHttp, symbol: str, tf: str, start: int, end: 
     return rows
 
 
-def write_files(out: Path, symbol: str, tf: str, rows: list[list[Any]], start: int, end: int) -> Path:
+def write_files(
+    out: Path, symbol: str, tf: str, rows: list[list[Any]], start: int, end: int
+) -> Path:
     out.mkdir(parents=True, exist_ok=True)
     name = f"binance_{symbol}_{tf}_{datetime.fromtimestamp(start / 1000, UTC):%Y%m%d}_{datetime.fromtimestamp(end / 1000, UTC):%Y%m%d}.csv"
     path = out / name
@@ -77,7 +87,9 @@ def write_files(out: Path, symbol: str, tf: str, rows: list[list[Any]], start: i
             "unverified_note": "values as served by Binance public API on retrieval date; not independently audited",
         },
     }
-    path.with_name(path.name + ".meta.json").write_text(json.dumps(meta, indent=1), encoding="utf-8")
+    path.with_name(path.name + ".meta.json").write_text(
+        json.dumps(meta, indent=1), encoding="utf-8"
+    )
     return path
 
 
@@ -94,7 +106,9 @@ async def main() -> int:
     out = Path(args.out)
     try:
         for symbol in args.symbols.split(","):
-            rows = await fetch_symbol(http, symbol, args.timeframe, to_ms(args.start), to_ms(args.end))
+            rows = await fetch_symbol(
+                http, symbol, args.timeframe, to_ms(args.start), to_ms(args.end)
+            )
             p = write_files(out, symbol, args.timeframe, rows, to_ms(args.start), to_ms(args.end))
             print(f"{symbol}: {len(rows)} rows -> {p}", flush=True)
         if args.rules:

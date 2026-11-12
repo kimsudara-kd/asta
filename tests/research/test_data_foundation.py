@@ -394,6 +394,12 @@ def test_derived_from_synthetic_stays_non_research():
     out = resample(s.dataset, Timeframe.H1)
     assert out.dataset.meta.provenance["root_source_type"] == "SYNTHETIC"
     assert not out.dataset.meta.accepted_for_research and not out.dataset.meta.is_real_exchange_data
+    # the LABEL must also say so: a derived dataset never hides a synthetic root
+    assert out.dataset.meta.label == "SYNTHETIC (not real exchange data) [derived]"
+    assert (
+        "SYNTHETIC" in out.dataset.meta.label
+        and "DERIVED" not in out.dataset.meta.label.split("[")[0]
+    )
 
 
 def test_synthetic_generator_is_deterministic_and_valid():

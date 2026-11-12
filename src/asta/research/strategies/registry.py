@@ -126,7 +126,7 @@ def build_strategy(strategy_id: str, params: dict[str, Any] | None = None) -> St
     if info is None:
         raise ValueError(f"unknown strategy {strategy_id!r}")
     parsed = parse_params(info.params_cls, params or {})
-    return info.cls(parsed)  # type: ignore[call-arg]
+    return info.cls(parsed)
 
 
 def default_params_json(strategy_id: str) -> dict[str, Any]:

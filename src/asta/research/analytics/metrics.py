@@ -247,7 +247,7 @@ def compute_performance(
         risk["daily_return_p05"] = _q(srt[int(0.05 * (n_days - 1))])
     else:
         risk["daily_return_p05"] = NA("fewer than 20 daily observations")
-    buckets = defaultdict(int)
+    buckets: defaultdict[str, int] = defaultdict(int)
     for p in pts:
         ratio = p.exposure / p.equity if p.equity > 0 else ZERO
         key = (

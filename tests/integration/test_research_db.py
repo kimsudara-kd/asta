@@ -253,3 +253,39 @@ def test_query_helpers_cover_list_fills_risk(db, tmp_path):
     r = rs.risk_json(db, run_id)
     assert r["verdict"] == out.result.risk_verdict and r["limits"]["label"] == "RISK_COMPLIANT"
     assert db.query(HistoricalDatasetVersion).count() == 2
+
+
+def test_persisting_a_large_run_is_fast_regression(db, tmp_path):
+    """Regression: row-by-row executemany made persisting a 20k-bar run take minutes. Multi-row
+    INSERT batches must keep it to seconds."""
+    import time
+
+    from asta.research.data.fixtures import DOWNTREND, RANGE, UPTREND, seg
+    from tests.research.run_helpers import make_datasets
+
+    big = make_datasets(
+        segments=[seg(RANGE, 6000), seg(UPTREND, 7000), seg(DOWNTREND, 7000)], symbols=("BTC-USDT",)
+    )
+    store = DatasetFileStore(tmp_path)
+    ds = big["BTC-USDT"]
+    store.save(ds)
+    rep = validate_bars(ds.bars, ds.meta.timeframe, "BINANCE", "BTC-USDT")
+    ids = {"BTC-USDT": str(rs.register_dataset(db, ds, rep, "tester", "big.csv").id)}
+    db.commit()
+    cfg = make_config("sma_cross", {"symbols": ["BTC-USDT"], "fast": 6, "slow": 20}, big)
+    out = run_backtest(cfg, big)
+    assert len(out.result.equity) >= 19000
+    row = rs.create_run(db, cfg, ids, "tester", "abc")
+    db.commit()
+    rs.set_running(db, row.id)
+    t0 = time.time()
+    rs.save_result(db, row.id, out)
+    elapsed = time.time() - t0
+    assert db.get(BacktestRun, row.id).status == "COMPLETED"
+    n = (
+        db.execute(select(PortfolioEquitySnapshot).where(PortfolioEquitySnapshot.run_id == row.id))
+        .scalars()
+        .all()
+    )
+    assert len(n) == len(out.result.equity)
+    assert elapsed < 30, f"persisting took {elapsed:.1f}s (row-by-row inserts?)"

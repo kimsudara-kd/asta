@@ -38,7 +38,9 @@ def _id() -> sa.Column:
 
 
 def _run_fk() -> sa.Column:
-    return sa.Column("run_id", pg.UUID(as_uuid=True), sa.ForeignKey("backtest_runs.id"), nullable=False)
+    return sa.Column(
+        "run_id", pg.UUID(as_uuid=True), sa.ForeignKey("backtest_runs.id"), nullable=False
+    )
 
 
 def upgrade() -> None:
@@ -54,7 +56,12 @@ def upgrade() -> None:
     op.create_table(
         "historical_dataset_versions",
         _id(),
-        sa.Column("dataset_id", pg.UUID(as_uuid=True), sa.ForeignKey("historical_datasets.id"), nullable=False),
+        sa.Column(
+            "dataset_id",
+            pg.UUID(as_uuid=True),
+            sa.ForeignKey("historical_datasets.id"),
+            nullable=False,
+        ),
         sa.Column("checksum", sa.String(64), nullable=False, unique=True),
         sa.Column("source", sa.Text, nullable=False),
         sa.Column("source_type", sa.String(24), nullable=False),
@@ -74,7 +81,12 @@ def upgrade() -> None:
     op.create_table(
         "dataset_quality_reports",
         _id(),
-        sa.Column("version_id", pg.UUID(as_uuid=True), sa.ForeignKey("historical_dataset_versions.id"), nullable=False),
+        sa.Column(
+            "version_id",
+            pg.UUID(as_uuid=True),
+            sa.ForeignKey("historical_dataset_versions.id"),
+            nullable=False,
+        ),
         sa.Column("status", sa.String(10), nullable=False),
         sa.Column("report", pg.JSONB, nullable=False),
         sa.Column("created_by", sa.String(64), nullable=False),
@@ -91,11 +103,18 @@ def upgrade() -> None:
     op.create_table(
         "strategy_versions",
         _id(),
-        sa.Column("definition_id", pg.UUID(as_uuid=True), sa.ForeignKey("strategy_definitions.id"), nullable=False),
+        sa.Column(
+            "definition_id",
+            pg.UUID(as_uuid=True),
+            sa.ForeignKey("strategy_definitions.id"),
+            nullable=False,
+        ),
         sa.Column("version", sa.String(16), nullable=False),
         sa.Column("code_fingerprint", sa.String(64), nullable=False),
         sa.Column("default_params", pg.JSONB, nullable=False),
-        sa.UniqueConstraint("definition_id", "version", "code_fingerprint", name="uq_strategy_version"),
+        sa.UniqueConstraint(
+            "definition_id", "version", "code_fingerprint", name="uq_strategy_version"
+        ),
     )
     op.create_table(
         "backtest_run_configs",
@@ -107,8 +126,15 @@ def upgrade() -> None:
     op.create_table(
         "backtest_runs",
         _id(),
-        sa.Column("config_id", pg.UUID(as_uuid=True), sa.ForeignKey("backtest_run_configs.id"), nullable=False),
-        sa.Column("strategy_version_id", pg.UUID(as_uuid=True), sa.ForeignKey("strategy_versions.id")),
+        sa.Column(
+            "config_id",
+            pg.UUID(as_uuid=True),
+            sa.ForeignKey("backtest_run_configs.id"),
+            nullable=False,
+        ),
+        sa.Column(
+            "strategy_version_id", pg.UUID(as_uuid=True), sa.ForeignKey("strategy_versions.id")
+        ),
         sa.Column("status", sa.String(12), nullable=False),
         sa.Column("result_status", sa.String(24)),
         sa.Column("risk_verdict", sa.String(10)),
@@ -197,7 +223,9 @@ def upgrade() -> None:
         sa.Column("reserved_cash", NUM, nullable=False),
         sa.Column("exposure", NUM, nullable=False),
     )
-    op.create_index("ix_portfolio_equity_snapshots_run_id", "portfolio_equity_snapshots", ["run_id"])
+    op.create_index(
+        "ix_portfolio_equity_snapshots_run_id", "portfolio_equity_snapshots", ["run_id"]
+    )
     op.create_table(
         "risk_events",
         sa.Column("id", sa.BigInteger, primary_key=True, autoincrement=True),
@@ -212,7 +240,13 @@ def upgrade() -> None:
     op.create_table(
         "performance_reports",
         _id(),
-        sa.Column("run_id", pg.UUID(as_uuid=True), sa.ForeignKey("backtest_runs.id"), nullable=False, unique=True),
+        sa.Column(
+            "run_id",
+            pg.UUID(as_uuid=True),
+            sa.ForeignKey("backtest_runs.id"),
+            nullable=False,
+            unique=True,
+        ),
         sa.Column("metrics", pg.JSONB, nullable=False),
         sa.Column("summary", pg.JSONB, nullable=False),
         sa.Column("created_at", TS, server_default=NOW, nullable=False),
@@ -294,10 +328,21 @@ def downgrade() -> None:
         op.execute(f"DROP TRIGGER IF EXISTS {t}_no_truncate ON {t}")
     op.execute("DROP FUNCTION IF EXISTS research_immutable()")
     for t in (
-        "idempotency_keys", "research_holdout_windows", "research_validations", "performance_reports",
-        "risk_events", "portfolio_equity_snapshots", "simulated_ledger_entries", "simulated_fills",
-        "simulated_orders", "backtest_runs", "backtest_run_configs", "strategy_versions",
-        "strategy_definitions", "dataset_quality_reports", "historical_dataset_versions",
+        "idempotency_keys",
+        "research_holdout_windows",
+        "research_validations",
+        "performance_reports",
+        "risk_events",
+        "portfolio_equity_snapshots",
+        "simulated_ledger_entries",
+        "simulated_fills",
+        "simulated_orders",
+        "backtest_runs",
+        "backtest_run_configs",
+        "strategy_versions",
+        "strategy_definitions",
+        "dataset_quality_reports",
+        "historical_dataset_versions",
         "historical_datasets",
     ):
         op.drop_table(t)
