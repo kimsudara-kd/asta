@@ -35,7 +35,7 @@ TRANSITIONS: dict[SessionState, frozenset[SessionState]] = {
     S.READY: frozenset({S.RUNNING, S.STOPPED, S.FAILED}),
     S.RUNNING: frozenset({S.PAUSED, S.RECOVERING, S.RISK_HALTED, S.STOPPED, S.FAILED}),
     S.PAUSED: frozenset({S.RUNNING, S.RECOVERING, S.STOPPED, S.FAILED}),
-    S.RECOVERING: frozenset({S.RUNNING, S.PAUSED, S.STOPPED, S.FAILED}),
+    S.RECOVERING: frozenset({S.RUNNING, S.PAUSED, S.RISK_HALTED, S.STOPPED, S.FAILED}),
     S.RISK_HALTED: frozenset({S.PAUSED, S.RECOVERING, S.STOPPED, S.FAILED}),
     S.STOPPED: frozenset(),
     S.FAILED: frozenset(),

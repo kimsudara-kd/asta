@@ -121,6 +121,7 @@ def test_rebuilt_runtime_continues_exactly_like_the_original(db):
         ts, bars = SERIES[k]
         a = live.step(k, ts, bars, {}, True, False)
         b = rebuilt.step(k, ts, bars, {}, True, False)
+        assert a.checkpoint and b.checkpoint
         assert a.checkpoint["digest"] == b.checkpoint["digest"]
         assert [f["fill_id"] for f in a.fills] == [f["fill_id"] for f in b.fills]
 

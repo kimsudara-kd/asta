@@ -45,10 +45,13 @@ def _s(x: Decimal | None) -> str | None:
     return None if x is None else dec_str(x)
 
 
-def build_report(db: Session, session_id: uuid.UUID, day: datetime) -> dict[str, Any]:
-    """Pure function of durable rows for the UTC window [day, day+1)."""
+def build_report(
+    db: Session, session_id: uuid.UUID, day: datetime, until: datetime | None = None
+) -> dict[str, Any]:
+    """Pure function of durable rows for the UTC window [day, day+1). ``until`` produces a
+    clearly-flagged PARTIAL preview of an unfinished day (never stored, never a CEO report)."""
     w0 = day_start(day)
-    w1 = w0 + timedelta(days=1)
+    w1 = until if until is not None else w0 + timedelta(days=1)
     cfg = store.load_config(db, session_id)
     start_eq = cfg.total_equity
 
@@ -157,7 +160,7 @@ def build_report(db: Session, session_id: uuid.UUID, day: datetime) -> dict[str,
             StrategySignal.accepted.is_(False),
         )
     ).scalar_one()
-    ev_counts = dict(
+    ev_counts: dict[str, int] = dict(
         db.execute(
             select(PaperOrderEvent.status, func.count())
             .where(
@@ -195,7 +198,7 @@ def build_report(db: Session, session_id: uuid.UUID, day: datetime) -> dict[str,
         ).scalars()
     )
     tf = cfg.timeframe.seconds
-    expected_steps = int(timedelta(days=1).total_seconds() // tf)
+    expected_steps = max(1, int((w1 - w0).total_seconds() // tf))
     feed_avail: dict[str, str] = {}
     for v in cfg.enabled_venues:
         keys = [f"{v}:{s}" for s in cfg.symbols]
@@ -221,7 +224,7 @@ def build_report(db: Session, session_id: uuid.UUID, day: datetime) -> dict[str,
             )
         ).scalars()
     )
-    src = dict(
+    src: dict[str, int] = dict(
         db.execute(
             select(MarketObservation.source, func.count())
             .where(
@@ -240,7 +243,12 @@ def build_report(db: Session, session_id: uuid.UUID, day: datetime) -> dict[str,
         "labels": LABELS,
         "session_id": str(session_id),
         "config_hash": store.get_session(db, session_id).config_hash,
-        "window": {"start": w0.isoformat(), "end": w1.isoformat(), "timezone": "UTC"},
+        "window": {
+            "start": w0.isoformat(),
+            "end": w1.isoformat(),
+            "timezone": "UTC",
+            "partial": until is not None,
+        },
         "kind": "OBSERVED_PAPER_SIMULATION",
         "financial": {
             "opening_equity": dec_str(open_eq),

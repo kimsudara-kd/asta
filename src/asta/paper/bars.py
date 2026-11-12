@@ -35,16 +35,19 @@ def aggregate_1m(
     if any(m not in by_ts for m in mins):
         return None
     cs = [by_ts[m] for m in mins]
-    assert all(c.open is not None and c.high is not None and c.low is not None for c in cs)
-    assert all(c.close is not None and c.volume is not None for c in cs)
-    return Bar(
-        open_ts,
-        cs[0].open,  # type: ignore[arg-type]
-        max(c.high for c in cs),  # type: ignore[type-var]
-        min(c.low for c in cs),  # type: ignore[type-var]
-        cs[-1].close,  # type: ignore[arg-type]
-        sum((c.volume for c in cs), Decimal(0)),  # type: ignore[misc]
-    )
+    highs: list[Decimal] = []
+    lows: list[Decimal] = []
+    vols: list[Decimal] = []
+    for c in cs:
+        if c.high is None or c.low is None or c.volume is None:
+            return None
+        highs.append(c.high)
+        lows.append(c.low)
+        vols.append(c.volume)
+    first_open, last_close = cs[0].open, cs[-1].close
+    if first_open is None or last_close is None:
+        return None
+    return Bar(open_ts, first_open, max(highs), min(lows), last_close, sum(vols, Decimal(0)))
 
 
 def load_bar(

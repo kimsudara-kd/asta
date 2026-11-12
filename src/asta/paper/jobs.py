@@ -38,7 +38,7 @@ BACKOFF_CAP_S = 300
 
 
 def backoff_seconds(attempts: int) -> int:
-    return min(BACKOFF_CAP_S, BACKOFF_BASE_S * (2 ** max(0, attempts - 1)))
+    return int(min(BACKOFF_CAP_S, BACKOFF_BASE_S * (2 ** max(0, attempts - 1))))
 
 
 class JobError(Exception):
@@ -200,16 +200,19 @@ def cancel_session_jobs(db: Session, session_id: uuid.UUID, now: datetime | None
 
 def queue_stats(db: Session, now: datetime | None = None) -> dict[str, Any]:
     now = now or utcnow()
-    counts = dict(
-        db.execute(select(DurableJob.status, func.count()).group_by(DurableJob.status)).all()  # type: ignore[arg-type]
-    )
+    counts: dict[str, int] = {
+        str(k): int(v)
+        for k, v in db.execute(
+            select(DurableJob.status, func.count()).group_by(DurableJob.status)
+        ).all()
+    }
     oldest = db.execute(
         select(func.min(DurableJob.run_after)).where(
             DurableJob.status == PENDING, DurableJob.run_after <= now
         )
     ).scalar_one()
     return {
-        "counts": {k: int(v) for k, v in counts.items()},
+        "counts": dict(counts),
         "backlog": int(counts.get(PENDING, 0)),
         "dead": int(counts.get(DEAD, 0)),
         "oldest_runnable_age_s": None if oldest is None else (now - oldest).total_seconds(),

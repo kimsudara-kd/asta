@@ -7,7 +7,7 @@ from datetime import timedelta
 from decimal import Decimal as D
 
 import pytest
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import sessionmaker
 
 from asta.core.events import CandleEvent, QuoteEvent, Venue
@@ -218,7 +218,7 @@ def test_plan_inputs_blocks_stale_feeds_gaps_and_disabled_feeds(db):
     _, blocked = plan_inputs(db, CFG, T0, now)
     assert blocked["BINANCE:BTC-USDT"] == "STALE_DATA"
     # a feed that was never recorded is stale too (fail-closed)
-    db.execute(MarketFeedConnection.__table__.delete())
+    db.execute(delete(MarketFeedConnection))
     db.commit()
     _, blocked = plan_inputs(db, CFG, T0, now)
     assert blocked["BINANCE:BTC-USDT"] == "STALE_DATA"

@@ -123,6 +123,8 @@ class StepWorker:
             permanent = isinstance(exc, jobs.JobError) and exc.permanent
             if isinstance(exc, store.ReplayMismatch):
                 permanent = True
+                if sid:
+                    self._fail_session(sid, f"replay verification failed: {exc}")
             with self.factory() as db:
                 status = jobs.fail(
                     db,
@@ -157,8 +159,16 @@ class StepWorker:
         rt = self.runtimes.get(sid)
         if rt is not None and rt.step_seq == sess.last_step_seq:
             return rt
+        prev = SessionState(sess.state)
+        resumable = prev in (SessionState.RUNNING, SessionState.PAUSED, SessionState.RISK_HALTED)
+        if resumable and sess.last_step_seq >= 0:
+            store.transition(
+                db, sid, SessionState.RECOVERING, "system", "restoring runtime by replay"
+            )
         rt, rep = store.rebuild_runtime(db, sid)  # verified replay; raises ReplayMismatch
         self.runtimes[sid] = rt
+        if resumable and sess.last_step_seq >= 0:
+            store.transition(db, sid, prev, "system", f"recovered: {rep.steps} steps verified")
         if rep.steps:
             ops.open_incident(
                 db,
@@ -273,6 +283,19 @@ class StepWorker:
             if key not in blocked:
                 for kind in (ops.PRICE_STALE, ops.DATA_GAP):
                     ops.resolve_incident(db, f"{kind}:{sid}:{key}")
+
+    def _fail_session(self, sid: uuid.UUID, reason: str) -> None:
+        """Fail closed in its own transaction (the step transaction was rolled back)."""
+        with self.factory() as db:
+            sess = store.get_session(db, sid)
+            if SessionState(sess.state) not in (SessionState.FAILED, SessionState.STOPPED):
+                # RECOVERING is part of the rolled-back transaction, so the state read here is
+                # the last committed one; every non-terminal state may go to FAILED.
+                store.transition(db, sid, SessionState.FAILED, "system", reason[:300])
+            ops.open_incident(
+                db, ops.REPLAY_MISMATCH, ops.SEV_CRIT, reason[:1500], f"replay:{sid}", sid
+            )
+            db.commit()
 
     def _reconcile_or_fail(self, db: Session, sid: uuid.UUID) -> None:
         bad = store.reconcile(db, sid)

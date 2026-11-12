@@ -74,6 +74,14 @@ def main() -> int:
                     }
                 )
             )
+        elif cmd == "measure":
+            print(
+                json.dumps(
+                    measure(db, since=sys.argv[2] if len(sys.argv) > 2 else None),
+                    indent=1,
+                    default=str,
+                )
+            )
         elif cmd == "gate":
             sid = uuid.UUID(sys.argv[2])
             hours = (
@@ -81,6 +89,114 @@ def main() -> int:
             )
             return gate(db, sid, hours)
     return 0
+
+
+def measure(db, since: str | None = None):  # type: ignore[no-untyped-def]
+    """Operational measurements for the evidence document (all derived from durable rows)."""
+    from datetime import datetime
+
+    from asta.paper import reports
+
+    now = utcnow()
+    t0 = datetime.fromisoformat(since) if since else now - timedelta(hours=24)
+    out: dict = {
+        "measured_at": now.isoformat(),
+        "since": t0.isoformat(),
+        "sessions": [],
+        "feeds": {},
+    }
+    for s in db.execute(select(PaperSession).order_by(PaperSession.created_at)).scalars():
+        cfg = store.load_config(db, s.id)
+        live = (
+            db.execute(
+                select(PaperStepInput)
+                .where(PaperStepInput.session_id == s.id, PaperStepInput.warm.is_(False))
+                .order_by(PaperStepInput.step_seq)
+            )
+            .scalars()
+            .all()
+        )
+        muted = sum(1 for x in live if not x.strategy_active)
+        blocked = sum(1 for x in live if x.blocked)
+        elapsed = (now - s.started_at).total_seconds() if s.started_at else 0.0
+        expected = int(elapsed // cfg.timeframe.seconds)
+        bad = store.reconcile(db, s.id)
+        fills = db.execute(
+            select(func.count()).select_from(PaperFill).where(PaperFill.session_id == s.id)
+        ).scalar_one()
+        out["sessions"].append(
+            {
+                "id": str(s.id),
+                "name": s.name,
+                "state": s.state,
+                "timeframe": cfg.timeframe.value,
+                "started_at": s.started_at,
+                "elapsed_hours": round(elapsed / 3600, 3),
+                "live_steps": len(live),
+                "expected_steps_approx": expected,
+                "muted_late_or_paused_steps": muted,
+                "steps_with_blocked_markets": blocked,
+                "fills": fills,
+                "reconciliation_discrepancies": len(bad),
+                "last_reconcile_ok": s.last_reconcile_ok,
+                "equity": views.session_json(db, s)["equity"],
+                "partial_day_report": reports.build_report(
+                    db, s.id, now.replace(hour=0, minute=0, second=0, microsecond=0), until=now
+                )
+                if live
+                else None,
+            }
+        )
+    rows = db.execute(
+        text(
+            "select venue, symbol, count(*), min(event_ts), max(event_ts), "
+            "sum(case when source='BACKFILL' then 1 else 0 end) from market_observations "
+            "where kind='CANDLE_1M' and event_ts >= :t group by venue, symbol order by 1,2"
+        ),
+        {"t": t0},
+    ).all()
+    for v, sym, n, lo, hi, bf in rows:
+        span = int((hi - lo).total_seconds() // 60) + 1
+        out["feeds"][f"{v}:{sym}"] = {
+            "candles": n,
+            "span_minutes": span,
+            "present_fraction": round(n / span, 5),
+            "from_backfill": int(bf),
+            "first": lo,
+            "last": hi,
+        }
+    out["gaps"] = [
+        {
+            "venue": g.venue,
+            "symbol": g.symbol,
+            "start": g.gap_start,
+            "missing": g.missing,
+            "status": g.status,
+        }
+        for g in db.execute(select(MarketDataGap).order_by(MarketDataGap.gap_start)).scalars()
+    ]
+    out["incidents"] = [
+        {
+            "kind": i["kind"],
+            "severity": i["severity"],
+            "opened": i["opened_at"],
+            "resolved": i["resolved_at"],
+            "detail": i["detail"][:160],
+        }
+        for s in db.execute(select(PaperSession)).scalars()
+        for i in views.incidents(db, s.id, 500)
+    ]
+    out["queue"] = views.health(db)["queue"]
+    out["workers_seen"] = [
+        {"id": w, "started": a, "last_heartbeat": b}
+        for w, a, b in db.execute(
+            text(
+                "select worker_id, started_at, heartbeat_at from worker_leases order by started_at"
+            )
+        )
+    ]
+    out["feed_status"] = views.feeds_status(db)["feeds"]
+    return out
 
 
 def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-def]

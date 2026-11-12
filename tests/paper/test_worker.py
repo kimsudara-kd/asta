@@ -48,7 +48,9 @@ def reference_digests(n=N):
     out = []
     for k in range(n):
         ts, bars = SERIES[k]
-        out.append(rt.step(k, ts, bars, {}, True, k < WARM).checkpoint["digest"])
+        cp = rt.step(k, ts, bars, {}, True, k < WARM).checkpoint
+        assert cp is not None
+        out.append(cp["digest"])
     return out, rt
 
 
@@ -258,8 +260,10 @@ def test_two_workers_never_process_the_same_job_and_results_are_identical(factor
             errors.append(e)
 
     ts = [threading.Thread(target=run, args=(f"w{i}",)) for i in range(3)]
-    [t.start() for t in ts]
-    [t.join(timeout=300) for t in ts]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join(timeout=300)
     assert not errors
     # late clock => strategies muted: the invariant under test is exactly-once posting + order
     with factory() as db:
@@ -424,6 +428,14 @@ def test_replay_mismatch_on_restart_fails_the_session_instead_of_guessing(factor
             select(func.count()).select_from(DurableJob).where(DurableJob.status == "DEAD")
         ).scalar_one()
         assert dead >= 1 and store.get_session(db, sid).last_step_seq == 324
+        sess = store.get_session(db, sid)
+        assert sess.state == "FAILED" and "replay verification failed" in sess.state_reason
+        assert (
+            db.execute(
+                select(func.count()).select_from(Incident).where(Incident.kind == "REPLAY_MISMATCH")
+            ).scalar_one()
+            == 1
+        )
         assert (
             db.execute(
                 select(func.count())
@@ -495,3 +507,28 @@ def test_graceful_shutdown_drains_then_resumes_from_the_durable_cursor(factory):
     w2 = late_ok_worker(factory)
     drain_steps(w2, factory, sid, 50)
     assert cursor(factory, sid) == 49 and checkpoints(factory, sid) == REF_DIGESTS[:50]
+
+
+def test_a_restart_is_logged_as_recovering_then_back_to_the_previous_state(factory):
+    sid = new_session(factory)
+    enqueue_steps(factory, sid, 0, 320)
+    w = late_ok_worker(factory)
+    drain_steps(w, factory, sid, 310)
+    w2 = late_ok_worker(factory)  # "restart": empty cache
+    drain_steps(w2, factory, sid, 320)
+    with factory() as db:
+        log = db.execute(
+            text(
+                "select from_state, to_state, reason from paper_session_states where session_id=:s order by id"
+            ),
+            {"s": str(sid)},
+        ).all()
+        assert (
+            db.execute(
+                select(func.count()).select_from(Incident).where(Incident.kind == "RECOVERY")
+            ).scalar_one()
+            >= 1
+        )
+    pairs = [(a, b) for a, b, _ in log]
+    assert ("RUNNING", "RECOVERING") in pairs and ("RECOVERING", "RUNNING") in pairs
+    assert any("recovered:" in r for _, _, r in log)

@@ -64,3 +64,15 @@ docker run --rm -v "$PWD:/repo:ro" -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=saf
 cd apps/web && node e2e/run.mjs     # live-data, no-data and aging phases; screenshots -> docs/evidence/m0-r1/screenshots
 ```
 Set `ASTA_TEST_DATABASE_URL` to use the compose test DB (`--profile test`, port 5641) instead.
+
+## M2 — continuous paper trading (virtual funds only; public market data only)
+```bash
+# database migrated to head (alembic 0004), then in one terminal:
+uv run python -m asta.paper_service         # public feeds -> observations -> durable STEP jobs -> worker
+#   ASTA_PAPER_VENUES=BINANCE uv run ...    # restrict venues; a venue that fails verification is DISABLED with a reason
+uv run python scripts/paper_observation.py create "my session" 1h   # warm-up from public REST history
+uv run python scripts/paper_observation.py start <session-id>       # or use the Paper trading pages
+uv run python scripts/paper_observation.py status | gate <session-id> --hours 72
+```
+The service has no credentials, no signer and no order path; paper orders are rows produced by the offline simulator
+(see ADR-0009..0011, `docs/architecture/m2-plan.md`, `docs/evidence/M2-acceptance.md`).

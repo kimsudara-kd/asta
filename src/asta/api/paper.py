@@ -45,12 +45,19 @@ Viewer = Annotated[auth.Principal, Depends(_view)]
 Controller = Annotated[auth.Principal, Depends(_ctl)]
 
 
+StrategyName = Literal["regime_grid", "trend_pullback", "sma_cross"]
+
+
+def _default_strategies() -> list[StrategyName]:
+    return ["regime_grid", "trend_pullback", "sma_cross"]
+
+
 class CreateBody(BaseModel):
     name: str = Field(min_length=1, max_length=80, pattern=r"^[\w .:+()-]+$")
     binance_wallet: Decimal = Field(default=Decimal(500), ge=0, le=1000)
     okx_wallet: Decimal = Field(default=Decimal(500), ge=0, le=1000)
-    strategies: list[Literal["regime_grid", "trend_pullback", "sma_cross"]] = Field(
-        default_factory=lambda: list(ACTIVE_STRATEGIES), min_length=1, max_length=3
+    strategies: list[StrategyName] = Field(
+        default_factory=_default_strategies, min_length=1, max_length=3
     )
     timeframe: Literal["5m", "15m", "1h"] = "1h"
 

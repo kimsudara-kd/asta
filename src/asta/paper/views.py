@@ -261,7 +261,7 @@ def risk_view(db: Session, sid: uuid.UUID) -> dict[str, Any]:
             daily = False
         elif e.kind == "DRAWDOWN_HALT":
             drawdown = True
-    rejects = dict(
+    rejects: dict[str, int] = dict(
         db.execute(
             select(StrategySignal.reason, func.count())
             .where(StrategySignal.session_id == sid, StrategySignal.accepted.is_(False))
@@ -361,7 +361,7 @@ def performance(db: Session, sid: uuid.UUID, max_points: int = 600) -> dict[str,
         for key, rec in snaps[-1].accounts.items():
             st = key.split(":", 1)[1]
             strat_equity[st] = strat_equity.get(st, ZERO) + Decimal(rec["equity"])
-    start_by = {}
+    start_by: dict[str, Decimal] = {}
     for a in cfg.accounts():
         if a.counts_toward_portfolio:
             start_by[a.strategy_id] = start_by.get(a.strategy_id, ZERO) + a.starting_cash

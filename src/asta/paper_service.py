@@ -245,9 +245,16 @@ class PaperService:
                 last = self.last_event.get(venue)
                 silent = last is None or (now - last).total_seconds() > FEED_SILENCE_S
                 key = f"feed:{venue}"
-                await self._db(
-                    self._set_state, venue, "RECONNECTING" if silent else "CONNECTED", key, silent
-                )
+                try:
+                    await self._db(
+                        self._set_state,
+                        venue,
+                        "RECONNECTING" if silent else "CONNECTED",
+                        key,
+                        silent,
+                    )
+                except Exception as exc:  # noqa: BLE001 - a DB hiccup must not kill supervision
+                    log.warning("feed monitor %s failed: %s", venue, exc)
 
     def _set_state(self, db: Session, venue: str, state: str, key: str, silent: bool) -> None:
         set_feed_state(
