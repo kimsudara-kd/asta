@@ -13,7 +13,7 @@ from collections.abc import Sequence
 from decimal import Decimal
 from typing import Any, ClassVar
 
-from asta.core.money import floor_to_step
+from asta.core.money import dec_str, floor_to_step
 from asta.research.sim.context import StrategyContext
 from asta.research.sim.orders import CancelIntent, OrderIntent
 
@@ -22,7 +22,7 @@ Action = OrderIntent | CancelIntent
 
 def _jsonable(v: Any) -> Any:
     if isinstance(v, Decimal):
-        return str(v)
+        return dec_str(v)
     if isinstance(v, tuple | list):
         return [_jsonable(x) for x in v]
     return v

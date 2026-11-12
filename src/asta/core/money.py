@@ -58,3 +58,8 @@ def round_up(value: Decimal, quantum: Decimal = QUANTUM) -> Decimal:
 def round_down(value: Decimal, quantum: Decimal = QUANTUM) -> Decimal:
     """Conservative rounding for amounts the simulated account receives (sell notional)."""
     return value.quantize(quantum, rounding=ROUND_DOWN)
+
+
+def dec_str(value: Decimal) -> str:
+    """Plain-notation text for a Decimal ('0.00000000', never '0E-8' or '1E+1'), for JSON/UI."""
+    return format(value, "f")
