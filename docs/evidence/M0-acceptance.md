@@ -1,3 +1,5 @@
+> **Status update (ASTA-DECISION-003, 2026-11-12):** after CEO review this milestone was closed as `ACCEPTED_WITH_RESIDUAL` — see `M0-ACCEPTANCE-RECORD.md`. The status and results below are the pre-decision evidence and are preserved unchanged.
+
 # M0 acceptance evidence (ASTA-M0-IMPLEMENTATION-01 + ASTA-M0-R1 remediation)
 
 Updated: 2026-11-12 · Repo `E:\Dev\asta`, branch `main`, **local only, not pushed**.
