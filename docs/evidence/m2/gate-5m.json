@@ -1,0 +1,17 @@
+{
+ "gate_pass": false,
+ "elapsed_hours": 1.65,
+ "required_hours": 72.0,
+ "duration_met": false,
+ "session_state": "RUNNING",
+ "state_is_operating": true,
+ "steps_processed": 20,
+ "steps_expected_approx": 19,
+ "reconciliation_discrepancies": 0,
+ "duplicate_fill_postings": 0,
+ "open_data_gaps": 0,
+ "unrecoverable_data_gaps": 0,
+ "critical_incidents": 0,
+ "fills": 2,
+ "real_orders_possible": false
+}

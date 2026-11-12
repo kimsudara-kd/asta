@@ -6,6 +6,7 @@ at that exact point, then start a brand-new worker with an empty cache and verif
 
 import threading
 from datetime import timedelta
+from decimal import Decimal as D
 
 import pytest
 from sqlalchemy import func, select, text
@@ -532,3 +533,34 @@ def test_a_restart_is_logged_as_recovering_then_back_to_the_previous_state(facto
     pairs = [(a, b) for a, b, _ in log]
     assert ("RUNNING", "RECOVERING") in pairs and ("RECOVERING", "RUNNING") in pairs
     assert any("recovered:" in r for _, _, r in log)
+
+
+def test_a_risk_trip_halts_the_session_opens_incidents_and_keeps_history(factory):
+    """Tiny limits (0.01 % drawdown, 0.01 % daily) trip on the first marked loss: the worker moves
+    RUNNING -> RISK_HALTED, records the risk events and opens the incidents; nothing is deleted."""
+    from asta.research.sim.risk import SimRiskLimits
+
+    tight = SimRiskLimits(
+        D("1000"), D("0.10"), D("0.30"), D("0.0001"), D("0.0001"), "RISK_COMPLIANT", "test-tight"
+    )
+    cfg = CFG.__class__(**{**CFG.__dict__, "risk": tight})
+    sid = new_session(factory, cfg)
+    enqueue_steps(factory, sid)
+    w = late_ok_worker(factory)
+    drain_steps(w, factory, sid)
+    with factory() as db:
+        sess = store.get_session(db, sid)
+        kinds = {
+            k
+            for (k,) in db.execute(
+                text("select distinct kind from paper_risk_events where session_id=:s"),
+                {"s": str(sid)},
+            )
+        }
+        inc = {k for (k,) in db.execute(select(Incident.kind).where(Incident.session_id == sid))}
+    assert sess.state == "RISK_HALTED" and "risk halt" in sess.state_reason
+    assert kinds & {"DAILY_LOSS_TRIP", "DRAWDOWN_HALT"} and inc & {
+        "DAILY_LOSS_LIMIT",
+        "MAX_DRAWDOWN",
+    }
+    assert cursor(factory, sid) == N - 1  # observation continues while halted (bars still absorbed)
