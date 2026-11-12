@@ -114,7 +114,7 @@ NETWORK_MODULES = {
 
 def test_research_package_cannot_reach_network_exchanges_or_database():
     """M1 (ADR-0005): the research engine is pure. No network, subprocess, DB or async I/O imports,
-    and no exchange/market_data/api/auth/db packages (closes the 'direct HTTP client' gap for it)."""
+    and no exchange/market_data/api/auth/db packages (closes the direct-HTTP-client gap here)."""
     bad = []
     for p in (SRC / "research").rglob("*.py"):
         for node in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
