@@ -64,5 +64,14 @@ class ExecutionGateway:
         return GatewayDecision(Decision.DENY, tuple(reasons))
 
 
+def is_execution_enabled() -> bool:
+    """Read-only view for status screens. Cannot be used to change the policy."""
+    return EXECUTION_ENABLED_IN_THIS_BUILD
+
+
+def is_live_trading_enabled() -> bool:
+    return LIVE_TRADING_ENABLED
+
+
 class EnvironmentNotAllowed(Exception):
     pass

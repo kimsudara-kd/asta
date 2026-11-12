@@ -28,11 +28,11 @@ from asta.market_data.fixture_feed import run_fixture_feed
 from asta.market_data.service import IngestSupervisor
 from asta.market_data.state import FreshnessMonitor, MarketState
 from asta.risk.gateway import (
-    EXECUTION_ENABLED_IN_THIS_BUILD,
-    LIVE_TRADING_ENABLED,
     Decision,
     ExecutionGateway,
     OrderRequest,
+    is_execution_enabled,
+    is_live_trading_enabled,
 )
 from asta.risk.policy import RiskPolicy, RiskSnapshot, evaluate
 
@@ -253,8 +253,8 @@ def create_app(
                 "decision": decision.decision.value,
                 "reasons": list(decision.reason_codes),
             },
-            "execution_enabled": EXECUTION_ENABLED_IN_THIS_BUILD,
-            "live_trading_enabled": LIVE_TRADING_ENABLED,
+            "execution_enabled": is_execution_enabled(),
+            "live_trading_enabled": is_live_trading_enabled(),
             "policy": {k: str(v) for k, v in asdict(ctx.policy).items()},
         }
 
