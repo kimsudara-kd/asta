@@ -7,15 +7,20 @@ import pytest
 import respx
 
 from asta.core.events import CandleEvent, QuoteEvent, TradeEvent, Venue
+from asta.core.money import loads_decimal
 from asta.exchanges.binance.adapter import (
     BinancePublicAdapter,
+)
+from asta.exchanges.binance.adapter import (
     parse_rules as b_rules,
+)
+from asta.exchanges.binance.adapter import (
     parse_stream_message as b_parse,
 )
 from asta.exchanges.common.base import BINANCE_ALLOWLIST, PublicMarketDataAdapter
 from asta.exchanges.common.http import PublicHttp
-from asta.exchanges.okx.adapter import OkxPublicAdapter, parse_rules as o_rules, parse_ws_message
-from asta.core.money import loads_decimal
+from asta.exchanges.okx.adapter import OkxPublicAdapter, parse_ws_message
+from asta.exchanges.okx.adapter import parse_rules as o_rules
 
 FX = Path(__file__).parent.parent / "fixtures"
 NOW = datetime(2026, 11, 12, tzinfo=UTC)
@@ -29,7 +34,11 @@ def test_binance_trade():
     (ev,) = b_parse(fx("binance_trade.json"), BINANCE_ALLOWLIST, NOW)
     assert isinstance(ev, TradeEvent)
     assert (ev.symbol, ev.price, ev.quantity, ev.taker_side) == (
-        "BTC-USDT", D("67000.10"), D("0.00150000"), "SELL")
+        "BTC-USDT",
+        D("67000.10"),
+        D("0.00150000"),
+        "SELL",
+    )
     assert ev.venue is Venue.BINANCE and ev.exchange_ts is not None
 
 
@@ -49,7 +58,11 @@ def test_binance_rules_decimal_exact():
     info = loads_decimal(fx("binance_exchangeinfo.json"))
     (r,) = b_rules(info, ["BTC-USDT"], BINANCE_ALLOWLIST, NOW)
     assert (r.tick_size, r.step_size, r.min_qty, r.min_notional) == (
-        D("0.01"), D("0.00001"), D("0.00001"), D("5"))
+        D("0.01"),
+        D("0.00001"),
+        D("0.00001"),
+        D("5"),
+    )
     assert r.trading
 
 
@@ -81,17 +94,34 @@ def test_adapters_satisfy_protocol_and_have_no_write_methods():
     for a in (b, o):
         assert isinstance(a, PublicMarketDataAdapter)
         names = {n.lower() for n in dir(a)}
-        for banned in ("place", "cancel", "order", "withdraw", "transfer", "borrow", "margin",
-                       "leverage", "futures", "sign", "api_key", "secret"):
+        for banned in (
+            "place",
+            "cancel",
+            "order",
+            "withdraw",
+            "transfer",
+            "borrow",
+            "margin",
+            "leverage",
+            "futures",
+            "sign",
+            "api_key",
+            "secret",
+        ):
             assert not any(banned in n for n in names), (banned, names)
 
 
 @respx.mock
 async def test_binance_rest_via_mock_and_egress():
     respx.get("https://data-api.binance.vision/api/v3/time").mock(
-        return_value=httpx.Response(200, json={"serverTime": 1794464233952}))
+        return_value=httpx.Response(200, json={"serverTime": 1794464233952})
+    )
     respx.get("https://data-api.binance.vision/api/v3/ticker/bookTicker").mock(
-        return_value=httpx.Response(200, text='{"symbol":"BTCUSDT","bidPrice":"1.10","bidQty":"2","askPrice":"1.20","askQty":"3"}'))
+        return_value=httpx.Response(
+            200,
+            text='{"symbol":"BTCUSDT","bidPrice":"1.10","bidQty":"2","askPrice":"1.20","askQty":"3"}',
+        )
+    )
     a = BinancePublicAdapter(BINANCE_ALLOWLIST)
     assert (await a.server_time()).year >= 2026
     q = await a.best_quote("BTC-USDT")
@@ -103,7 +133,8 @@ async def test_rate_limit_raises_not_retries():
     from asta.exchanges.common.http import RateLimited
 
     route = respx.get("https://data-api.binance.vision/api/v3/time").mock(
-        return_value=httpx.Response(429, headers={"Retry-After": "30"}))
+        return_value=httpx.Response(429, headers={"Retry-After": "30"})
+    )
     with pytest.raises(RateLimited):
         await PublicHttp("https://data-api.binance.vision").get("/api/v3/time")
     assert route.call_count == 1

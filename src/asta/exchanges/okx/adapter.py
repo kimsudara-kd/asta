@@ -4,6 +4,7 @@ NOTE: endpoints and fields follow OKX API v5 as given in the handoff plus third-
 the official docs were unreachable in M0 (see docs/exchange-matrix/capability-matrix.md).
 Contract fixtures pin the parsing; confirm against the official docs before M3.
 """
+
 from __future__ import annotations
 
 import json
@@ -169,7 +170,9 @@ class OkxPublicAdapter:
 
     def subscribe_messages(self, symbols: Sequence[str]) -> list[str]:
         args = [
-            {"channel": ch, "instId": s} for s in symbols for ch in ("tickers", "trades", "candle1m")
+            {"channel": ch, "instId": s}
+            for s in symbols
+            for ch in ("tickers", "trades", "candle1m")
         ]
         return [json.dumps({"op": "subscribe", "args": args}, separators=(",", ":"))]
 

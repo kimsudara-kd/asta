@@ -1,4 +1,5 @@
 """UTC time helpers and clock-drift tracking."""
+
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -31,14 +32,16 @@ class DriftReading:
 class ClockMonitor:
     """Tracks per-venue clock offset and reports whether drift exceeds a threshold (fail-closed)."""
 
-    def __init__(self, max_drift: timedelta = timedelta(seconds=2),
-                 now: Callable[[], datetime] = utcnow) -> None:
+    def __init__(
+        self, max_drift: timedelta = timedelta(seconds=2), now: Callable[[], datetime] = utcnow
+    ) -> None:
         self.max_drift = max_drift
         self._now = now
         self._readings: dict[str, DriftReading] = {}
 
-    def record(self, venue: str, local_before: datetime, venue_time: datetime,
-               local_after: datetime) -> DriftReading:
+    def record(
+        self, venue: str, local_before: datetime, venue_time: datetime, local_after: datetime
+    ) -> DriftReading:
         require_utc(local_before), require_utc(venue_time), require_utc(local_after)
         rtt = local_after - local_before
         midpoint = local_before + rtt / 2

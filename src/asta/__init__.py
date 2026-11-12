@@ -1,4 +1,5 @@
 """ASTA - spot-only trading research platform. M0: public market data only, NO order execution."""
+
 import os
 
 # Some Windows App Control policies block SQLAlchemy's compiled extensions; fall back to pure Python.

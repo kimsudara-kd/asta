@@ -1,4 +1,5 @@
 """Settings. Fail-closed if anything looks like exchange credentials (ADR-0002/0004)."""
+
 from __future__ import annotations
 
 import os
@@ -18,12 +19,14 @@ class CredentialsPresent(RuntimeError):
 def assert_no_exchange_credentials(environ: dict[str, str] | None = None) -> None:
     env = os.environ if environ is None else environ
     bad = sorted(
-        k for k in env
+        k
+        for k in env
         if k.upper().endswith(_FORBIDDEN_SUFFIXES) and k.upper().startswith(_FORBIDDEN_PREFIXES)
     )
     if bad:
         raise CredentialsPresent(
-            "exchange credential variables are forbidden in M0: " + ", ".join(bad))
+            "exchange credential variables are forbidden in M0: " + ", ".join(bad)
+        )
 
 
 class Settings(BaseSettings):

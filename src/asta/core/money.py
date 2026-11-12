@@ -1,4 +1,5 @@
 """Decimal-only financial arithmetic helpers (ADR-0003)."""
+
 from __future__ import annotations
 
 import json

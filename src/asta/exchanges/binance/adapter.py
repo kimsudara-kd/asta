@@ -1,4 +1,5 @@
 """Binance Spot PUBLIC market-data adapter (read-only; no keys, no orders)."""
+
 from __future__ import annotations
 
 import json

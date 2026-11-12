@@ -2,6 +2,7 @@
 
 There is no configuration, environment variable or flag that can change this in M0.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass

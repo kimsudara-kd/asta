@@ -1,4 +1,5 @@
 """Reconnecting WebSocket stream helper: egress-checked, backoff with jitter."""
+
 from __future__ import annotations
 
 import asyncio

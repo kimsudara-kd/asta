@@ -1,4 +1,5 @@
 """In-memory market state: dedupe, freshness, gap marking."""
+
 from __future__ import annotations
 
 from collections import OrderedDict
@@ -42,8 +43,9 @@ class FeedStatus:
 class FreshnessMonitor:
     """Unknown or old data is STALE (fail-closed)."""
 
-    def __init__(self, stale_after: timedelta = timedelta(seconds=15),
-                 now: Callable[[], datetime] = utcnow) -> None:
+    def __init__(
+        self, stale_after: timedelta = timedelta(seconds=15), now: Callable[[], datetime] = utcnow
+    ) -> None:
         self.stale_after = stale_after
         self._now = now
         self._last: dict[tuple[Venue, str], datetime] = {}
@@ -88,6 +90,11 @@ class MarketState:
     def status(self, venue: Venue, symbol: str) -> FeedStatus:
         q = self.quotes.get((venue, symbol))
         return FeedStatus(
-            venue=venue, symbol=symbol, last_ingested=self.freshness.last(venue, symbol),
-            stale=self.freshness.is_stale(venue, symbol), source=q.source if q else "NONE",
-            reconnects=self.reconnects.get(venue, 0), gap_open=self.gap_open.get(venue, False))
+            venue=venue,
+            symbol=symbol,
+            last_ingested=self.freshness.last(venue, symbol),
+            stale=self.freshness.is_stale(venue, symbol),
+            source=q.source if q else "NONE",
+            reconnects=self.reconnects.get(venue, 0),
+            gap_open=self.gap_open.get(venue, False),
+        )

@@ -1,4 +1,5 @@
 """Ingestion service: runs one adapter stream into MarketState, with clock-drift checks."""
+
 from __future__ import annotations
 
 import asyncio
@@ -23,8 +24,9 @@ async def check_clock(adapter: PublicMarketDataAdapter, monitor: ClockMonitor) -
     return monitor.is_drift_ok(adapter.venue.value)
 
 
-async def run_stream(adapter: PublicMarketDataAdapter, symbols: Sequence[str],
-                     state: MarketState) -> None:
+async def run_stream(
+    adapter: PublicMarketDataAdapter, symbols: Sequence[str], state: MarketState
+) -> None:
     async for item in adapter.stream(symbols):
         if isinstance(item, Reconnected):
             state.mark_reconnect(adapter.venue)

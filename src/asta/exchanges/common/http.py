@@ -1,4 +1,5 @@
 """Egress-checked public HTTP client shared by adapters."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -10,8 +11,9 @@ from asta.core.money import loads_decimal
 
 
 class PublicHttp:
-    def __init__(self, base_url: str, client: httpx.AsyncClient | None = None,
-                 timeout: float = 10.0) -> None:
+    def __init__(
+        self, base_url: str, client: httpx.AsyncClient | None = None, timeout: float = 10.0
+    ) -> None:
         assert_url_allowed(base_url)
         self._base = base_url.rstrip("/")
         self._client = client or httpx.AsyncClient(timeout=timeout)

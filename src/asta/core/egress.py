@@ -2,28 +2,46 @@
 
 Only public market-data hosts are allowed, over TLS, and never a private/trading path.
 """
+
 from __future__ import annotations
 
 from urllib.parse import urlsplit
 
-ALLOWED_HOSTS: frozenset[str] = frozenset({
-    "data-api.binance.vision",      # Binance public market-data REST
-    "data-stream.binance.vision",   # Binance public market-data WS
-    "testnet.binance.vision",       # Binance Spot Testnet (public endpoints only in M0)
-    "stream.testnet.binance.vision",
-    "www.okx.com",                  # OKX public REST/WS
-    "ws.okx.com",
-})
+ALLOWED_HOSTS: frozenset[str] = frozenset(
+    {
+        "data-api.binance.vision",  # Binance public market-data REST
+        "data-stream.binance.vision",  # Binance public market-data WS
+        "testnet.binance.vision",  # Binance Spot Testnet (public endpoints only in M0)
+        "stream.testnet.binance.vision",
+        "www.okx.com",  # OKX public REST/WS
+        "ws.okx.com",
+    }
+)
 
 ALLOWED_SCHEMES: frozenset[str] = frozenset({"https", "wss"})
 
 #: Path fragments that indicate private, trading, funds-movement or margin endpoints.
 FORBIDDEN_PATH_FRAGMENTS: tuple[str, ...] = (
-    "/api/v3/order", "/api/v3/account", "/api/v3/myTrades", "/api/v3/openOrders",
-    "/api/v3/userDataStream", "/sapi/", "/wapi/", "/fapi/", "/dapi/", "/papi/",
-    "/api/v5/trade", "/api/v5/asset", "/api/v5/account", "/api/v5/finance",
-    "/api/v5/users", "/api/v5/sprd", "/api/v5/copytrading", "/api/v5/broker",
-    "/ws/v5/private", "/ws/v5/business",
+    "/api/v3/order",
+    "/api/v3/account",
+    "/api/v3/myTrades",
+    "/api/v3/openOrders",
+    "/api/v3/userDataStream",
+    "/sapi/",
+    "/wapi/",
+    "/fapi/",
+    "/dapi/",
+    "/papi/",
+    "/api/v5/trade",
+    "/api/v5/asset",
+    "/api/v5/account",
+    "/api/v5/finance",
+    "/api/v5/users",
+    "/api/v5/sprd",
+    "/api/v5/copytrading",
+    "/api/v5/broker",
+    "/ws/v5/private",
+    "/ws/v5/business",
 )
 
 

@@ -71,30 +71,36 @@ def test_clock_drift_ok_and_exceeded_and_unknown():
 
 
 # ---- egress ----
-@pytest.mark.parametrize("url", [
-    "https://data-api.binance.vision/api/v3/time",
-    "wss://data-stream.binance.vision/stream?streams=btcusdt@trade",
-    "https://www.okx.com/api/v5/public/time",
-    "wss://ws.okx.com:8443/ws/v5/public",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "https://data-api.binance.vision/api/v3/time",
+        "wss://data-stream.binance.vision/stream?streams=btcusdt@trade",
+        "https://www.okx.com/api/v5/public/time",
+        "wss://ws.okx.com:8443/ws/v5/public",
+    ],
+)
 def test_egress_allows_public(url):
     assert assert_url_allowed(url) == url
 
 
-@pytest.mark.parametrize("url", [
-    "http://data-api.binance.vision/api/v3/time",          # not TLS
-    "https://api.binance.com/api/v3/time",                 # host not allowlisted
-    "https://evil.example.com/x",
-    "https://data-api.binance.vision/api/v3/order",        # trading path
-    "https://testnet.binance.vision/api/v3/account",
-    "https://data-api.binance.vision/sapi/v1/capital/withdraw/apply",
-    "https://www.okx.com/api/v5/trade/order",
-    "https://www.okx.com/api/v5/asset/withdrawal",
-    "https://www.okx.com/api/v5/account/set-leverage",
-    "wss://ws.okx.com:8443/ws/v5/private",
-    "https://user:pw@www.okx.com/api/v5/public/time",
-    "ftp://www.okx.com/x",
-])
+@pytest.mark.parametrize(
+    "url",
+    [
+        "http://data-api.binance.vision/api/v3/time",  # not TLS
+        "https://api.binance.com/api/v3/time",  # host not allowlisted
+        "https://evil.example.com/x",
+        "https://data-api.binance.vision/api/v3/order",  # trading path
+        "https://testnet.binance.vision/api/v3/account",
+        "https://data-api.binance.vision/sapi/v1/capital/withdraw/apply",
+        "https://www.okx.com/api/v5/trade/order",
+        "https://www.okx.com/api/v5/asset/withdrawal",
+        "https://www.okx.com/api/v5/account/set-leverage",
+        "wss://ws.okx.com:8443/ws/v5/private",
+        "https://user:pw@www.okx.com/api/v5/public/time",
+        "ftp://www.okx.com/x",
+    ],
+)
 def test_egress_denies(url):
     with pytest.raises(EgressDenied):
         assert_url_allowed(url)

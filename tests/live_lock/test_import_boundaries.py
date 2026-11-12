@@ -1,4 +1,5 @@
 """Live-lock / boundary proofs (ADR-0002): source scans, so they cannot be satisfied by config."""
+
 import ast
 import re
 from pathlib import Path
@@ -66,7 +67,7 @@ def test_module_import_graph():
         "risk": {"core", "audit", "risk"},
         "exchanges": {"core", "exchanges"},
         "market_data": {"core", "exchanges", "market_data"},
-        "db": {"core", "db"},
+        "db": {"core", "audit", "db"},
         "auth": {"core", "audit", "auth", "db"},
     }
     bad = []

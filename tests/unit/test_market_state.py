@@ -11,9 +11,17 @@ T0 = datetime(2026, 11, 12, tzinfo=UTC)
 
 
 def quote(eid="1", at=T0, venue=Venue.BINANCE):
-    return QuoteEvent(venue=venue, symbol="BTC-USDT", event_id=eid, exchange_ts=None,
-                      ingested_ts=at, bid_price=D("1"), bid_qty=D("1"), ask_price=D("2"),
-                      ask_qty=D("1"))
+    return QuoteEvent(
+        venue=venue,
+        symbol="BTC-USDT",
+        event_id=eid,
+        exchange_ts=None,
+        ingested_ts=at,
+        bid_price=D("1"),
+        bid_qty=D("1"),
+        ask_price=D("2"),
+        ask_qty=D("1"),
+    )
 
 
 def test_duplicate_events_dropped():
@@ -64,8 +72,15 @@ class FakeAdapter:
 async def test_run_stream_recovery_dedupes_replay_after_reconnect():
     """Disconnect -> reconnect replays an already-seen event: no double count, gap closes."""
     st = MarketState()
-    trade = TradeEvent(venue=Venue.BINANCE, symbol="BTC-USDT", event_id="t1", exchange_ts=T0,
-                       ingested_ts=T0, price=D("1"), quantity=D("1"))
+    trade = TradeEvent(
+        venue=Venue.BINANCE,
+        symbol="BTC-USDT",
+        event_id="t1",
+        exchange_ts=T0,
+        ingested_ts=T0,
+        price=D("1"),
+        quantity=D("1"),
+    )
     feed = [Reconnected(0), trade, Reconnected(1), trade, quote("q2")]
     await run_stream(FakeAdapter(feed), ["BTC-USDT"], st)
     assert st.events_accepted == 2 and st.duplicates_dropped == 1

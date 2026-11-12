@@ -1,4 +1,5 @@
 """Canonical market-data models. Decimal-only, UTC-only (ADR-0003)."""
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -19,7 +20,7 @@ class Venue(StrEnum):
 
 class Channel(StrEnum):
     TRADE = "TRADE"
-    QUOTE = "QUOTE"      # best bid/ask
+    QUOTE = "QUOTE"  # best bid/ask
     CANDLE = "CANDLE"
 
 
@@ -39,9 +40,9 @@ class _Frozen(BaseModel):
 
 class MarketEvent(_Frozen):
     venue: Venue
-    symbol: str               # canonical "BASE-QUOTE", e.g. "BTC-USDT"
+    symbol: str  # canonical "BASE-QUOTE", e.g. "BTC-USDT"
     channel: Channel
-    event_id: str             # venue-stable id used for dedupe
+    event_id: str  # venue-stable id used for dedupe
     exchange_ts: datetime | None
     ingested_ts: datetime
     environment: Environment = Environment.PAPER
@@ -86,7 +87,7 @@ class CandleEvent(MarketEvent):
     low: Decimal
     close: Decimal
     volume: Decimal
-    closed: bool              # incomplete candles must never feed research (handoff §9)
+    closed: bool  # incomplete candles must never feed research (handoff §9)
 
 
 class SymbolRules(_Frozen):

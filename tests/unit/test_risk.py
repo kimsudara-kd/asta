@@ -41,9 +41,16 @@ def test_environment_check():
 
 
 def _snap(**kw):
-    base = dict(equity=D("1000"), start_of_day_equity=D("1000"), peak_equity=D("1000"),
-                invested_by_asset={"BTC": D("50")}, cash=D("950"),
-                data_fresh=True, clock_ok=True, reconciled=True)
+    base = dict(
+        equity=D("1000"),
+        start_of_day_equity=D("1000"),
+        peak_equity=D("1000"),
+        invested_by_asset={"BTC": D("50")},
+        cash=D("950"),
+        data_fresh=True,
+        clock_ok=True,
+        reconciled=True,
+    )
     base.update(kw)
     return RiskSnapshot(**base)
 
@@ -52,20 +59,29 @@ def test_risk_ok():
     assert not evaluate(RiskPolicy(), _snap()).halt_new_buys
 
 
-@pytest.mark.parametrize("kw,reason", [
-    (dict(data_fresh=False), "STALE_MARKET_DATA"),
-    (dict(clock_ok=False), "CLOCK_DRIFT"),
-    (dict(reconciled=False), "UNRECONCILED"),
-    (dict(equity=D("980")), "DAILY_DRAWDOWN_TRIP"),
-    (dict(equity=D("949"), start_of_day_equity=D("949")), "PEAK_DRAWDOWN_TRIP"),
-    (dict(invested_by_asset={"BTC": D("100"), "ETH": D("100"), "SOL": D("101")}, cash=D("699")),
-     "TOTAL_EXPOSURE_CAP"),
-    (dict(invested_by_asset={"BTC": D("101")}), "ASSET_EXPOSURE_CAP"),
-    (dict(cash=D("600")), "CASH_RESERVE"),
-    (dict(cash=D("-1")), "NEGATIVE_BALANCE_INVARIANT"),
-    (dict(invested_by_asset={"A": D("1"), "B": D("1"), "C": D("1"), "D": D("1")}),
-     "MAX_POSITIONS"),
-])
+@pytest.mark.parametrize(
+    "kw,reason",
+    [
+        (dict(data_fresh=False), "STALE_MARKET_DATA"),
+        (dict(clock_ok=False), "CLOCK_DRIFT"),
+        (dict(reconciled=False), "UNRECONCILED"),
+        (dict(equity=D("980")), "DAILY_DRAWDOWN_TRIP"),
+        (dict(equity=D("949"), start_of_day_equity=D("949")), "PEAK_DRAWDOWN_TRIP"),
+        (
+            dict(
+                invested_by_asset={"BTC": D("100"), "ETH": D("100"), "SOL": D("101")}, cash=D("699")
+            ),
+            "TOTAL_EXPOSURE_CAP",
+        ),
+        (dict(invested_by_asset={"BTC": D("101")}), "ASSET_EXPOSURE_CAP"),
+        (dict(cash=D("600")), "CASH_RESERVE"),
+        (dict(cash=D("-1")), "NEGATIVE_BALANCE_INVARIANT"),
+        (
+            dict(invested_by_asset={"A": D("1"), "B": D("1"), "C": D("1"), "D": D("1")}),
+            "MAX_POSITIONS",
+        ),
+    ],
+)
 def test_risk_trips(kw, reason):
     ev = evaluate(RiskPolicy(), _snap(**kw))
     assert ev.halt_new_buys and reason in ev.reasons

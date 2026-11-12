@@ -1,4 +1,5 @@
 """Environment types. There is deliberately NO `LIVE` member (ADR-0002)."""
+
 from __future__ import annotations
 
 from enum import StrEnum
