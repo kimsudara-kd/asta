@@ -47,6 +47,7 @@ class IngestSupervisor:
                 await check_clock(adapter, self.clock)
                 self.venue_errors.pop(adapter.venue, None)
                 await run_stream(adapter, symbols, self.state)
+                await asyncio.sleep(1)  # stream ended unexpectedly: never restart in a tight loop
             except asyncio.CancelledError:
                 raise
             except Exception as exc:  # isolate per venue; record and retry with delay

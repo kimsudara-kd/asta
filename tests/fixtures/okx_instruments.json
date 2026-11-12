@@ -1,0 +1,1 @@
+{"code":"0","msg":"","data":[{"instType":"SPOT","instId":"BTC-USDT","baseCcy":"BTC","quoteCcy":"USDT","tickSz":"0.1","lotSz":"0.00000001","minSz":"0.00001","state":"live"},{"instType":"SPOT","instId":"DOGE-USDT","baseCcy":"DOGE","quoteCcy":"USDT","tickSz":"0.00001","lotSz":"1","minSz":"10","state":"live"}]}
