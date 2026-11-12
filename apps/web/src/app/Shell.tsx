@@ -21,7 +21,7 @@ export default function Shell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      <div className={halted ? "banner halt" : "banner"} role="status">
+      <div className={halted ? "banner halt" : "banner"} role="status" data-testid="banner">
         {halted ? `RISK HALT — new buys suspended (${risk.data?.halt_reasons.join(", ")}). ` : ""}
         PAPER · PUBLIC MARKET DATA ONLY · NO TRADING · NO REAL FUNDS
       </div>

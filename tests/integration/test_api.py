@@ -89,6 +89,9 @@ def test_overview_content_labels_fixture_and_denies_execution(client, db):
     assert states["OKX"] == "FIXTURE"
     # Binance not started in this test: must NOT claim to be live
     assert states["BINANCE"] in {"CONNECTING", "STALE", "UNREACHABLE"}
+    okx = next(v for v in o["venues"] if v["venue"] == "OKX")
+    assert okx["clock_ok"] is None and okx["clock_offset_ms"] is None  # n/a for fixtures
+    assert next(v for v in o["venues"] if v["venue"] == "BINANCE")["clock_ok"] is False  # unknown
 
 
 def test_markets_fixture_rows_are_labelled(client, db):

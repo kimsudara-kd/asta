@@ -1,2 +1,5 @@
 node_modules
 .next
+e2e/.secrets.json
+test-results
+playwright-report

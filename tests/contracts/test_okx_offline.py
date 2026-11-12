@@ -231,7 +231,8 @@ async def test_okx_ws_reconnect_resubscribe_dedupe_and_keepalive(
             ):
                 frames.append(item)
                 if isinstance(item, Reconnected):
-                    state.mark_reconnect(Venue.OKX)
+                    if item.attempt > 0:
+                        state.mark_reconnect(Venue.OKX)
                     continue
                 for ev in parse_ws_message(item, NOW):
                     state.ingest(ev)
@@ -243,7 +244,7 @@ async def test_okx_ws_reconnect_resubscribe_dedupe_and_keepalive(
         assert len(srv.subscribes) >= 2  # re-subscribed after reconnect
         assert all(s["op"] == "subscribe" for s in srv.subscribes)
         assert sum(isinstance(f, Reconnected) for f in frames) >= 2
-        assert state.reconnects[Venue.OKX] >= 2
+        assert state.reconnects[Venue.OKX] == 1  # initial connect is not counted as a reconnect
         assert state.duplicates_dropped >= 1  # replayed event id dropped, not double counted
         assert state.events_accepted == 3
         q = state.quotes[(Venue.OKX, "BTC-USDT")]

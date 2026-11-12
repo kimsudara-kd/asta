@@ -1,6 +1,6 @@
 "use client";
 import { type Market } from "../../lib/api";
-import { showDecimal } from "../../lib/format";
+import { DATA_DISCLAIMER, showDecimal, sourceLabel } from "../../lib/format";
 import { usePoll } from "../../lib/usePoll";
 import Shell from "../Shell";
 
@@ -17,6 +17,9 @@ export default function MarketsPage() {
       <h1>Markets</h1>
       <p className="muted">
         Allowlist: BTC/ETH/SOL vs USDT. Public data only. Unknown or old data is shown as stale.
+      </p>
+      <p className="muted" data-testid="data-disclaimer">
+        {DATA_DISCLAIMER}
       </p>
       {error && <p className="err">{error}</p>}
       <div className="card scroll">
@@ -35,7 +38,7 @@ export default function MarketsPage() {
           </thead>
           <tbody>
             {(data ?? []).map((m) => (
-              <tr key={`${m.venue}-${m.symbol}`}>
+              <tr key={`${m.venue}-${m.symbol}`} data-testid="market-row">
                 <td>{m.venue}</td>
                 <td>{m.symbol}</td>
                 <td>{showDecimal(m.bid)}</td>
@@ -44,12 +47,12 @@ export default function MarketsPage() {
                 <td>{m.last_ingested ? m.last_ingested.slice(11, 19) : "—"}</td>
                 <td>
                   <span className={`pill ${tone(m.source)}`}>
-                    {m.source === "NONE" ? "NO DATA" : m.source}
+                    {sourceLabel(m.source)}
                   </span>
                 </td>
                 <td>
                   {m.stale ? (
-                    <span className="pill bad">STALE</span>
+                    <span className="pill bad" data-testid="stale-pill">STALE</span>
                   ) : (
                     <span className="pill ok">fresh</span>
                   )}

@@ -45,9 +45,22 @@ Windows App Control note: if `alembic.exe` / `pytest.exe` / `mypy.exe` are block
 ## Checks
 ```bash
 uv run ruff check . && uv run ruff format --check .
-uv run python -m pytest tests -q                       # DB tests start a throw-away embedded Postgres
-ASTA_RUN_NETWORK_TESTS=1 uv run python -m pytest tests # + real public Binance/OKX smoke tests
-uv run python scripts/secret_scan.py                   # working tree + full git history
+uv run python -m pytest tests -q                       # default: DB tests use a throw-away embedded Postgres
+ASTA_RUN_NETWORK_TESTS=1 uv run python -m pytest tests # + real public Binance/OKX smoke tests (OKX skips if unreachable)
+uv run python scripts/secret_scan.py                   # dependency-free scan: tree + full git history
 cd apps/web && pnpm run typecheck && pnpm run test && pnpm run build
+```
+Compose-backed run (PostgreSQL 16.4): `docker compose -f infra/docker-compose.yml --profile test up -d --wait db db_test`,
+then `ASTA_TEST_DATABASE_URL=postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5641/asta_test` for pytest.
+
+**mypy / gitleaks (native binaries may be blocked on Windows App Control — run them in containers):**
+```bash
+docker run --rm -v "$PWD:/src:ro" -w /src -e UV_PROJECT_ENVIRONMENT=/opt/venv -e UV_LINK_MODE=copy python:3.12-slim   sh -c "pip install -q uv && uv sync --frozen --no-install-project -q && /opt/venv/bin/python -m mypy"
+docker run --rm -v "$PWD:/repo:ro" -e GIT_CONFIG_COUNT=1 -e GIT_CONFIG_KEY_0=safe.directory -e GIT_CONFIG_VALUE_0=/repo   ghcr.io/gitleaks/gitleaks:latest git /repo -c /repo/.gitleaks.toml --redact
+```
+
+**Browser acceptance (Playwright + system Chrome, disposable `asta_e2e` DB on the compose test Postgres):**
+```bash
+cd apps/web && node e2e/run.mjs     # live-data, no-data and aging phases; screenshots -> docs/evidence/m0-r1/screenshots
 ```
 Set `ASTA_TEST_DATABASE_URL` to use the compose test DB (`--profile test`, port 5641) instead.

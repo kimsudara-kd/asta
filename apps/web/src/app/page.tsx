@@ -1,6 +1,6 @@
 "use client";
 import { type Overview } from "../lib/api";
-import { stateLabel, stateTone } from "../lib/format";
+import { DATA_DISCLAIMER, stateLabel, stateTone } from "../lib/format";
 import { usePoll } from "../lib/usePoll";
 import Shell from "./Shell";
 
@@ -41,15 +41,20 @@ export default function OverviewPage() {
               </div>
             </div>
           </div>
+          <p className="muted" data-testid="data-disclaimer">
+            {DATA_DISCLAIMER}
+          </p>
           <h2>Venues</h2>
           <div className="grid">
             {data.venues.map((v) => (
-              <div className="card" key={v.venue}>
+              <div className="card" key={v.venue} data-testid="venue-card">
                 <strong>{v.venue}</strong>{" "}
                 <span className={`pill ${stateTone(v.state)}`}>{stateLabel(v.state)}</span>
                 <div className="muted">
-                  clock offset {v.clock_offset_ms ?? "?"} ms {v.clock_ok ? "(ok)" : "(NOT ok)"} ·
-                  reconnects {v.reconnects}
+                  {v.state === "FIXTURE"
+                    ? "clock: n/a (fixture data)"
+                    : `clock offset ${v.clock_offset_ms ?? "?"} ms ${v.clock_ok ? "(ok)" : "(NOT ok)"}`}{" "}
+                  · reconnects {v.reconnects}
                   {v.gap_open ? " · data gap open" : ""}
                 </div>
                 {v.error && <div className="err">{v.error}</div>}

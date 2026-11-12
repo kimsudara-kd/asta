@@ -86,7 +86,7 @@ async def test_run_stream_recovery_dedupes_replay_after_reconnect():
     feed = [Reconnected(0), trade, Reconnected(1), trade, quote("q2")]
     await run_stream(cast(PublicMarketDataAdapter, FakeAdapter(feed)), ["BTC-USDT"], st)
     assert st.events_accepted == 2 and st.duplicates_dropped == 1
-    assert st.reconnects[Venue.BINANCE] == 2 and not st.gap_open[Venue.BINANCE]
+    assert st.reconnects[Venue.BINANCE] == 1 and not st.gap_open[Venue.BINANCE]
 
 
 def test_backoff_bounded_with_jitter():

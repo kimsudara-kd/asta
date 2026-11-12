@@ -1,13 +1,30 @@
-import { test } from "node:test";
 import assert from "node:assert/strict";
-import { canSee, showDecimal, stateLabel, stateTone } from "./format.ts";
+import { test } from "node:test";
+import {
+  canSee,
+  DATA_DISCLAIMER,
+  showDecimal,
+  sourceLabel,
+  stateLabel,
+  stateTone,
+} from "./format.ts";
 
-test("fixture is never labelled live", () => {
+test("fixture is never labelled as real data", () => {
   assert.match(stateLabel("FIXTURE"), /FIXTURE/);
-  assert.doesNotMatch(stateLabel("FIXTURE"), /^Live/);
+  assert.match(stateLabel("FIXTURE"), /not real/);
   assert.equal(stateTone("FIXTURE"), "warn");
   assert.equal(stateTone("LIVE"), "ok");
   assert.equal(stateTone("UNREACHABLE"), "bad");
+});
+
+test("real-time data is never described as live trading", () => {
+  for (const s of ["LIVE", "FIXTURE", "NONE", "weird", "STALE", "CONNECTING"]) {
+    assert.doesNotMatch(sourceLabel(s), /\blive\b/i);
+    assert.doesNotMatch(stateLabel(s), /\blive\b/i);
+  }
+  assert.equal(sourceLabel("LIVE"), "REAL-TIME PUBLIC DATA");
+  assert.match(sourceLabel("FIXTURE"), /not real/);
+  assert.match(DATA_DISCLAIMER, /do not enable, authorise or imply live trading/);
 });
 
 test("decimals stay exact strings", () => {

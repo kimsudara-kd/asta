@@ -66,7 +66,7 @@ export default function Login() {
           )}
           <button type="submit">{step === "password" ? "Continue" : "Verify"}</button>
           {err && (
-            <div className="err" role="alert">
+            <div className="err" role="alert" data-testid="login-error">
               {err}
             </div>
           )}

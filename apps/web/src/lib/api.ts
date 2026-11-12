@@ -13,7 +13,7 @@ export async function api<T>(path: string, init?: RequestInit): Promise<T> {
 export type Me = { username: string; role: string; csrf_token: string };
 export type Venue = {
   venue: string; state: string; error: string | null; clock_offset_ms: number | null;
-  clock_ok: boolean; reconnects: number; gap_open: boolean;
+  clock_ok: boolean | null; reconnects: number; gap_open: boolean;
 };
 export type Risk = {
   halt_new_buys: boolean; halt_reasons: string[];

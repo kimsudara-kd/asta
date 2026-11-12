@@ -29,7 +29,8 @@ async def run_stream(
 ) -> None:
     async for item in adapter.stream(symbols):
         if isinstance(item, Reconnected):
-            state.mark_reconnect(adapter.venue)
+            if item.attempt > 0:  # attempt 0 = the initial connect, not a drop/reconnect
+                state.mark_reconnect(adapter.venue)
             continue
         state.ingest(item)
 

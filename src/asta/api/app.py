@@ -219,7 +219,10 @@ def create_app(
                     "state": state,
                     "error": err,
                     "clock_offset_ms": int(drift.offset.total_seconds() * 1000) if drift else None,
-                    "clock_ok": ctx.clock.is_drift_ok(venue.value),
+                    # a fixture venue has no clock to measure: report "not applicable", not "bad"
+                    "clock_ok": None
+                    if venue in ctx.fixture_venues
+                    else ctx.clock.is_drift_ok(venue.value),
                     "reconnects": ctx.state.reconnects.get(venue, 0),
                     "gap_open": ctx.state.gap_open.get(venue, False),
                 }
