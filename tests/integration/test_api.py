@@ -1,0 +1,140 @@
+import pyotp
+import pytest
+from fastapi.testclient import TestClient
+from sqlalchemy.orm import sessionmaker
+
+from asta.api.app import AppContext, create_app
+from asta.auth import service as auth
+from asta.core.events import Venue
+from asta.core.settings import Settings
+
+pytestmark = pytest.mark.db
+PW = "correct-horse-battery"
+
+
+@pytest.fixture
+def client(migrated_engine, db):
+    settings = Settings(database_url="unused")
+    ctx = AppContext(settings, sessionmaker(migrated_engine, expire_on_commit=False))
+    app = create_app(ctx, start_ingest=False, fixture_venues={Venue.OKX})
+    with TestClient(app) as c:
+        c.ctx = ctx  # type: ignore[attr-defined]
+        yield c
+
+
+def seed(db, name, role):
+    u = auth.create_user(db, name, PW, role)
+    secret = None
+    if auth.mfa_required(role):
+        secret = pyotp.parse_uri(auth.enroll_mfa(db, u)).secret
+    db.commit()
+    return secret
+
+
+def sign_in(client, db, name, role):
+    secret = seed(db, name, role)
+    r = client.post("/v1/auth/login", json={"username": name, "password": PW})
+    assert r.status_code == 200
+    if secret:
+        r = client.post("/v1/auth/mfa", json={"code": pyotp.TOTP(secret).now()})
+        assert r.status_code == 200
+
+
+def test_health_and_readiness_public(client):
+    assert client.get("/health").json()["status"] == "ok"
+    assert client.get("/readiness").json()["database"] == "ok"
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["/v1/overview", "/v1/venues", "/v1/markets", "/v1/risk", "/v1/audit", "/v1/incidents"],
+)
+def test_unauthenticated_denied(client, path):
+    assert client.get(path).status_code == 401
+
+
+def test_password_only_session_for_mfa_role_is_denied(client, db):
+    seed(db, "op1", "operator")
+    client.post("/v1/auth/login", json={"username": "op1", "password": PW})
+    assert client.get("/v1/overview").status_code == 401  # MFA not completed
+
+
+def test_cookie_flags(client, db):
+    seed(db, "v1", "viewer")
+    r = client.post("/v1/auth/login", json={"username": "v1", "password": PW})
+    cookie = r.headers["set-cookie"].lower()
+    assert "httponly" in cookie and "samesite=strict" in cookie
+
+
+def test_viewer_sees_status_not_audit(client, db):
+    sign_in(client, db, "v1", "viewer")
+    assert client.get("/v1/overview").status_code == 200
+    assert client.get("/v1/audit").status_code == 403
+
+
+def test_reviewer_sees_audit_and_chain_is_ok(client, db):
+    sign_in(client, db, "rev", "reviewer")
+    r = client.get("/v1/audit")
+    assert r.status_code == 200 and r.json()["chain_ok"] is True and r.json()["events"]
+
+
+def test_overview_content_labels_fixture_and_denies_execution(client, db):
+    sign_in(client, db, "v1", "viewer")
+    o = client.get("/v1/overview").json()
+    assert "NO TRADING" in o["banner"] and o["environment"] == "PAPER"
+    assert o["risk"]["execution_enabled"] is False and o["risk"]["live_trading_enabled"] is False
+    assert o["risk"]["gateway_probe"]["decision"] == "DENY"
+    states = {v["venue"]: v["state"] for v in o["venues"]}
+    assert states["OKX"] == "FIXTURE"
+    # Binance not started in this test: must NOT claim to be live
+    assert states["BINANCE"] in {"CONNECTING", "STALE", "UNREACHABLE"}
+
+
+def test_markets_fixture_rows_are_labelled(client, db):
+    import time
+
+    sign_in(client, db, "v1", "viewer")
+    time.sleep(0.3)
+    rows = client.get("/v1/markets").json()
+    okx = [r for r in rows if r["venue"] == "OKX"]
+    assert okx and all(r["source"] == "FIXTURE" for r in okx if r["bid"])
+    binance = [r for r in rows if r["venue"] == "BINANCE"]
+    assert all(r["bid"] is None and r["stale"] for r in binance)  # unknown => stale
+
+
+def test_risk_halts_when_data_missing(client, db):
+    sign_in(client, db, "v1", "viewer")
+    r = client.get("/v1/risk").json()
+    assert r["halt_new_buys"] and "STALE_MARKET_DATA" in r["halt_reasons"]
+
+
+def test_logout_requires_csrf_and_revokes(client, db):
+    sign_in(client, db, "v1", "viewer")
+    csrf = client.get("/v1/auth/me").json()["csrf_token"]
+    assert client.post("/v1/auth/logout").status_code == 403
+    assert client.post("/v1/auth/logout", headers={"X-CSRF-Token": csrf}).status_code == 200
+    assert client.get("/v1/overview").status_code == 401
+
+
+def test_security_headers(client):
+    h = client.get("/health").headers
+    assert h["x-frame-options"] == "DENY" and h["x-content-type-options"] == "nosniff"
+    assert h["cache-control"] == "no-store"
+
+
+def test_no_order_or_funds_routes_registered(client):
+    """Live-lock proof: the route table has no trading/transfer surface."""
+    paths = {r.path.lower() for r in client.app.routes}
+    banned = ("order", "trade", "withdraw", "transfer", "borrow", "margin", "live", "execute")
+    assert not [p for p in paths if any(b in p for b in banned)], paths
+    mutating = {
+        (m, r.path)
+        for r in client.app.routes
+        for m in getattr(r, "methods", set())
+        if m in {"POST", "PUT", "PATCH", "DELETE"}
+    }
+    assert mutating == {
+        ("POST", "/v1/auth/login"),
+        ("POST", "/v1/auth/mfa"),
+        ("POST", "/v1/auth/logout"),
+    }
