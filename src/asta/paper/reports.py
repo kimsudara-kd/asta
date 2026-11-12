@@ -326,7 +326,7 @@ def build_report(
             "observation_sources": {k: int(v) for k, v in src.items()},
             "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
             "statement": (
-                f"Simulated net P&L {dec_str(net)} USDT on {dec_str(open_eq)} opening equity; "
+                f"Simulated net P&L {net:.8f} USDT on {open_eq:.8f} opening equity; "
                 f"risk limits {'were breached' if breached else 'were not breached'}. "
                 "This is a short paper observation, not evidence of a profitable edge."
             ),

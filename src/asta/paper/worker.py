@@ -178,6 +178,7 @@ class StepWorker:
                 f"recovery:{sid}:{rep.last_step_seq}",
                 sid,
             )
+            ops.resolve_incident(db, f"recovery:{sid}:{rep.last_step_seq}")  # informational record
         return rt
 
     def _pending_actions(self, db: Session, sid: uuid.UUID, now: datetime) -> list[DurableJob]:

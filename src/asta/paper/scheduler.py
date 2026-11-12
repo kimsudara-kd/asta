@@ -52,7 +52,7 @@ def _bar_ready(db: Session, cfg: PaperSessionConfig, ts: datetime) -> bool:
 
 
 def schedule_steps(
-    db: Session, now: datetime | None = None, grace_s: int = 90, max_per_call: int = 500
+    db: Session, now: datetime | None = None, grace_s: int = 150, max_per_call: int = 500
 ) -> int:
     """Enqueue due STEP jobs for every active session. Returns the number of new jobs."""
     now = now or utcnow()
