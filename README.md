@@ -39,8 +39,8 @@ uv run python -m asta.main
 # 5. dashboard (127.0.0.1:3640, proxies /api -> API)
 cd apps/web && pnpm install && pnpm build && pnpm start
 ```
-Windows App Control note: if `alembic.exe` / `pytest.exe` / `mypy.exe` are blocked, use
-`python -m alembic|pytest`. See "Limitations" in the evidence file for mypy.
+Windows App Control note: if `alembic.exe` / `pytest.exe` are blocked, use `python -m alembic|pytest`;
+mypy and gitleaks run in containers (see Checks).
 
 ## Checks
 ```bash
