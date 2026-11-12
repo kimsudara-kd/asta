@@ -27,9 +27,8 @@ def git(*args: str) -> str:
     return subprocess.run(  # noqa: S603
         ["git", *args],  # noqa: S607
         capture_output=True,
-        text=True,
         check=True,
-    ).stdout
+    ).stdout.decode("utf-8", errors="replace")  # history may contain binary (PNG) diffs
 
 
 def scan(label: str, text: str, findings: list[str]) -> None:
@@ -51,7 +50,11 @@ def main() -> int:
         except OSError:
             pass
     # full history: every added line in every commit
-    scan("history", git("log", "-p", "--all", "--no-color", "--format=commit %H"), findings)
+    scan(
+        "history",
+        git("log", "-p", "--all", "--no-color", "--no-textconv", "--format=commit %H"),
+        findings,
+    )
     for f in findings:
         print("FINDING", f)
     print(f"secret scan: {len(findings)} finding(s)")

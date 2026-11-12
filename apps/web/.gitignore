@@ -3,3 +3,4 @@ node_modules
 e2e/.secrets.json
 test-results
 playwright-report
+*.tsbuildinfo

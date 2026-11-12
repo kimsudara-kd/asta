@@ -10,12 +10,12 @@
     "test": "node --test --experimental-strip-types src/lib/*.test.ts"
   },
   "dependencies": {
-    "next": "^16.4.6",
+    "next": "16.4.3",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.0",
+    "@playwright/test": "1.64.1",
     "@types/node": "^22.0.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.2.0",
