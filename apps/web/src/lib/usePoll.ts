@@ -2,8 +2,10 @@
 import { useEffect, useState } from "react";
 import { api, ApiError } from "./api";
 
+/** Poll an API path. The payload is keyed by its path, so a changed path never shows the previous
+ *  path's data (that would be a different shape and could crash a page during the switch). */
 export function usePoll<T>(path: string, everyMs = 5000): { data: T | null; error: string | null } {
-  const [data, setData] = useState<T | null>(null);
+  const [state, setState] = useState<{ path: string; data: T } | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     let alive = true;
@@ -11,7 +13,7 @@ export function usePoll<T>(path: string, everyMs = 5000): { data: T | null; erro
       try {
         const d = await api<T>(path);
         if (alive) {
-          setData(d);
+          setState({ path, data: d });
           setError(null);
         }
       } catch (e) {
@@ -30,5 +32,5 @@ export function usePoll<T>(path: string, everyMs = 5000): { data: T | null; erro
       clearInterval(id);
     };
   }, [path, everyMs]);
-  return { data, error };
+  return { data: state && state.path === path ? state.data : null, error };
 }

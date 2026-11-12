@@ -31,6 +31,7 @@ export default function Shell({ children }: { children: ReactNode }) {
         <Link href="/markets">Markets</Link>
         <Link href="/risk">Risk</Link>
         <Link href="/research/datasets">Research</Link>
+        <Link href="/paper">Paper trading</Link>
         {me.data && canSee(me.data.role, "audit") && <Link href="/audit">Audit</Link>}
         <span className="sp" />
         {me.data && (

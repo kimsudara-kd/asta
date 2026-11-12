@@ -74,6 +74,8 @@ try {
   if (psql("CREATE DATABASE asta_e2e").status !== 0) throw new Error("cannot create asta_e2e");
   rmSync(path.join(repo, "data", "e2e"), { recursive: true, force: true });
   run(py, [path.join(repo, "scripts/e2e_seed.py"), secrets, path.join(repo, "data", "e2e", "import")], { cwd: repo, env: baseEnv });
+  const onlyPre = (process.env.E2E_PHASES ?? "").split(",").filter(Boolean);
+  if (onlyPre.length === 0 || onlyPre.includes("paper")) run(py, [path.join(repo, "scripts/e2e_seed_paper.py")], { cwd: repo, env: baseEnv });
 
   run(process.execPath, [path.join(web, "node_modules/next/dist/bin/next"), "build"], { cwd: web });
   webProc = start("web", process.execPath, [path.join(web, "node_modules/next/dist/bin/next"), "start", "-H", "127.0.0.1", "-p", "3640"], { cwd: web });
@@ -86,6 +88,7 @@ try {
   if (want("nodata")) results.push(["nodata", await phase("nodata", "@nodata", { ASTA_ENABLE_MARKET_INGEST: "false", ASTA_FIXTURE_VENUES: "" })]);
   if (want("aging")) results.push(["aging", await phase("aging", "@aging", { ASTA_FIXTURE_VENUES: "BINANCE,OKX", ASTA_STALE_AFTER_SECONDS: "1" })]);
   if (want("research")) results.push(["research", await phase("research", "@research", { ASTA_ENABLE_MARKET_INGEST: "false", ASTA_FIXTURE_VENUES: "" })]);
+  if (want("paper")) results.push(["paper", await phase("paper", "@paper", { ASTA_ENABLE_MARKET_INGEST: "false", ASTA_FIXTURE_VENUES: "" })]);
   console.log("\nPHASE RESULTS:", JSON.stringify(results));
   ok = results.every(([, v]) => v);
 } catch (e) {
