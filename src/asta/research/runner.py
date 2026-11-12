@@ -14,8 +14,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
-from asta.core.money import dec_str
 from asta.research.analytics.metrics import PerformanceReport, compute_performance
+from asta.research.data.checksum import canon_decimal
 from asta.research.data.models import Bar, Dataset
 from asta.research.data.profiles import FeeSchedule, RuleProfile
 from asta.research.sim.engine import Engine, EngineConfig, RunResult
@@ -118,7 +118,8 @@ def canonical(obj: Any) -> str:
 
 def _default(o: Any) -> Any:
     if isinstance(o, Decimal):
-        return dec_str(o)
+        # value-based text: 100.10 and 100.1 are the same number and must hash the same
+        return canon_decimal(o)
     if isinstance(o, datetime):
         return o.isoformat()
     if hasattr(o, "value") and not isinstance(o, type):

@@ -65,6 +65,19 @@ def db(migrated_engine: Engine) -> Iterator[Session]:
                 "market_rules_versions, risk_policies, incidents CASCADE"
             )
         )
+        # research result tables are append-only (triggers also block TRUNCATE). A test database may
+        # reset them only by bypassing ORIGIN triggers (superuser): production code never can.
+        c.execute(text("SET LOCAL session_replication_role = replica"))
+        c.execute(
+            text(
+                "TRUNCATE idempotency_keys, research_holdout_windows, research_validations, "
+                "performance_reports, risk_events, portfolio_equity_snapshots, "
+                "simulated_ledger_entries, "
+                "simulated_fills, simulated_orders, backtest_runs, backtest_run_configs, "
+                "strategy_versions, strategy_definitions, dataset_quality_reports, "
+                "historical_dataset_versions, historical_datasets CASCADE"
+            )
+        )
     factory = sessionmaker(migrated_engine, expire_on_commit=False)
     with factory() as s:
         yield s

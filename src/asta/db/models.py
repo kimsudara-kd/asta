@@ -140,3 +140,7 @@ class AuditEvent(Base):
     prev_hash: Mapped[str] = mapped_column(String(64))
     row_hash: Mapped[str] = mapped_column(String(64), unique=True)
     __table_args__ = (CheckConstraint(f"environment IN {ENVIRONMENTS}", name="ck_audit_env"),)
+
+
+# register the M1 research tables on the same metadata (import at the end: they import Base above)
+from asta.db import research_models as _research_models  # noqa: E402,F401

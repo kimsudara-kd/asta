@@ -67,7 +67,7 @@ def test_module_import_graph():
         "risk": {"core", "audit", "risk"},
         "exchanges": {"core", "exchanges"},
         "market_data": {"core", "exchanges", "market_data"},
-        "db": {"core", "audit", "db"},
+        "db": {"core", "audit", "db", "research"},
         "auth": {"core", "audit", "auth", "db"},
         "research": {"core", "risk", "research"},  # ADR-0005: pure, offline, no exchanges
     }

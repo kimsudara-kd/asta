@@ -140,3 +140,21 @@ def test_cancellation_stops_the_run():
 
     with pytest.raises(RunCancelled):
         run_backtest(make_config("sma_cross", SMA_PARAMS, DATA), DATA, should_cancel=lambda: True)
+
+
+def test_result_checksum_depends_on_values_not_decimal_text(tmp_path):
+    """100.10 and 100.1 are the same number: a store round trip (which normalises decimal text) must
+    not change the result checksum. Regression for a defect found by the DB round-trip test."""
+    from asta.research.data.store import DatasetFileStore
+
+    store = DatasetFileStore(tmp_path)
+    for ds in DATA.values():
+        store.save(ds)
+    reloaded = {s: store.load(d.meta.checksum) for s, d in DATA.items()}
+    assert any(
+        str(a.close) != str(b.close)
+        for s in DATA
+        for a, b in zip(DATA[s].bars, reloaded[s].bars, strict=True)
+    ), "fixture should contain differently-formatted but equal decimals"
+    cfg = make_config("sma_cross", SMA_PARAMS, DATA)
+    assert run_backtest(cfg, DATA).result_checksum == run_backtest(cfg, reloaded).result_checksum
