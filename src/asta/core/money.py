@@ -43,7 +43,9 @@ def loads_decimal(text: str | bytes) -> Any:
 QUANTUM = Decimal("1e-8")
 
 
-def quantize(value: Decimal, quantum: Decimal = QUANTUM, rounding: str = ROUND_HALF_EVEN) -> Decimal:
+def quantize(
+    value: Decimal, quantum: Decimal = QUANTUM, rounding: str = ROUND_HALF_EVEN
+) -> Decimal:
     """Round to a multiple of `quantum` with an explicit rounding mode."""
     return value.quantize(quantum, rounding=rounding)
 
