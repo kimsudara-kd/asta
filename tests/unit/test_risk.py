@@ -1,4 +1,6 @@
+import dataclasses
 from decimal import Decimal as D
+from typing import Any
 
 import pytest
 
@@ -40,8 +42,8 @@ def test_environment_check():
         g.assert_environment_allowed("LIVE")
 
 
-def _snap(**kw):
-    base = dict(
+def _snap(**kw: Any) -> RiskSnapshot:
+    base = RiskSnapshot(
         equity=D("1000"),
         start_of_day_equity=D("1000"),
         peak_equity=D("1000"),
@@ -51,8 +53,7 @@ def _snap(**kw):
         clock_ok=True,
         reconciled=True,
     )
-    base.update(kw)
-    return RiskSnapshot(**base)
+    return dataclasses.replace(base, **kw)
 
 
 def test_risk_ok():

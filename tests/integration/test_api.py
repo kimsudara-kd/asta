@@ -5,6 +5,7 @@ from sqlalchemy.orm import sessionmaker
 
 from asta.api.app import AppContext, create_app
 from asta.auth import service as auth
+from asta.auth.rbac import mfa_required
 from asta.core.events import Venue
 from asta.core.settings import Settings
 
@@ -18,14 +19,14 @@ def client(migrated_engine, db):
     ctx = AppContext(settings, sessionmaker(migrated_engine, expire_on_commit=False))
     app = create_app(ctx, start_ingest=False, fixture_venues={Venue.OKX})
     with TestClient(app) as c:
-        c.ctx = ctx  # type: ignore[attr-defined]
+        c.ctx = ctx
         yield c
 
 
 def seed(db, name, role):
     u = auth.create_user(db, name, PW, role)
     secret = None
-    if auth.mfa_required(role):
+    if mfa_required(role):
         secret = pyotp.parse_uri(auth.enroll_mfa(db, u)).secret
     db.commit()
     return secret

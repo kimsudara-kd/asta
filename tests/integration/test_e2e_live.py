@@ -6,6 +6,7 @@ OKX is run as a clearly labelled FIXTURE venue when unreachable (never presented
 import os
 import time
 from datetime import timedelta
+from typing import Any
 
 import pytest
 from fastapi.testclient import TestClient
@@ -40,7 +41,7 @@ def test_dashboard_api_shows_real_binance_and_labelled_fixture(migrated_engine, 
             == 200
         )
         deadline = time.time() + 45
-        rows: list[dict] = []
+        rows: list[dict[str, Any]] = []
         while time.time() < deadline:
             rows = c.get("/v1/markets").json()
             if all(r["bid"] for r in rows if r["venue"] == "BINANCE"):

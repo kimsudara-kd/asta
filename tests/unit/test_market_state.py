@@ -1,8 +1,10 @@
 import asyncio
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal as D
+from typing import cast
 
 from asta.core.events import QuoteEvent, TradeEvent, Venue
+from asta.exchanges.common.base import PublicMarketDataAdapter
 from asta.exchanges.common.ws import Backoff, Reconnected
 from asta.market_data.service import run_stream
 from asta.market_data.state import FreshnessMonitor, MarketState
@@ -82,7 +84,7 @@ async def test_run_stream_recovery_dedupes_replay_after_reconnect():
         quantity=D("1"),
     )
     feed = [Reconnected(0), trade, Reconnected(1), trade, quote("q2")]
-    await run_stream(FakeAdapter(feed), ["BTC-USDT"], st)
+    await run_stream(cast(PublicMarketDataAdapter, FakeAdapter(feed)), ["BTC-USDT"], st)
     assert st.events_accepted == 2 and st.duplicates_dropped == 1
     assert st.reconnects[Venue.BINANCE] == 2 and not st.gap_open[Venue.BINANCE]
 

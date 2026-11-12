@@ -6,6 +6,7 @@ import argparse
 import getpass
 
 from asta.auth import service as auth
+from asta.auth.rbac import mfa_required
 from asta.core.settings import load_settings
 from asta.db.session import make_engine, make_session_factory
 
@@ -23,7 +24,7 @@ def main() -> None:
         if pw != getpass.getpass("Repeat: "):
             raise SystemExit("passwords differ")
         user = auth.create_user(db, args.username, pw, args.role, actor="cli")
-        if auth.mfa_required(user.role):
+        if mfa_required(user.role):
             print("Add this to your authenticator app (shown once):")
             print(auth.enroll_mfa(db, user))
         db.commit()

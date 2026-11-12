@@ -18,7 +18,7 @@ class Backoff:
     cap: float = 60.0
 
     def delay(self, attempt: int, rng: Callable[[], float] = random.random) -> float:
-        ceiling = min(self.cap, self.base * (2**attempt))
+        ceiling = float(min(self.cap, self.base * (2.0**attempt)))
         return ceiling / 2 + rng() * ceiling / 2  # "equal jitter"; never below ceiling/2
 
 

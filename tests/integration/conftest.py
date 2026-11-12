@@ -34,7 +34,7 @@ def database_url() -> Iterator[str]:
     import pgserver
 
     with tempfile.TemporaryDirectory(prefix="asta-pg-") as d:
-        server = pgserver.get_server(d, cleanup_mode="stop")
+        server = pgserver.get_server(d, cleanup_mode="stop")  # type: ignore[attr-defined]
         try:
             yield _to_pg8000(server.get_uri())
         finally:
