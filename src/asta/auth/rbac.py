@@ -17,12 +17,25 @@ class Permission(StrEnum):
     VIEW_AUDIT = "view_audit"
     CONTROL_HALT = "control_halt"
     MANAGE_USERS = "manage_users"
+    VIEW_RESEARCH = "view_research"  # simulated backtests, datasets, strategies (read-only)
+    RUN_RESEARCH = "run_research"  # start/cancel simulated backtests (offline)
+    IMPORT_DATA = "import_data"  # import/validate/derive LOCAL historical datasets
 
 
 _MAP: dict[Role, frozenset[Permission]] = {
-    Role.VIEWER: frozenset({Permission.VIEW_STATUS}),
-    Role.OPERATOR: frozenset({Permission.VIEW_STATUS, Permission.CONTROL_HALT}),
-    Role.REVIEWER: frozenset({Permission.VIEW_STATUS, Permission.VIEW_AUDIT}),
+    Role.VIEWER: frozenset({Permission.VIEW_STATUS, Permission.VIEW_RESEARCH}),
+    Role.OPERATOR: frozenset(
+        {
+            Permission.VIEW_STATUS,
+            Permission.CONTROL_HALT,
+            Permission.VIEW_RESEARCH,
+            Permission.RUN_RESEARCH,
+            Permission.IMPORT_DATA,
+        }
+    ),
+    Role.REVIEWER: frozenset(
+        {Permission.VIEW_STATUS, Permission.VIEW_AUDIT, Permission.VIEW_RESEARCH}
+    ),
     Role.ADMIN: frozenset(Permission),
 }
 

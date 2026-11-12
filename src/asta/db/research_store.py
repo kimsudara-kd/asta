@@ -292,7 +292,7 @@ def recover_interrupted(db: Session) -> int:
         )
     )
     db.commit()
-    return int(res.rowcount or 0)
+    return int(getattr(res, "rowcount", 0) or 0)
 
 
 def _chunks(rows: Sequence[dict[str, Any]]) -> Iterable[Sequence[dict[str, Any]]]:

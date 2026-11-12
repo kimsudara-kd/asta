@@ -126,19 +126,44 @@ def test_security_headers(client):
     assert h["cache-control"] == "no-store"
 
 
+# M1 (ADR-0008): the OFFLINE research surface is enumerated explicitly. `.../trades` lists SIMULATED
+# fills of a backtest; it is the only path allowed to contain a banned word, and only this
+# exact path.
+RESEARCH_ALLOWED_PATHS = {"/v1/backtests/{run_id}/trades"}
+RESEARCH_MUTATING = {
+    ("POST", "/v1/datasets/import"),
+    ("POST", "/v1/datasets/{version_id}/validate"),
+    ("POST", "/v1/datasets/{version_id}/derive"),
+    ("POST", "/v1/backtests"),
+    ("POST", "/v1/backtests/{run_id}/cancel"),
+}
+
+
 def test_no_order_or_funds_routes_registered(client):
-    """Live-lock proof: the route table has no trading/transfer surface."""
+    """Live-lock proof: the route table has no trading/transfer surface beyond the enumerated
+    offline-research paths (simulated results only)."""
     paths = {r.path.lower() for r in client.app.routes}
     banned = ("order", "trade", "withdraw", "transfer", "borrow", "margin", "live", "execute")
-    assert not [p for p in paths if any(b in p for b in banned)], paths
+    offenders = [
+        p for p in paths if p not in RESEARCH_ALLOWED_PATHS and any(b in p for b in banned)
+    ]
+    assert not offenders, offenders
+    assert RESEARCH_ALLOWED_PATHS <= paths  # the exception is real, not a loophole for other paths
     mutating = {
         (m, r.path)
         for r in client.app.routes
         for m in getattr(r, "methods", set())
         if m in {"POST", "PUT", "PATCH", "DELETE"}
     }
-    assert mutating == {
-        ("POST", "/v1/auth/login"),
-        ("POST", "/v1/auth/mfa"),
-        ("POST", "/v1/auth/logout"),
-    }
+    assert (
+        mutating
+        == {
+            ("POST", "/v1/auth/login"),
+            ("POST", "/v1/auth/mfa"),
+            ("POST", "/v1/auth/logout"),
+        }
+        | RESEARCH_MUTATING
+    )
+    # no PUT/PATCH/DELETE route exists anywhere: nothing can edit or remove stored results via HTTP
+    methods = {m for r in client.app.routes for m in getattr(r, "methods", set())}
+    assert not (methods & {"PUT", "PATCH", "DELETE"}), methods

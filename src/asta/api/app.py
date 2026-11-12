@@ -2,9 +2,10 @@
 
 import asyncio
 import contextlib
-from collections.abc import AsyncIterator, Callable, Iterator
+from collections.abc import AsyncIterator, Callable
 from dataclasses import asdict
 from datetime import timedelta
+from pathlib import Path
 from typing import Annotated, Any
 
 from fastapi import Cookie, Depends, FastAPI, Header, HTTPException, Request, Response
@@ -13,8 +14,10 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from asta import __version__
+from asta.api.deps import COOKIE, Db, require
+from asta.api.research import ResearchRuntime, register_research_routes
 from asta.auth import service as auth
-from asta.auth.rbac import Permission, has_permission
+from asta.auth.rbac import Permission
 from asta.core.environment import Environment
 from asta.core.events import Venue
 from asta.core.settings import Settings
@@ -27,6 +30,8 @@ from asta.exchanges.okx.adapter import OkxPublicAdapter
 from asta.market_data.fixture_feed import run_fixture_feed
 from asta.market_data.service import IngestSupervisor
 from asta.market_data.state import FreshnessMonitor, MarketState
+from asta.research.data.store import DatasetFileStore
+from asta.research_jobs import ResearchWorker
 from asta.risk.gateway import (
     Decision,
     ExecutionGateway,
@@ -36,7 +41,6 @@ from asta.risk.gateway import (
 )
 from asta.risk.policy import RiskPolicy, RiskSnapshot, evaluate
 
-COOKIE = "asta_session"
 SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
@@ -55,14 +59,6 @@ class MfaBody(BaseModel):
     code: str = Field(pattern=r"^\d{6}$")
 
 
-def get_db(request: Request) -> Iterator[Session]:
-    with request.app.state.ctx.sessions() as s:
-        yield s
-
-
-Db = Annotated[Session, Depends(get_db)]
-
-
 class AppContext:
     def __init__(
         self,
@@ -79,12 +75,18 @@ class AppContext:
         self.policy = RiskPolicy()
         self.gateway = ExecutionGateway()
         self.started_at = utcnow()
+        self.research = ResearchRuntime(
+            DatasetFileStore(Path(settings.data_dir)), Path(settings.import_dir)
+        )
         self.fixture_venues: set[Venue] = set()
         self._bg: list[asyncio.Task[None]] = []
 
 
 def create_app(
-    ctx: AppContext, start_ingest: bool = True, fixture_venues: set[Venue] | None = None
+    ctx: AppContext,
+    start_ingest: bool = True,
+    fixture_venues: set[Venue] | None = None,
+    start_research_worker: bool = True,
 ) -> FastAPI:
     @contextlib.asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
@@ -97,9 +99,16 @@ def create_app(
                 ctx.supervisor.start(OkxPublicAdapter(), ALLOWLIST_SYMBOLS)
         for v in fixtures:
             ctx._bg.append(asyncio.create_task(run_fixture_feed(ctx.state, v)))
+        if start_research_worker:
+            ctx.research.worker = ResearchWorker(
+                ctx.sessions, ctx.research.store, ctx.settings.worker_queue_size
+            )
+            ctx.research.worker.start()
         try:
             yield
         finally:
+            if ctx.research.worker is not None:
+                ctx.research.worker.stop()
             await ctx.supervisor.stop()
             for t in ctx._bg:
                 t.cancel()
@@ -116,19 +125,6 @@ def create_app(
         return response
 
     app.state.ctx = ctx
-
-    def require(perm: Permission | None) -> Callable[..., auth.Principal]:
-        def dep(
-            db: Db, token: Annotated[str | None, Cookie(alias=COOKIE)] = None
-        ) -> auth.Principal:
-            principal = auth.authenticate(db, token)
-            if principal is None:
-                raise HTTPException(401, "not authenticated")
-            if perm is not None and not has_permission(principal.role, perm):
-                raise HTTPException(403, "forbidden")  # default deny
-            return principal
-
-        return dep
 
     status_user = require(Permission.VIEW_STATUS)
     audit_user = require(Permission.VIEW_AUDIT)
@@ -349,4 +345,5 @@ def create_app(
             ],
         }
 
+    register_research_routes(app, ctx)
     return app

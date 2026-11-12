@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     max_clock_drift_seconds: int = Field(default=2, ge=1)
     enable_market_ingest: bool = True
     allowed_origins: str = "http://localhost:3640"
+    data_dir: str = "data/store"  # content-addressed dataset files (local)
+    import_dir: str = "data/import"  # LOCAL files the research importer may read (names only)
+    worker_queue_size: int = Field(default=4, ge=1, le=32)
 
     @property
     def stale_after(self) -> timedelta:
