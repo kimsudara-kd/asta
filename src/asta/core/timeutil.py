@@ -42,7 +42,8 @@ class ClockMonitor:
     def record(
         self, venue: str, local_before: datetime, venue_time: datetime, local_after: datetime
     ) -> DriftReading:
-        require_utc(local_before), require_utc(venue_time), require_utc(local_after)
+        for ts in (local_before, venue_time, local_after):
+            require_utc(ts)
         rtt = local_after - local_before
         midpoint = local_before + rtt / 2
         reading = DriftReading(venue, venue_time - midpoint, self._now(), rtt)

@@ -50,7 +50,7 @@ def test_no_live_environment_anywhere():
 
 
 def test_only_gateway_module_is_execution_entrypoint():
-    """Nothing outside risk/ may reference the execution gateway authorize path except api read-only status."""
+    """Nothing outside risk/ may reference the execution-enable constant."""
     allowed = {"risk/gateway.py"}
     for p in py_files():
         rel = p.relative_to(SRC).as_posix()

@@ -1,9 +1,8 @@
 """FastAPI app. M0 routes are read-only status + auth. There is NO order, transfer or live route."""
 
-
 import asyncio
 import contextlib
-from collections.abc import AsyncIterator, Callable
+from collections.abc import AsyncIterator, Callable, Iterator
 from dataclasses import asdict
 from datetime import timedelta
 from typing import Annotated, Any
@@ -56,6 +55,14 @@ class MfaBody(BaseModel):
     code: str = Field(pattern=r"^\d{6}$")
 
 
+def get_db(request: Request) -> Iterator[Session]:
+    with request.app.state.ctx.sessions() as s:
+        yield s
+
+
+Db = Annotated[Session, Depends(get_db)]
+
+
 class AppContext:
     def __init__(
         self,
@@ -97,7 +104,9 @@ def create_app(
             for t in ctx._bg:
                 t.cancel()
 
-    app = FastAPI(title="ASTA", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None)
+    app = FastAPI(
+        title="ASTA", version=__version__, lifespan=lifespan, docs_url=None, redoc_url=None
+    )
 
     @app.middleware("http")
     async def headers(request: Request, call_next: Callable[..., Any]) -> Response:
@@ -106,14 +115,12 @@ def create_app(
             response.headers.setdefault(k, v)
         return response
 
-    def get_db() -> Any:
-        with ctx.sessions() as s:
-            yield s
-
-    Db = Annotated[Session, Depends(get_db)]
+    app.state.ctx = ctx
 
     def require(perm: Permission | None) -> Callable[..., auth.Principal]:
-        def dep(db: Db, token: Annotated[str | None, Cookie(alias=COOKIE)] = None) -> auth.Principal:
+        def dep(
+            db: Db, token: Annotated[str | None, Cookie(alias=COOKIE)] = None
+        ) -> auth.Principal:
             principal = auth.authenticate(db, token)
             if principal is None:
                 raise HTTPException(401, "not authenticated")
@@ -141,7 +148,10 @@ def create_app(
     def login(body: LoginBody, response: Response, db: Db) -> dict[str, Any]:
         try:
             res = auth.login(
-                db, body.username, body.password, timedelta(minutes=ctx.settings.session_ttl_minutes)
+                db,
+                body.username,
+                body.password,
+                timedelta(minutes=ctx.settings.session_ttl_minutes),
             )
         except auth.AuthError:
             raise HTTPException(401, "invalid credentials") from None
@@ -157,7 +167,9 @@ def create_app(
         return {"mfa_required": res.needs_mfa}
 
     @app.post("/v1/auth/mfa")
-    def mfa(body: MfaBody, db: Db, token: Annotated[str | None, Cookie(alias=COOKIE)] = None) -> dict[str, str]:
+    def mfa(
+        body: MfaBody, db: Db, token: Annotated[str | None, Cookie(alias=COOKIE)] = None
+    ) -> dict[str, str]:
         if not token:
             raise HTTPException(401, "not authenticated")
         try:
@@ -253,7 +265,11 @@ def create_app(
         return {
             "environment": Environment.PAPER.value,
             "banner": "M0 — NO TRADING. Public market data only. No real funds.",
-            "equity": {"simulated_start": str(ctx.policy.starting_equity), "pnl": "0", "fee_drag": "0"},
+            "equity": {
+                "simulated_start": str(ctx.policy.starting_equity),
+                "pnl": "0",
+                "fee_drag": "0",
+            },
             "venues": _venue_rows(),
             "heartbeat_utc": utcnow().isoformat(),
             "uptime_seconds": int((utcnow() - ctx.started_at).total_seconds()),
@@ -292,15 +308,24 @@ def create_app(
         return _risk()
 
     @app.get("/v1/incidents")
-    def incidents(db: Db, _: Annotated[auth.Principal, Depends(status_user)]) -> list[dict[str, Any]]:
+    def incidents(
+        db: Db, _: Annotated[auth.Principal, Depends(status_user)]
+    ) -> list[dict[str, Any]]:
         rows = db.query(Incident).order_by(Incident.opened_at.desc()).limit(100).all()
         return [
-            {"severity": r.severity, "kind": r.kind, "detail": r.detail, "opened_at": r.opened_at.isoformat()}
+            {
+                "severity": r.severity,
+                "kind": r.kind,
+                "detail": r.detail,
+                "opened_at": r.opened_at.isoformat(),
+            }
             for r in rows
         ]
 
     @app.get("/v1/audit")
-    def audit(db: Db, p: Annotated[auth.Principal, Depends(audit_user)], limit: int = 100) -> dict[str, Any]:
+    def audit(
+        db: Db, p: Annotated[auth.Principal, Depends(audit_user)], limit: int = 100
+    ) -> dict[str, Any]:
         limit = max(1, min(limit, 500))
         rows = recent_audit(db, limit)
         ok, bad = verify_audit_chain(db)
@@ -310,8 +335,13 @@ def create_app(
             "chain_ok": ok,
             "first_bad_index": bad,
             "events": [
-                {"id": r.id, "at": r.at.isoformat(), "actor": r.actor, "action": r.action,
-                 "payload": r.payload}
+                {
+                    "id": r.id,
+                    "at": r.at.isoformat(),
+                    "actor": r.actor,
+                    "action": r.action,
+                    "payload": r.payload,
+                }
                 for r in rows
             ],
         }

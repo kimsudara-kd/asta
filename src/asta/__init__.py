@@ -2,7 +2,7 @@
 
 import os
 
-# Some Windows App Control policies block SQLAlchemy's compiled extensions; fall back to pure Python.
+# Some Windows App Control policies block SQLAlchemy compiled extensions: use pure Python.
 os.environ.setdefault("DISABLE_SQLALCHEMY_CEXT_RUNTIME", "1")
 
 __version__ = "0.0.1"

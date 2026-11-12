@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 
 import uvicorn
+from fastapi import FastAPI
 
 from asta.api.app import AppContext, create_app
 from asta.core.events import Venue
@@ -12,10 +13,14 @@ from asta.core.settings import load_settings
 from asta.db.session import make_engine, make_session_factory
 
 
-def build_app() -> object:
+def build_app() -> FastAPI:
     settings = load_settings()  # refuses to start if exchange credentials are in the environment
     ctx = AppContext(settings, make_session_factory(make_engine(settings.database_url)))
-    fixtures = {Venue(v.strip().upper()) for v in os.environ.get("ASTA_FIXTURE_VENUES", "").split(",") if v.strip()}
+    fixtures = {
+        Venue(v.strip().upper())
+        for v in os.environ.get("ASTA_FIXTURE_VENUES", "").split(",")
+        if v.strip()
+    }
     return create_app(ctx, start_ingest=settings.enable_market_ingest, fixture_venues=fixtures)
 
 

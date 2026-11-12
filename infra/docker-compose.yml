@@ -1,0 +1,38 @@
+# ASTA local stack. Own project name, volume and ports; shares nothing with other projects.
+# Postgres is bound to 127.0.0.1 only. No exchange credentials are used or accepted.
+name: asta
+
+services:
+  db:
+    image: postgres:16.4-alpine
+    container_name: asta-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: asta
+      POSTGRES_PASSWORD: asta_dev_only # local dev only; override via infra/.env for anything else
+      POSTGRES_DB: asta
+    ports:
+      - "127.0.0.1:5640:5432"
+    volumes:
+      - asta_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U asta -d asta"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  db_test:
+    image: postgres:16.4-alpine
+    container_name: asta-db-test
+    profiles: ["test"]
+    environment:
+      POSTGRES_USER: asta_test
+      POSTGRES_PASSWORD: asta_test_only
+      POSTGRES_DB: asta_test
+    ports:
+      - "127.0.0.1:5641:5432"
+    tmpfs:
+      - /var/lib/postgresql/data
+
+volumes:
+  asta_pgdata:

@@ -34,11 +34,12 @@ async def ws_messages(
     subscribe: list[str] | None = None,
     text_ping: str | None = None,
     ping_every: float = 20.0,
-    backoff: Backoff = Backoff(),
+    backoff: Backoff | None = None,
     max_attempts: int | None = None,
 ) -> AsyncIterator[str | Reconnected]:
     """Yield raw text frames forever, reconnecting with backoff."""
     assert_url_allowed(url)
+    backoff = backoff or Backoff()
     attempt = 0
     while max_attempts is None or attempt <= max_attempts:
         try:
