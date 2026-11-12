@@ -1,0 +1,56 @@
+{
+ "gate_pass": false,
+ "elapsed_hours": 4.12,
+ "required_hours": 72.0,
+ "duration_met": false,
+ "session_state": "RUNNING",
+ "state_is_operating": true,
+ "steps_processed": 4,
+ "steps_expected_approx": 4,
+ "reconciliation_discrepancies": 0,
+ "duplicate_fill_postings": 0,
+ "open_data_gaps": 0,
+ "unrecoverable_data_gaps": 0,
+ "critical_incidents_ever": 0,
+ "critical_incidents_unresolved": 0,
+ "dead_letter_jobs": 0,
+ "unexplained_state_changes": [],
+ "risk_halt_events": 0,
+ "daily_reports_missing_days": [],
+ "daily_reports_not_reproducible": [],
+ "supervision_demonstrated": false,
+ "availability": {
+  "window_seconds": 14817.434547,
+  "samples": 114,
+  "available_seconds": 1109.5012090000005,
+  "unavailable_seconds": 20.021363,
+  "unmonitored_seconds": 13681.42557,
+  "service_availability": 0.07487809077075591,
+  "monitored_fraction": 0.07666704876587438,
+  "feed_fresh_fraction": {
+   "BINANCE": 0.9822744905712253,
+   "OKX": 0.9822744905712253
+  },
+  "downtime_episodes": [
+   {
+    "start": "2026-11-12T20:14:39.779619+00:00",
+    "end": "2026-11-12T20:14:49.790939+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.01132
+   },
+   {
+    "start": "2026-11-12T20:15:50.917586+00:00",
+    "end": "2026-11-12T20:16:00.927629+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.010043
+   }
+  ]
+ },
+ "thresholds": {
+  "required_hours": 72.0,
+  "supervision_min_monitored_fraction": 0.95,
+  "note": "thresholds are fixed constants of this script; no value is tuned to obtain a pass"
+ },
+ "fills": 0,
+ "real_orders_possible": false
+}

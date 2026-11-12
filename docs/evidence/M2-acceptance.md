@@ -165,3 +165,77 @@ None of this is a profitability result. M1 found no validated edge and all strat
 ## 20. M2 acceptance recommendation
 
 **Status: BUILT — NOT ACCEPTED.** All M2 engineering scope is implemented and verified (451/451 Python tests with network opt-ins, 39/39 browser tests, strict static checks, live-lock/security regression, replay recovery, fault-injection suite, live hard-kill and DB-outage tests, UI, API, reports), but the directive's acceptance gate — **72 consecutive supervised hours** — has not been run: only 1.67 hours were observed. Acceptance cannot honestly be recommended until that run completes with no reconciliation discrepancy, no duplicate posting, no silent gap and no unauthorised transition (the tooling to measure each of these exists). Everything else is ready for CEO review; no M2 acceptance tag was created and none should be until the gate passes. M3/M4 were not started; no exchange credential, signing code or order path exists.
+
+---
+
+# M2-R1 evidence addendum — 72-hour operational verification (ASTA-M2-R1)
+
+**Status after this addendum: BUILT — NOT ACCEPTED.** The remediation tooling is complete and verified and the supervised observation is **running and preserved**, but at the time of writing (2026-11-12 20:30 UTC) it covers **4.1 of the 72 required hours**. Wall-clock time cannot be shortened: the gate has not passed and is not claimed. No M2 tag was created; nothing was pushed; no credential, authenticated connection or order path was added.
+
+## R1-A. Sessions preserved (Workstream A)
+
+| | `observe-1h` | `observe-5m` |
+|---|---|---|
+| Session id | `afec3e2b-c5dc-4306-a98d-82da6ea38346` | `489d0990-6cf9-4120-9ad7-c6d370374dc2` |
+| Config hash | `dd59484ff7d1da598c9a946ecf5662955372d0eda40cd2ea5ecd9266febefb84` | `f06aaf1a8f6b4595349ee6b591390480ddddee94de0689aec824e58ce42eae72` |
+| Started (RUNNING) | 2026-11-12 16:23:20 UTC | 2026-11-12 16:24:16 UTC |
+| Config | 1,000 virtual USDT (Binance 500 / OKX 500), regime grid + trend pullback + SMA cross, 1 h bars, M1 reference risk policy, assumed fees, M1 execution model | same, 5 m bars |
+| State at 20:30 UTC | RUNNING, 4 live steps, 0 fills, equity 1,000.00 | RUNNING, 49 live steps, 3 fills, equity 1,000.142 |
+
+Both sessions were **continued, never recreated**: same ids and config hashes (the config row is immutable and hash-checked), cursors advanced continuously, no fill or ledger row was rewritten (history tables are insert-only), equity was not reset, and every service (re)start recovered by verified replay. Strategy, fee, execution and risk settings were not changed. Funds are virtual only (`paper_*` tables; no exchange client exists in the code path).
+
+## R1-B. Operational supervision (Workstream B)
+
+* **`scripts/paper_supervisor.py`** (external to the engine) starts `python -m asta.paper_service` only after a **pre-resume gate** (database reachable and every active session reconciles from durable rows; otherwise a CRITICAL `SUPERVISOR_BLOCKED` incident and no start — fail closed); samples health every 10 s into `data/paper/supervisor.jsonl` (process alive, DB reachable, worker heartbeat fresh, per-venue feed freshness); detects unexpected exit or a hung worker; restarts with bounded backoff; records `SERVICE_DOWN` and `SERVICE_RECOVERED` incidents (with measured downtime); and declares recovery **only on evidence produced by the new process** (a heartbeat and a feed event newer than its start). A first version accepted the dead process's last heartbeat ("recovered after 1 s"); that false positive was found in the live test and fixed.
+* **Risk halts are never auto-resumed:** the supervisor changes no session state; PAUSED / RISK_HALTED live in the database and are restored by replay (tests: risk-trip worker test, restart-recovery tests, latched daily/drawdown halts).
+* **Live supervision tests:** (1) service processes killed at 20:12:49 → detected, restarted, recorded (the 1 s figure was the false positive above); (2) killed again at 20:15:45 with the corrected supervisor → unavailable sample recorded, **recovered in 11 s** with a fresh heartbeat and fresh feeds on both venues, incidents resolved, both sessions still RUNNING with continuous steps.
+* **Not supervised:** the supervisor itself. `scripts/register_supervisor_task.ps1` (Task Scheduler, restart on failure) is provided but **not installed**: it changes machine configuration and needs operator consent. While this session's background supervisor lives it supervises the service; if this PC sleeps, logs off or restarts, nothing restarts the supervisor (the dev database container restarts itself, `unless-stopped`). **This is the main blocker to an unattended 72 h completion and is recorded as such.**
+
+## R1-C. Observation measurements at 20:30 UTC (Workstream C, partial)
+
+Window since the sessions started (about 16:21 UTC); raw data `docs/evidence/m2/r1-observation-measure.json`.
+
+| Measure | Result |
+|---|---|
+| Duration | **4.1 h of 72 h** |
+| Closed 1-minute candles, **eventual** completeness (per market) | 1.000 on all six markets; a minority came from REST backfill |
+| Closed candles **real-time** (ingested ≤ 180 s after close) | **0.964 Binance / 0.972 OKX** — the difference to 1.000 is the outage periods (crash tests, DB outage, restarts). Eventual completeness is **not** real-time availability |
+| Reconnections | 0 (both feeds) |
+| Data gaps | 6 detected (the 9-minute hard-kill test), 6 backfilled, 0 open, 0 unrecoverable |
+| Database outages | 1 deliberate (76 s at 17:05 UTC): survived, no minute lost |
+| Service starts / interruptions | initial start, hard-kill recovery, 2 planned restarts, 2 supervisor handovers, 2 supervised kill tests; supervisor-recorded downtime episodes: 2 (11 s; the other is the false-positive-era 1 s) |
+| Supervisor-monitored coverage of the window | **7.6 %** (it started at 20:11 UTC, 3.8 h into the window). Within its coverage: 20 s unavailable, 2 episodes, all recovered. **The earlier 3.8 h are unmonitored by the supervisor and are not counted as uptime.** |
+| Risk halts | 0 (equity within limits); halt handling is evidenced by tests only |
+| Simulated fills | 5m: 3, 1h: 0 (virtual, estimated) |
+| Duplicate postings / ledger discrepancies / dead-letter jobs | **0 / 0 / 0** (691 jobs DONE, backlog 0) |
+| Recovery time | 11 s (supervised kill); the 9-minute hard-kill test recovered through gap detection, backfill and verified replay of 303 steps |
+
+## R1-D. Acceptance gate (Workstream D)
+
+Run with the repository tools, thresholds unchanged by me to obtain a result: `python scripts/paper_observation.py measure <since>` and `… gate <session-id> --hours 72`. The gate was **tightened** in M2-R1, never loosened: it now also requires zero unresolved critical incidents (aligned with the directive's wording; the earlier version counted every critical incident ever), zero dead-letter jobs, zero unexplained state transitions, a **reproducible daily report for every completed UTC day** of the window, zero unrecoverable gaps, and demonstrated supervision (supervisor-monitored coverage ≥ 95 % of the window with every downtime episode recovered). Thresholds are fixed constants printed in the output (`docs/evidence/m2/r1-gate-1h.json`, `r1-gate-5m.json`).
+
+Current result for both sessions: `gate_pass: false` — `duration_met: false` (4.1 h) and `supervision_demonstrated: false` (7.6 % monitored); every other criterion is currently satisfied (0 unresolved critical incidents, 0 dead letters, 0 unexplained transitions, 0 open gaps, 0 reconciliation discrepancies; no completed UTC day yet, so no report is due). **Earliest honest pass:** the later of 72 h after start (2026-11-15 16:24 UTC) and the moment supervisor coverage reaches 95 % of the window, about **2026-11-15 20:30 UTC**, provided supervisor and service keep running. Any interruption will appear as recorded incidents and availability episodes; the evaluation must then be repeated.
+
+## R1-E. Defects found and fixed in this pass
+
+1. **Reports for days before a session existed.** The report scheduler enqueued "yesterday" on every tick, so two reports for 2026-11-11 (before either session started; zero activity) were stored. They are immutable rows and **remain in the database as a documented defect**; the scheduler now enqueues only completed days from the session's first day and the job skips earlier days (tested). The gate checks days from the session start and ignores them.
+2. False recovery declared from a dead process's last heartbeat (R1-B): fixed, re-tested live.
+3. The gate lacked criteria the directive requires (R1-D): extended.
+
+## R1-F. Regression and verification (Workstream E, run mid-observation)
+
+* **Python:** `ASTA_RUN_NETWORK_TESTS=1` → **458 passed, 0 failed, 0 skipped** (M2 closed at 451; +6 availability tests, +1 report-skip test). The default network-off run was not repeated in this pass (previous: 447 passed / 4 skipped).
+* **Browser:** live 16 + nodata 1 + aging 1 + research 12 + paper 9 = **39/39** (`docs/evidence/m2/e2e-full-run-r1.log`).
+* **Static/security:** ruff and format clean; pyright 0 errors; **mypy strict clean on 144 files**; `pip-audit` and `pnpm audit` no known vulnerabilities; secret scan 0 findings; gitleaks re-run at the closing commit (below).
+* **M0 live-lock / M1 immutability:** `git diff 773b604` over `src/asta/risk`, `src/asta/core/egress.py`, `src/asta/core/environment.py`, `docs/evidence/m0-r1`, `m1`, `m1-r1` and the M0/M1 acceptance documents is **empty**; the 15 live-lock tests (import boundaries, no credential vocabulary, gateway DENY, no LIVE environment, route allow-list) pass.
+* **Ledger reconciliation:** both live sessions reconcile from durable rows (0 discrepancies, `last_reconcile_ok = true`).
+* **Exchange data-source status:** Binance CONNECTED / LIVE and OKX CONNECTED / LIVE (public REST + public WS; OKX candles via REST polling), both with fresh events at measurement.
+* **Operational logs preserved:** `data/paper/service*.log`, `supervisor.jsonl`, `supervisor.out` (local, git-ignored); measurement and gate JSON committed under `docs/evidence/m2/`.
+
+## R1-G. Remaining residual risks
+
+M2-G1 (72 h gate) **open**; the supervisor is not installed as a system service and is not itself supervised (blocker for unattended completion; PC sleep or restart interrupts monitoring); R-1 OKX (REST-polled candles, no history); R-2 hosted CI; **R-3 infrastructure egress (mandatory before any credential)**; R-11 assumed fees; M2-1…M2-5 (§18); the two immutable pre-session reports.
+
+## R1-H. Recommendation
+
+**BUILT — NOT ACCEPTED.** To finish: keep the supervised service running (preferably install the optional Task Scheduler entry), let both sessions run until the later of 2026-11-15 16:24 UTC and supervisor coverage ≥ 95 % (about 2026-11-15 20:30 UTC), then run `scripts/paper_observation.py measure` and `gate` for both session ids, attach the output, confirm the daily-report check (the first completed day closes at 2026-11-13 00:00 UTC) and re-run the regression. Acceptance can be recommended only if every criterion is met with all interruptions recorded and recovered. No acceptance tag without CEO authorization.
