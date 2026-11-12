@@ -236,6 +236,13 @@ class ResearchValidation(Base):
     advisory: Mapped[dict[str, Any]] = mapped_column(JSONB)
     created_by: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+    # M1-R1 provenance / de-duplication (migration 0003)
+    content_hash: Mapped[str | None] = mapped_column(String(64), nullable=True, unique=True)
+    sample_type: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    strategy_version: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    source_datasets: Mapped[dict[str, Any] | None] = mapped_column(JSONB, nullable=True)
+    source_artifact: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    generated_at: Mapped[datetime | None] = mapped_column(TS, nullable=True)
 
 
 class ResearchHoldoutWindow(Base):

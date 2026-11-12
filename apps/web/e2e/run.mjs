@@ -69,7 +69,7 @@ async function phase(label, grep, apiEnv) {
 let ok = false;
 let webProc;
 try {
-  mkdirSync(path.resolve(repo, "docs/evidence/m0-r1/screenshots"), { recursive: true });
+  mkdirSync(path.resolve(repo, "docs/evidence/m1-r1/screenshots"), { recursive: true });
   psql("DROP DATABASE IF EXISTS asta_e2e WITH (FORCE)");
   if (psql("CREATE DATABASE asta_e2e").status !== 0) throw new Error("cannot create asta_e2e");
   rmSync(path.join(repo, "data", "e2e"), { recursive: true, force: true });

@@ -1,10 +1,10 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
 import LineChart from "../../../components/LineChart";
-import ResearchShell from "../../../components/ResearchShell";
+import ResearchShell, { usePrincipal } from "../../../components/ResearchShell";
 import { api } from "../../../lib/api";
 import { metricText, pctText, trimDecimal } from "../../../lib/format";
-import { download, toCsv, type EquityPoint, type Performance, type RunRow, type ValidationRow } from "../../../lib/research";
+import { canWriteResearch, download, explain, post, toCsv, type EquityPoint, type Performance, type RunRow, type ValidationRow } from "../../../lib/research";
 import { usePoll } from "../../../lib/usePoll";
 import { useQueryParam } from "../../../lib/useQuery";
 
@@ -22,6 +22,14 @@ function flagsFor(l: Loaded, passive: Loaded | undefined): string[] {
   return f;
 }
 
+const SAMPLE_LABEL: Record<string, string> = {
+  IN_SAMPLE: "IN-SAMPLE (not out-of-sample evidence)",
+  IN_AND_OUT_OF_SAMPLE: "IN-SAMPLE (train) and OUT-OF-SAMPLE (test) shown separately",
+  FINAL_HOLDOUT: "FINAL HOLDOUT (single evaluation; window consumed)",
+  UNSPECIFIED: "SAMPLE TYPE NOT RECORDED",
+};
+const sampleLabel = (t?: string) => SAMPLE_LABEL[t ?? "UNSPECIFIED"] ?? t ?? "";
+
 function Validation({ v }: { v: ValidationRow }) {
   const r = (v.result ?? {}) as Record<string, unknown>;
   const windows = (r.windows as Record<string, unknown>[] | undefined) ?? [];
@@ -30,6 +38,17 @@ function Validation({ v }: { v: ValidationRow }) {
   return (
     <div className="card" data-testid="validation-detail">
       <h3>{v.title} <span className="muted">({v.kind}, cycle {v.cycle})</span></h3>
+      <div className={v.sample_type === "IN_SAMPLE" ? "warnbox" : "card"} data-testid="sample-type">{sampleLabel(v.sample_type)}</div>
+      <p className="muted" data-testid="study-provenance">
+        Strategy {v.strategy_id}{v.strategy_version ? ` v${v.strategy_version}` : ""} · generated {v.generated_at ? v.generated_at.slice(0, 19).replace("T", " ") + " UTC" : "n/a"} · artifact {v.source_artifact ?? "n/a"}
+      </p>
+      {v.source_datasets && (
+        <div className="scroll"><table data-testid="study-datasets">
+          <thead><tr><th>Dataset</th><th>Timeframe</th><th>Rows</th><th>Source</th><th>Quality</th><th>Checksum</th></tr></thead>
+          <tbody>{Object.entries(v.source_datasets).map(([sym, d]) => (
+            <tr key={sym}><td>{sym}</td><td>{d.timeframe}</td><td>{d.rows}</td><td>{d.root_source_type}</td><td>{d.validation}</td><td className="mono">{(d.checksum ?? "").slice(0, 12)}</td></tr>
+          ))}</tbody></table></div>
+      )}
       {v.oos_reused && <div className="badbox">OUT-OF-SAMPLE REUSED: this result is no longer out-of-sample.</div>}
       {!v.research_grade && <div className="warnbox">Not research-grade data.</div>}
       {warnings.length > 0 && <div data-testid="overfit-warnings">{warnings.map((w, i) => <div key={i} className="warnbox">Overfitting/robustness warning: {w}</div>)}</div>}
@@ -57,8 +76,56 @@ function Validation({ v }: { v: ValidationRow }) {
           <thead><tr><th>Scenario</th><th>Value</th><th>Net P&amp;L</th><th>Return</th><th>Max drawdown</th><th>Risk budget</th></tr></thead>
           <tbody>{scenarios.map((s, i) => <tr key={i}><td>{s.scenario}</td><td>{s.value}</td><td>{trimDecimal(s.summary.net_pnl)}</td><td>{pctText(s.summary.net_return_pct)}</td><td>{pctText(s.summary.max_drawdown_pct)}</td><td>{s.summary.risk_verdict === "PASSED" ? "within" : "FAILED"}</td></tr>)}</tbody></table></div>
       )}
+      {v.kind === "HOLDOUT" && (() => {
+        const hs = r.holdout_summary as { net_pnl: string; net_return_pct: string; max_drawdown_pct: string; risk_verdict: string; fees: string; fills: number; result_checksum: string } | undefined;
+        return hs ? (
+          <div className="scroll"><table data-testid="holdout-table">
+            <thead><tr><th>Window</th><th>Net P&amp;L (simulated)</th><th>Return</th><th>Max drawdown</th><th>Fees</th><th>Fills</th><th>Risk budget</th><th>Result checksum</th></tr></thead>
+            <tbody><tr>
+              <td>{String((r.holdout_window as string[])[0]).slice(0, 10)} → {String((r.holdout_window as string[])[1]).slice(0, 10)}</td>
+              <td>{trimDecimal(hs.net_pnl)}</td><td>{pctText(hs.net_return_pct)}</td><td>{pctText(hs.max_drawdown_pct)}</td><td>{trimDecimal(hs.fees)}</td><td>{hs.fills}</td>
+              <td>{hs.risk_verdict === "PASSED" ? "within" : "FAILED"}</td><td className="mono">{hs.result_checksum.slice(0, 12)}</td>
+            </tr></tbody></table></div>
+        ) : null;
+      })()}
+      {v.kind === "BASELINE_COMPARISON" && (() => {
+        const rows = ((r.comparison as { rows?: Record<string, string>[] } | undefined)?.rows ?? []);
+        return (
+          <div className="scroll"><table data-testid="baseline-table">
+            <thead><tr><th>Run</th><th>Net P&amp;L (simulated)</th><th>Return</th><th>Max drawdown</th><th>Fees</th><th>Risk budget</th><th>Flags</th></tr></thead>
+            <tbody>{rows.map((b, i) => (
+              <tr key={i}><td>{b.name}</td><td>{trimDecimal(b.net_pnl)}</td><td>{pctText(b.net_return_pct)}</td><td>{pctText(b.max_drawdown_pct)}</td><td>{trimDecimal(b.fees)}</td><td>{b.risk_verdict === "PASSED" ? "within" : "FAILED"}</td><td>{Array.isArray(b.flags) ? (b.flags as string[]).join(", ") : ""}</td></tr>
+            ))}</tbody></table></div>
+        );
+      })()}
       {v.pooled && <p className="muted">Pooled: {JSON.stringify(v.pooled)}</p>}
       {v.advisory && <p className="muted">Advisory (rule-based, not a claim of profitability): {JSON.stringify(v.advisory)}</p>}
+    </div>
+  );
+}
+
+function ImportStudies({ onDone }: { onDone?: () => void }) {
+  const me = usePrincipal();
+  const [dir, setDir] = useState("m1-run");
+  const [msg, setMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  if (!canWriteResearch(me?.role)) return null;
+  return (
+    <div className="card">
+      <h3>Import completed studies</h3>
+      <p className="muted">Reads study files from the server&apos;s local studies folder. Repeating an import never creates duplicates.</p>
+      <div className="row">
+        <label>Study folder<input value={dir} onChange={(e) => setDir(e.target.value)} data-testid="studies-dir" /></label>
+        <button disabled={busy} data-testid="import-studies" onClick={async () => {
+          setBusy(true); setMsg(null);
+          try {
+            const r = await post<{ inserted: string[]; skipped_duplicate: string[] }>("/v1/validations/import", { directory: dir }, me!.csrf_token);
+            setMsg(`Imported ${r.inserted.length} new, ${r.skipped_duplicate.length} already stored.`);
+            onDone?.();
+          } catch (e) { setMsg(await explain(e)); } finally { setBusy(false); }
+        }}>Import studies</button>
+      </div>
+      {msg && <p role="status" data-testid="studies-msg">{msg}</p>}
     </div>
   );
 }
@@ -67,7 +134,8 @@ function CompareInner() {
   const idsParam = useQueryParam("ids");
   const ids = idsParam ? idsParam.split(",").filter(Boolean) : [];
   const runs = usePoll<{ runs: RunRow[] }>("/v1/backtests", 5000);
-  const validations = usePoll<{ validations: ValidationRow[] }>("/v1/validations", 20000);
+  const [rev, setRev] = useState(0);
+  const validations = usePoll<{ validations: ValidationRow[] }>(`/v1/validations?rev=${rev}`, 20000);
   const [loaded, setLoaded] = useState<Loaded[]>([]);
   const [pick, setPick] = useState<string[]>([]);
   const [openV, setOpenV] = useState<ValidationRow | null>(null);
@@ -160,18 +228,19 @@ function CompareInner() {
 
       <h2>Stored research validations</h2>
       <p className="muted">Walk-forward, sensitivity and out-of-sample studies. In-sample and out-of-sample results are shown side by side; overfitting warnings are mechanical checks.</p>
+      <ImportStudies onDone={() => setRev((n) => n + 1)} />
       <div className="card scroll">
         <table data-testid="validation-table">
-          <thead><tr><th>Study</th><th>Kind</th><th>Strategy</th><th>Cycle</th><th>Warnings</th><th /></tr></thead>
+          <thead><tr><th>Study</th><th>Kind</th><th>Sample</th><th>Strategy</th><th>Cycle</th><th>Warnings</th><th /></tr></thead>
           <tbody>
             {(validations.data?.validations ?? []).map((v) => (
               <tr key={v.id} data-testid="validation-row">
-                <td>{v.title}</td><td>{v.kind}</td><td>{v.strategy_id}</td><td>{v.cycle}{v.oos_reused ? " (OOS reused)" : ""}</td>
+                <td>{v.title}</td><td>{v.kind}</td><td data-testid="sample-cell">{v.sample_type ?? "UNSPECIFIED"}</td><td>{v.strategy_id}</td><td>{v.cycle}{v.oos_reused ? " (OOS reused)" : ""}</td>
                 <td>{(v.warnings ?? []).length}</td>
                 <td><button onClick={async () => setOpenV(await api<ValidationRow>(`/v1/validations/${v.id}`))}>Open study</button></td>
               </tr>
             ))}
-            {validations.data && validations.data.validations.length === 0 && <tr><td colSpan={6} className="muted">No stored studies yet (created by the research script).</td></tr>}
+            {validations.data && validations.data.validations.length === 0 && <tr><td colSpan={7} className="muted">No stored studies yet. An operator can import completed study files below.</td></tr>}
           </tbody>
         </table>
       </div>

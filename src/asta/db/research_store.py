@@ -632,10 +632,22 @@ def validation_json(r: ResearchValidation, full: bool = True) -> dict[str, Any]:
         "research_grade": r.research_grade,
         "created_by": r.created_by,
         "created_at": r.created_at.isoformat(),
+        "sample_type": r.sample_type or "UNSPECIFIED",
+        "strategy_version": r.strategy_version,
+        "source_artifact": r.source_artifact,
+        "generated_at": r.generated_at.isoformat() if r.generated_at else None,
+        "content_hash": r.content_hash,
         "labels": ["SIMULATED", "HISTORICAL DATA", "ESTIMATED FILLS", "NOT LIVE TRADING"],
     }
     if full:
-        d.update({"config": r.config, "result": r.result, "advisory": r.advisory})
+        d.update(
+            {
+                "config": r.config,
+                "result": r.result,
+                "advisory": r.advisory,
+                "source_datasets": r.source_datasets,
+            }
+        )
     else:
         d["warnings"] = (r.result or {}).get("warnings", [])
         d["pooled"] = (r.result or {}).get("pooled")

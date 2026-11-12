@@ -126,6 +126,12 @@ export type ValidationRow = {
   oos_reused: boolean;
   research_grade: boolean;
   created_at: string;
+  sample_type?: string;
+  strategy_version?: string | null;
+  source_artifact?: string | null;
+  generated_at?: string | null;
+  content_hash?: string | null;
+  source_datasets?: Record<string, { checksum?: string; timeframe?: string; root_source_type?: string; validation?: string; rows?: number }> | null;
   warnings?: string[];
   pooled?: Record<string, unknown> | null;
   result?: Record<string, unknown>;

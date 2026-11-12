@@ -59,6 +59,16 @@ def write_import_files(import_dir: str, n_bars: int = 20000) -> None:
                 f,
             )
 
+    # completed-study artifacts (real-data research output) for the Comparison page import test
+    import shutil
+    from pathlib import Path
+
+    src = Path(__file__).resolve().parents[1] / "docs" / "evidence" / "m1"
+    dst = Path(import_dir) / "studies" / "m1-run"
+    dst.mkdir(parents=True, exist_ok=True)
+    for f in src.glob("*.json"):
+        shutil.copy2(f, dst / f.name)
+
 
 def main(out: str, import_dir: str | None = None) -> None:
     settings = load_settings()

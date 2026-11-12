@@ -22,6 +22,7 @@ from asta.api.deps import Db, require, require_write
 from asta.auth import service as auth
 from asta.auth.rbac import Permission
 from asta.core.environment import Environment
+from asta.db import research_import as ri
 from asta.db import research_store as rs
 from asta.db.audit_store import append_audit
 from asta.db.research_models import BacktestRun, HistoricalDataset, HistoricalDatasetVersion
@@ -66,6 +67,10 @@ class ResearchRuntime:
 class ImportBody(BaseModel):
     file_name: str = Field(pattern=FILE_RE.pattern)
     tick_size: Decimal | None = Field(default=None, gt=0, le=1000)
+
+
+class StudyImportBody(BaseModel):
+    directory: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
 
 class DeriveBody(BaseModel):
@@ -548,6 +553,41 @@ def register_research_routes(app: FastAPI, ctx: Any) -> None:
     @app.get("/v1/validations")
     def validations(db: Db, _: User) -> dict[str, Any]:
         return {"labels": LABELS, "validations": rs.list_validations(db)}
+
+    @app.post("/v1/validations/import", status_code=201)
+    def import_validations(
+        body: StudyImportBody,
+        db: Db,
+        p: Importer,
+        idempotency_key: Annotated[str | None, Header()] = None,
+    ) -> Any:
+        """Persist completed study artifacts from <import_dir>/studies/<directory> (local files
+        only; verbatim, de-duplicated by content hash, so a retry or repeat is a no-op)."""
+        key = idem_key(idempotency_key)
+        ep = "POST /v1/validations/import"
+        hit = replay(db, key, p.user_id, ep, body.model_dump(mode="json"))
+        if isinstance(hit, JSONResponse):
+            return hit
+        root = (runtime.import_dir / "studies").resolve()
+        path = (root / body.directory).resolve()
+        if path.parent != root:
+            raise HTTPException(400, "directory must be a plain name under the studies directory")
+        try:
+            rep = ri.import_studies(db, path, p.username)
+        except ri.StudyImportError as exc:
+            db.rollback()
+            raise HTTPException(422, f"cannot import studies: {exc}") from None
+        append_audit(
+            db,
+            p.username,
+            "research.validations.import",
+            {"directory": body.directory, **{k: len(v) for k, v in rep.to_json().items()}},
+            Environment.BACKTEST,
+        )
+        out = {"labels": LABELS, **rep.to_json()}
+        rs.idempotent_store(db, key, p.user_id, ep, hit, 201, out)
+        db.commit()
+        return out
 
     @app.get("/v1/validations/{vid}")
     def validation(vid: uuid.UUID, db: Db, _: User) -> dict[str, Any]:

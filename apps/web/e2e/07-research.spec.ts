@@ -183,6 +183,50 @@ test.describe.serial("@research operator workflow: import -> derive -> run -> co
     await expect(page.getByTestId("run-row").filter({ hasText: "e2e heavy" })).toContainText("COMPLETED", { timeout: 180_000 });
   });
 
+  test("stored studies: import once, repeat is a no-op, sample types and provenance are explicit", async ({ page }) => {
+    await login(page, "op1");
+    await gotoResearch(page, "/research/compare");
+    await expect(page.getByTestId("validation-table")).toContainText("No stored studies yet");
+    await page.getByTestId("import-studies").click();
+    await expect(page.getByTestId("studies-msg")).toContainText("Imported 16 new, 0 already stored.");
+    const rows = page.getByTestId("validation-row");
+    await expect(rows).toHaveCount(16);
+    // repeat import (a retry) creates no duplicates
+    await page.getByTestId("import-studies").click();
+    await expect(page.getByTestId("studies-msg")).toContainText("Imported 0 new, 16 already stored.");
+    await expect(rows).toHaveCount(16);
+    // every study states whether it is in-sample, out-of-sample or the final holdout
+    const samples = await page.getByTestId("sample-cell").allTextContents();
+    expect(new Set(samples)).toEqual(new Set(["IN_SAMPLE", "IN_AND_OUT_OF_SAMPLE", "FINAL_HOLDOUT"]));
+    // walk-forward detail: in-sample and out-of-sample shown separately, windows, dataset provenance
+    await rows.filter({ hasText: "Walk-forward: regime_grid [strict" }).getByRole("button", { name: "Open study" }).click();
+    await expect(page.getByTestId("sample-type")).toContainText("IN-SAMPLE (train) and OUT-OF-SAMPLE (test) shown separately");
+    await expect(page.getByTestId("wf-table")).toContainText("Out-of-sample return");
+    await expect(page.getByTestId("wf-table").locator("tbody tr")).toHaveCount(7);
+    await expect(page.getByTestId("study-datasets")).toContainText("BTC-USDT");
+    await expect(page.getByTestId("study-provenance")).toContainText("regime_grid v");
+    await page.screenshot({ path: `${SHOTS}/18-research-stored-walkforward.png`, fullPage: true });
+    // final holdout: labelled as such, a risk-budget failure is shown
+    await rows.filter({ hasText: "Final holdout: trend_pullback" }).getByRole("button", { name: "Open study" }).click();
+    await expect(page.getByTestId("sample-type")).toContainText("FINAL HOLDOUT");
+    await expect(page.getByTestId("holdout-table")).toContainText("FAILED");
+    // sensitivity is flagged in-sample, never presented as out-of-sample evidence
+    await rows.filter({ hasText: "Sensitivity: regime_grid" }).getByRole("button", { name: "Open study" }).click();
+    await expect(page.getByTestId("sample-type")).toContainText("not out-of-sample evidence");
+    await expect(page.getByTestId("sens-table")).toBeVisible();
+    await page.screenshot({ path: `${SHOTS}/19-research-stored-sensitivity.png`, fullPage: true });
+    // reload: the studies come from the database, not from page state
+    await page.reload();
+    await expect(page.getByTestId("validation-row")).toHaveCount(16);
+  });
+
+  test("viewer sees stored studies but has no import control", async ({ page }) => {
+    await login(page, "viewer1");
+    await gotoResearch(page, "/research/compare");
+    await expect(page.getByTestId("validation-row")).toHaveCount(16);
+    await expect(page.getByTestId("import-studies")).toHaveCount(0);
+  });
+
   test("research pages expose no execution controls and carry the simulation banner", async ({ page }) => {
     await login(page, "op1");
     for (const p of PAGES) {
