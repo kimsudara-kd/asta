@@ -69,6 +69,7 @@ def test_module_import_graph():
         "market_data": {"core", "exchanges", "market_data"},
         "db": {"core", "audit", "db"},
         "auth": {"core", "audit", "auth", "db"},
+        "research": {"core", "risk", "research"},  # ADR-0005: pure, offline, no exchanges
     }
     bad = []
     for p in py_files():
@@ -86,3 +87,56 @@ def test_module_import_graph():
                 if parts[0] == "asta" and len(parts) > 1 and parts[1] not in rules[top]:
                     bad.append(f"{p.relative_to(SRC)} imports {m}")
     assert not bad, bad
+
+
+NETWORK_MODULES = {
+    "httpx",
+    "requests",
+    "urllib",
+    "urllib3",
+    "socket",
+    "ssl",
+    "http",
+    "websockets",
+    "aiohttp",
+    "ftplib",
+    "smtplib",
+    "telnetlib",
+    "xmlrpc",
+    "asyncio",
+    "subprocess",
+    "sqlalchemy",
+    "psycopg",
+    "pg8000",
+    "redis",
+}
+
+
+def test_research_package_cannot_reach_network_exchanges_or_database():
+    """M1 (ADR-0005): the research engine is pure. No network, subprocess, DB or async I/O imports,
+    and no exchange/market_data/api/auth/db packages (closes the 'direct HTTP client' gap for it)."""
+    bad = []
+    for p in (SRC / "research").rglob("*.py"):
+        for node in ast.walk(ast.parse(p.read_text(encoding="utf-8"))):
+            mods = []
+            if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                mods = [node.module]
+            elif isinstance(node, ast.Import):
+                mods = [a.name for a in node.names]
+            for m in mods:
+                if m.split(".")[0] in NETWORK_MODULES:
+                    bad.append(f"{p.relative_to(SRC)} imports {m}")
+    assert not bad, bad
+
+
+def test_no_order_submission_symbols_in_research_except_simulation_names():
+    """Simulated orders exist only inside research.sim; nothing named like an exchange call."""
+    banned = re.compile(
+        r"(place_order|new_order|submit_order|cancel_order|withdraw|transfer_funds|api_key)", re.I
+    )
+    offenders = []
+    for p in (SRC / "research").rglob("*.py"):
+        for i, line in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            if banned.search(line):
+                offenders.append(f"{p.relative_to(SRC)}:{i}: {line.strip()}")
+    assert not offenders, offenders

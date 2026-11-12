@@ -16,3 +16,4 @@ secrets/
 infra/data/
 *.log
 dist/
+data/
