@@ -16,6 +16,7 @@ import json
 import sys
 import uuid
 from datetime import timedelta
+from pathlib import Path
 
 from sqlalchemy import func, select, text
 
@@ -35,6 +36,10 @@ from asta.paper import store, views
 from asta.paper.states import SessionState
 
 ACTOR = "observation-operator"
+SUPERVISOR_LOG = Path("data/paper/supervisor.jsonl")
+SUPERVISION_MIN_MONITORED = (
+    0.95  # fixed; the observer itself must have watched >= 95 % of the window
+)
 
 
 def main() -> int:
@@ -155,6 +160,17 @@ def measure(db, since: str | None = None):  # type: ignore[no-untyped-def]
         ),
         {"t": t0},
     ).all()
+    rt = {
+        (v, sym): int(n)
+        for v, sym, n in db.execute(
+            text(
+                "select venue, symbol, count(*) from market_observations where kind='CANDLE_1M' "
+                "and event_ts >= :t and source='LIVE' "
+                "and ingested_ts <= event_ts + interval '180 seconds' group by 1,2"
+            ),
+            {"t": t0},
+        )
+    }
     for v, sym, n, lo, hi, bf in rows:
         span = int((hi - lo).total_seconds() // 60) + 1
         out["feeds"][f"{v}:{sym}"] = {
@@ -162,6 +178,8 @@ def measure(db, since: str | None = None):  # type: ignore[no-untyped-def]
             "span_minutes": span,
             "present_fraction": round(n / span, 5),
             "from_backfill": int(bf),
+            "realtime_candles_within_180s": rt.get((v, sym), 0),
+            "realtime_fraction": round(rt.get((v, sym), 0) / span, 5),
             "first": lo,
             "last": hi,
         }
@@ -186,6 +204,10 @@ def measure(db, since: str | None = None):  # type: ignore[no-untyped-def]
         for s in db.execute(select(PaperSession)).scalars()
         for i in views.incidents(db, s.id, 500)
     ]
+    from asta.paper import supervision
+
+    samples = supervision.load_samples(SUPERVISOR_LOG)
+    out["availability"] = supervision.summarize(samples, t0, now, 10.0) if samples else None
     out["queue"] = views.health(db)["queue"]
     out["workers_seen"] = [
         {"id": w, "started": a, "last_heartbeat": b}
@@ -237,6 +259,69 @@ def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-de
         ),
         {"s": str(sid)},
     ).scalar_one()
+    from datetime import UTC
+    from datetime import datetime as _dt
+
+    from asta.db.paper_models import DailyPaperReport, PaperSessionState
+    from asta.paper import reports as rep_mod
+    from asta.paper import supervision
+
+    dead = db.execute(text("select count(*) from durable_jobs where status='DEAD'")).scalar_one()
+    crit_unresolved = db.execute(
+        text(
+            "select count(*) from incidents where severity='CRITICAL' and resolved_at is null "
+            "and (session_id=:s or session_id is null)"
+        ),
+        {"s": str(sid)},
+    ).scalar_one()
+    # state changes: every transition after the start must be explainable (system recovery / risk
+    # halt, or an operator action by a known actor); anything else is "unexplained"
+    known_actors = {"system", ACTOR}
+    transitions = db.execute(
+        select(PaperSessionState.from_state, PaperSessionState.to_state, PaperSessionState.actor)
+        .where(PaperSessionState.session_id == sid)
+        .order_by(PaperSessionState.id)
+    ).all()
+    unexplained = [
+        f"{a}->{b} by {actor}"
+        for a, b, actor in transitions
+        if actor not in known_actors or b in ("FAILED", "STOPPED")
+    ]
+    risk_halts = db.execute(
+        text(
+            "select count(*) from paper_risk_events where session_id=:s "
+            "and kind in ('DAILY_LOSS_TRIP','DRAWDOWN_HALT')"
+        ),
+        {"s": str(sid)},
+    ).scalar_one()
+    # daily reports: every completed UTC day since the first day must have a reproducible report
+    missing_reports: list[str] = []
+    unreproducible: list[str] = []
+    if started is not None:
+        d = started.date()
+        while d < now.date():
+            day = _dt(d.year, d.month, d.day, tzinfo=UTC)
+            row = db.execute(
+                select(DailyPaperReport).where(
+                    DailyPaperReport.session_id == sid, DailyPaperReport.report_date == day
+                )
+            ).scalar_one_or_none()
+            if row is None:
+                missing_reports.append(d.isoformat())
+            elif not rep_mod.verify_report(db, row):
+                unreproducible.append(d.isoformat())
+            d += timedelta(days=1)
+    samples = supervision.load_samples(SUPERVISOR_LOG)
+    avail = (
+        supervision.summarize(samples, started, now, 10.0)
+        if started is not None and samples
+        else None
+    )
+    supervised = bool(
+        avail
+        and avail["monitored_fraction"] >= SUPERVISION_MIN_MONITORED
+        and not any(e["end"] is None for e in avail["downtime_episodes"])
+    )
     checks = {
         "elapsed_hours": round(elapsed, 2),
         "required_hours": hours,
@@ -249,17 +334,36 @@ def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-de
         "duplicate_fill_postings": dup,
         "open_data_gaps": open_gaps,
         "unrecoverable_data_gaps": unrec,
-        "critical_incidents": crit,
+        "critical_incidents_ever": crit,
+        "critical_incidents_unresolved": crit_unresolved,
+        "dead_letter_jobs": dead,
+        "unexplained_state_changes": unexplained,
+        "risk_halt_events": risk_halts,
+        "daily_reports_missing_days": missing_reports,
+        "daily_reports_not_reproducible": unreproducible,
+        "supervision_demonstrated": supervised,
+        "availability": avail,
+        "thresholds": {
+            "required_hours": hours,
+            "supervision_min_monitored_fraction": SUPERVISION_MIN_MONITORED,
+            "note": "thresholds are fixed constants of this script; no value is tuned to obtain a pass",
+        },
         "fills": fills,
         "real_orders_possible": False,
     }
-    ok = (
+    ok = bool(
         checks["duration_met"]
         and checks["state_is_operating"]
         and not bad
         and not dup
         and not open_gaps
-        and not crit
+        and not unrec
+        and not crit_unresolved
+        and not dead
+        and not unexplained
+        and not missing_reports
+        and not unreproducible
+        and supervised
     )
     print(json.dumps({"gate_pass": ok, **checks}, indent=1, default=str))
     return 0 if ok else 1

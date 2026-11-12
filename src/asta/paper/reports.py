@@ -375,6 +375,9 @@ def verify_report(db: Session, row: DailyPaperReport) -> bool:
 def handle_report_job(db: Session, sid: uuid.UUID | None, payload: dict[str, Any]) -> None:
     assert sid is not None
     day = datetime.fromisoformat(payload["day"])
+    sess = store.get_session(db, sid)
+    if sess.started_at is None or day_start(day) + timedelta(days=1) <= sess.started_at:
+        return  # the session did not exist on that day: no report (never invent an empty one)
     # the day must be COMPLETE and the ledger must reconcile before it is reported
     if day_start(day) + timedelta(days=1) > datetime.now(UTC):
         raise ValueError("reporting window is not complete yet")

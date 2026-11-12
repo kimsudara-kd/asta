@@ -346,3 +346,10 @@ def test_rearm_refuses_a_latched_drawdown_and_a_same_day_daily_trip(client, db, 
 
 
 _ = (timedelta, T0, MarketRulesVersion)
+
+
+def test_report_job_skips_days_before_the_session_existed(client, db):
+    sid = build_session(db, 320)
+    reports.handle_report_job(db, sid, {"day": "2026-01-01T00:00:00+00:00"})
+    db.commit()
+    assert db.execute(text("select count(*) from daily_paper_reports")).scalar_one() == 0

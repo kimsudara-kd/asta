@@ -385,14 +385,17 @@ class PaperService:
         ).scalars():
             slot = int(now.timestamp() // RECONCILE_EVERY.total_seconds())
             jobs.enqueue(db, f"RECONCILE:{s.id}:{slot}", jobs.KIND_RECONCILE, s.id, {})
-            yday = (now - timedelta(days=1)).date().isoformat()
-            jobs.enqueue(
-                db,
-                f"REPORT:{s.id}:{yday}",
-                jobs.KIND_REPORT,
-                s.id,
-                {"day": f"{yday}T00:00:00+00:00"},
-            )
+            # one report job per COMPLETED UTC day on or after the session's first day
+            d = (s.started_at or now).date()
+            while d < now.date():
+                jobs.enqueue(
+                    db,
+                    f"REPORT:{s.id}:{d.isoformat()}",
+                    jobs.KIND_REPORT,
+                    s.id,
+                    {"day": f"{d.isoformat()}T00:00:00+00:00"},
+                )
+                d += timedelta(days=1)
 
     async def _scheduler_loop(self) -> None:
         while not self.stop.is_set():
