@@ -26,7 +26,7 @@ from asta.exchanges.common.http import PublicHttp
 from asta.exchanges.common.ws import Reconnected, ws_messages
 
 REST_BASE = "https://www.okx.com"
-WS_PUBLIC = "wss://ws.okx.com:8443/ws/v5/public"
+WS_PUBLIC = "wss://ws.okx.com/ws/v5/public"  # port 8443 is being retired by OKX (notice 64010)
 
 
 def parse_rules(
@@ -151,6 +151,45 @@ class OkxPublicAdapter:
             )
             for r in payload["data"]
         ]
+
+    async def candles_paged(self, symbol: str, interval: str, total: int) -> list[CandleEvent]:
+        """Up to ``total`` most recent candles, newest first, paging the PUBLIC history endpoint
+        (``history-candles`` is a public market-data path; max 100 per page)."""
+        out = await self.recent_candles(symbol, interval, min(total, 300))
+        while len(out) < total:
+            oldest = min(c.open_time for c in out)
+            payload = await self._http.get(
+                "/api/v5/market/history-candles",
+                {
+                    "instId": symbol,
+                    "bar": interval,
+                    "after": int(oldest.timestamp() * 1000),
+                    "limit": min(100, total - len(out)),
+                },
+            )
+            rows = payload["data"]
+            if not rows:
+                break
+            now = utcnow()
+            out += [
+                CandleEvent(
+                    venue=Venue.OKX,
+                    symbol=symbol,
+                    event_id=f"candle{interval}:{r[0]}:{r[8]}",
+                    exchange_ts=from_epoch_ms(int(r[0])),
+                    ingested_ts=now,
+                    interval=interval,
+                    open_time=from_epoch_ms(int(r[0])),
+                    open=to_decimal(r[1]),
+                    high=to_decimal(r[2]),
+                    low=to_decimal(r[3]),
+                    close=to_decimal(r[4]),
+                    volume=to_decimal(r[5]),
+                    closed=r[8] == "1",
+                )
+                for r in rows
+            ]
+        return out
 
     async def best_quote(self, symbol: str) -> QuoteEvent:
         payload = await self._http.get("/api/v5/market/books", {"instId": symbol, "sz": 1})

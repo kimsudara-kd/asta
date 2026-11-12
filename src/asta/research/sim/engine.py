@@ -105,7 +105,6 @@ class PortfolioHooks(Protocol):
 
     def extra_asset_exposure(self, base: str) -> Decimal: ...
     def extra_total_exposure(self) -> Decimal: ...
-    def equity_for_risk(self, own_equity: Decimal) -> Decimal: ...
     def entry_block_reason(self, symbol: str) -> str | None: ...
 
 
@@ -174,6 +173,8 @@ class Engine:
         self.warm_bars = 0
         self.trade_idx: int | None = None
         self.last_ts: datetime | None = None
+        self._warm = False
+        self._present: frozenset[str] = frozenset()
 
     @classmethod
     def live(
@@ -584,18 +585,22 @@ class Engine:
             self._ctx(t0 - self.tf, -1, frozenset(), True, self.ledger.initial_cash)
         )
 
-    def step(self, k: int, ts: datetime, bars: dict[str, Bar]) -> None:
-        """Process one timeline step: the bars that just CLOSED (open time ts), then decide."""
+    def settle(
+        self, k: int, ts: datetime, bars: dict[str, Bar], warm: bool | None = None
+    ) -> Decimal:
+        """Phase 1: fill/expire against the bars that just CLOSED (open time ts), mark, record the
+        equity point. Returns this account's marked equity."""
         cfg = self.cfg
         led = self._led()
         present: set[str] = set()
         self.fills_this_step = []
-        warm = cfg.trade_start is not None and ts < cfg.trade_start
-        if not warm and self.trade_idx is None:
+        self._warm = (
+            (cfg.trade_start is not None and ts < cfg.trade_start) if warm is None else warm
+        )
+        if not self._warm and self.trade_idx is None:
             self.trade_idx = k
-        if warm:
+        if self._warm:
             self.warm_bars += 1
-        # 1. fills against the bar that just closed
         for sym in cfg.symbols:
             bar = bars.get(sym)
             if bar is not None and bar.open_time == ts:
@@ -605,16 +610,15 @@ class Engine:
                 self.marks[sym] = bar.close
                 self.base_marks[self._base(sym)] = bar.close
                 self.last_bar_ts[sym] = ts
+        self._present = frozenset(present)
         if len(present) < len(cfg.symbols):
             self.stale_mark_steps += 1
-        # 2/3. equity + risk (not during warm-up: nothing can have traded)
         eq = led.equity(self.base_marks)
-        close_ts = ts + self.tf
-        if not warm:
+        if not self._warm:
             pv = led.positions_value(self.base_marks)
             self.equity_curve.append(
                 EquityPoint(
-                    close_ts,
+                    ts + self.tf,
                     eq,
                     led.balance(cfg.quote_asset),
                     pv,
@@ -622,19 +626,39 @@ class Engine:
                     self._total_exposure(),
                 )
             )
-            eq_risk = self.hooks.equity_for_risk(eq) if self.hooks is not None else eq
-            if self.risk.on_equity(ts, eq_risk):
-                self._cancel_open_buys(close_ts, "RISK_TRIP")
-        # 4. strategy decision at bar close
-        ctx = self._ctx(ts, k, frozenset(present), warm, eq)
+        return eq
+
+    def after_risk(self, ts: datetime, tripped: bool) -> None:
+        """A (new) breaker trip cancels this account's open buys; exits are never blocked."""
+        if tripped:
+            self._cancel_open_buys(ts + self.tf, "RISK_TRIP")
+
+    def decide(self, k: int, ts: datetime, eq: Decimal, strategy_active: bool = True) -> None:
+        """Phase 2: strategy decisions at bar close (orders activate from the next bar).
+        ``strategy_active=False`` (paused / halted session): the strategy is STILL consulted with
+        ``is_warmup=True`` so its internal indicator state stays in step with the market, but every
+        order it proposes is rejected as WARMUP and cancels are ignored: the session cannot
+        create or change any simulated order."""
+        cfg = self.cfg
+        close_ts = ts + self.tf
+        mute = self._warm or not strategy_active
+        ctx = self._ctx(ts, k, self._present, mute, eq)
         for act in self.strategy.on_bar(ctx):
             if isinstance(act, CancelIntent):
-                self._cancel(act.client_id, close_ts)
+                if strategy_active:
+                    self._cancel(act.client_id, close_ts)
             else:
-                self._submit(act, close_ts, warm)
+                self._submit(act, close_ts, mute)
         if cfg.checkpoint_every and k % cfg.checkpoint_every == 0:
             self.checkpoints.append(Checkpoint(k, close_ts, self._digest(k, ts)))
         self.last_ts = ts
+
+    def step(self, k: int, ts: datetime, bars: dict[str, Bar]) -> None:
+        """M1 path: settle, update this run's own risk engine, decide."""
+        eq = self.settle(k, ts, bars)
+        if not self._warm and self.risk.on_equity(ts, eq):
+            self.after_risk(ts, True)
+        self.decide(k, ts, eq)
 
     def finish(self, n_steps: int) -> RunResult:
         """Cancel what is still open, reconcile and package the result."""

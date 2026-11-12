@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from asta import __version__
 from asta.api.deps import COOKIE, Db, require
+from asta.api.paper import register_paper_routes
 from asta.api.research import ResearchRuntime, register_research_routes
 from asta.auth import service as auth
 from asta.auth.rbac import Permission
@@ -346,4 +347,5 @@ def create_app(
         }
 
     register_research_routes(app, ctx)
+    register_paper_routes(app, ctx)
     return app

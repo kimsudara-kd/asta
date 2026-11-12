@@ -20,10 +20,14 @@ class Permission(StrEnum):
     VIEW_RESEARCH = "view_research"  # simulated backtests, datasets, strategies (read-only)
     RUN_RESEARCH = "run_research"  # start/cancel simulated backtests (offline)
     IMPORT_DATA = "import_data"  # import/validate/derive LOCAL historical datasets
+    VIEW_PAPER = "view_paper"  # paper-trading sessions, portfolio, reports (read-only)
+    CONTROL_PAPER = "control_paper"  # create/start/pause/resume/stop LOCAL simulated sessions
 
 
 _MAP: dict[Role, frozenset[Permission]] = {
-    Role.VIEWER: frozenset({Permission.VIEW_STATUS, Permission.VIEW_RESEARCH}),
+    Role.VIEWER: frozenset(
+        {Permission.VIEW_STATUS, Permission.VIEW_RESEARCH, Permission.VIEW_PAPER}
+    ),
     Role.OPERATOR: frozenset(
         {
             Permission.VIEW_STATUS,
@@ -31,10 +35,17 @@ _MAP: dict[Role, frozenset[Permission]] = {
             Permission.VIEW_RESEARCH,
             Permission.RUN_RESEARCH,
             Permission.IMPORT_DATA,
+            Permission.VIEW_PAPER,
+            Permission.CONTROL_PAPER,
         }
     ),
     Role.REVIEWER: frozenset(
-        {Permission.VIEW_STATUS, Permission.VIEW_AUDIT, Permission.VIEW_RESEARCH}
+        {
+            Permission.VIEW_STATUS,
+            Permission.VIEW_AUDIT,
+            Permission.VIEW_RESEARCH,
+            Permission.VIEW_PAPER,
+        }
     ),
     Role.ADMIN: frozenset(Permission),
 }

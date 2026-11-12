@@ -78,6 +78,12 @@ def db(migrated_engine: Engine) -> Iterator[Session]:
                 "historical_dataset_versions, historical_datasets CASCADE"
             )
         )
+        c.execute(
+            text(
+                "TRUNCATE paper_sessions, market_observations, market_data_gaps, "
+                "market_feed_connections, durable_jobs, worker_leases, operational_alerts CASCADE"
+            )
+        )
     factory = sessionmaker(migrated_engine, expire_on_commit=False)
     with factory() as s:
         yield s

@@ -13,12 +13,14 @@ from sqlalchemy import (
     CheckConstraint,
     DateTime,
     ForeignKey,
+    Index,
     Integer,
     Numeric,
     String,
     Text,
     UniqueConstraint,
     func,
+    text,
 )
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -125,6 +127,20 @@ class Incident(Base):
     detail: Mapped[str] = mapped_column(Text)
     opened_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
     resolved_at: Mapped[datetime | None] = mapped_column(TS, nullable=True)
+    # M2: operational incidents reuse this table (no second incident store)
+    session_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    venue: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    symbol: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    dedupe_key: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    resolved_by: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    __table_args__ = (
+        Index(
+            "uq_incident_open_dedupe",
+            "dedupe_key",
+            unique=True,
+            postgresql_where=text("dedupe_key IS NOT NULL AND resolved_at IS NULL"),
+        ),
+    )
 
 
 class AuditEvent(Base):
@@ -143,4 +159,5 @@ class AuditEvent(Base):
 
 
 # register the M1 research tables on the same metadata (import at the end: they import Base above)
+from asta.db import paper_models as _paper_models  # noqa: E402,F401
 from asta.db import research_models as _research_models  # noqa: E402,F401

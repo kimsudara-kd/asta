@@ -58,13 +58,18 @@ ignore = ["S101"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S105", "S106", "S311"]
-"src/asta/research/**" = ["E501"]  # formatter-managed; long literal lines in tables
+"src/asta/research/**" = ["E501"]
+"src/asta/paper/**" = ["E501"]
+"src/asta/paper_service.py" = ["E501"]  # formatter-managed; long literal lines in tables
 "scripts/*.py" = ["E501"]
 "migrations/versions/*.py" = ["E501"]
 "src/asta/db/research_*.py" = ["E501"]
 "src/asta/api/research.py" = ["E501"]
+"src/asta/api/paper.py" = ["E501"]
 "src/asta/research_jobs.py" = ["E501"]
 "tests/research/**" = ["S105", "S106", "S311", "E501"]
+"tests/live_lock/test_paper_boundaries.py" = ["E501"]
+"tests/paper/**" = ["S105", "S106", "S311", "S608", "E501"]
 "tests/integration/test_research_*.py" = ["S105", "S106", "E501"]
 
 [tool.mypy]

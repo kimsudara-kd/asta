@@ -140,16 +140,36 @@ RESEARCH_MUTATING = {
 }
 
 
+# M2: the PAPER-TRADING surface is enumerated explicitly as well. `.../orders` lists SIMULATED paper
+# orders stored in local tables; it is the only paper path allowed to contain a banned word. Every
+# mutating paper route acts on LOCAL simulated state only (RBAC + CSRF + idempotency + audit).
+PAPER_ALLOWED_PATHS = {"/v1/paper/sessions/{sid}/orders"}
+PAPER_MUTATING = {
+    ("POST", "/v1/paper/sessions"),
+    ("POST", "/v1/paper/sessions/{sid}/start"),
+    ("POST", "/v1/paper/sessions/{sid}/pause"),
+    ("POST", "/v1/paper/sessions/{sid}/resume"),
+    ("POST", "/v1/paper/sessions/{sid}/stop"),
+    ("POST", "/v1/paper/sessions/{sid}/rearm"),
+    ("POST", "/v1/paper/alerts/{alert_id}/ack"),
+    ("POST", "/v1/reports/daily"),
+}
+
+
 def test_no_order_or_funds_routes_registered(client):
     """Live-lock proof: the route table has no trading/transfer surface beyond the enumerated
     offline-research paths (simulated results only)."""
     paths = {r.path.lower() for r in client.app.routes}
     banned = ("order", "trade", "withdraw", "transfer", "borrow", "margin", "live", "execute")
     offenders = [
-        p for p in paths if p not in RESEARCH_ALLOWED_PATHS and any(b in p for b in banned)
+        p
+        for p in paths
+        if p not in RESEARCH_ALLOWED_PATHS | PAPER_ALLOWED_PATHS and any(b in p for b in banned)
     ]
     assert not offenders, offenders
-    assert RESEARCH_ALLOWED_PATHS <= paths  # the exception is real, not a loophole for other paths
+    assert (
+        RESEARCH_ALLOWED_PATHS | PAPER_ALLOWED_PATHS <= paths
+    )  # exceptions are real, not loopholes
     mutating = {
         (m, r.path)
         for r in client.app.routes
@@ -164,6 +184,7 @@ def test_no_order_or_funds_routes_registered(client):
             ("POST", "/v1/auth/logout"),
         }
         | RESEARCH_MUTATING
+        | PAPER_MUTATING
     )
     # no PUT/PATCH/DELETE route exists anywhere: nothing can edit or remove stored results via HTTP
     methods = {m for r in client.app.routes for m in getattr(r, "methods", set())}
