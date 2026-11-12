@@ -100,6 +100,7 @@ class RiskState:
     session_start_equity: Decimal = Decimal(0)
     daily_tripped: bool = False
     drawdown_halted: bool = False
+    daily_trip_day: date | None = None
     events: list[RiskEvent] = field(default_factory=list)
 
     @property
@@ -108,8 +109,14 @@ class RiskState:
 
 
 class RiskEngine:
-    def __init__(self, limits: SimRiskLimits) -> None:
+    """``auto_reset_daily=True`` (every M1 run, ADR-0007) re-arms the daily breaker at the next UTC
+    session. M2 paper trading uses ``False``: a daily trip stays latched across midnight and can
+    only be released by ``rearm_daily`` (an explicit operator action on a later UTC day). A
+    drawdown halt is always latched for the rest of the session."""
+
+    def __init__(self, limits: SimRiskLimits, auto_reset_daily: bool = True) -> None:
         self.limits = limits
+        self.auto_reset_daily = auto_reset_daily
         self.state = RiskState(peak_equity=limits.starting_equity)
 
     def _event(self, ts: datetime, kind: str, detail: str, equity: Decimal) -> None:
@@ -121,11 +128,11 @@ class RiskEngine:
         new: list[str] = []
         day = ts.date()
         if st.session_day != day:
-            if st.daily_tripped:
+            if st.daily_tripped and self.auto_reset_daily:
                 self._event(ts, "DAILY_RESET", "new UTC session; daily breaker re-armed", equity)
+                st.daily_tripped = False
             st.session_day = day
             st.session_start_equity = equity
-            st.daily_tripped = False
         if equity > st.peak_equity:
             st.peak_equity = equity
         if (
@@ -135,6 +142,7 @@ class RiskEngine:
             and (st.session_start_equity - equity) / st.session_start_equity >= lim.daily_loss_pct
         ):
             st.daily_tripped = True
+            st.daily_trip_day = day
             self._event(
                 ts,
                 "DAILY_LOSS_TRIP",
@@ -152,6 +160,22 @@ class RiskEngine:
             self._event(ts, "DRAWDOWN_HALT", f"equity {equity} vs peak {st.peak_equity}", equity)
             new.append("DRAWDOWN_HALT")
         return new
+
+    def rearm_daily(self, ts: datetime, equity: Decimal) -> str | None:
+        """Operator release of a latched daily-loss trip. Returns None on success, else the reason
+        it is refused (not tripped, drawdown halt active, or still the same UTC day)."""
+        st = self.state
+        if not st.daily_tripped:
+            return "NOT_TRIPPED"
+        if st.drawdown_halted:
+            return "DRAWDOWN_HALT_ACTIVE"
+        if st.daily_trip_day is not None and ts.date() <= st.daily_trip_day:
+            return "SAME_UTC_DAY"
+        st.daily_tripped = False
+        st.session_day = ts.date()
+        st.session_start_equity = equity
+        self._event(ts, "DAILY_REARM", "operator re-armed the daily breaker", equity)
+        return None
 
     def check_buy(self, asset_exposure_after: Decimal, total_exposure_after: Decimal) -> str | None:
         """Reject reason for a risk-increasing order, else None. Sells are never blocked."""

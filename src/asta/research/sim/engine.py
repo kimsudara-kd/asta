@@ -13,6 +13,7 @@ from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from decimal import Decimal
+from typing import Protocol
 
 from asta.core.money import QUANTUM, floor_to_step, round_down, round_up
 from asta.research.data.models import Bar
@@ -98,6 +99,16 @@ class RunResult:
     notes: list[str] = field(default_factory=list)
 
 
+class PortfolioHooks(Protocol):
+    """Optional portfolio-level coordination (M2 paper trading). When absent (every M1 run), the
+    engine behaves exactly as before: all limits are judged on this account alone."""
+
+    def extra_asset_exposure(self, base: str) -> Decimal: ...
+    def extra_total_exposure(self) -> Decimal: ...
+    def equity_for_risk(self, own_equity: Decimal) -> Decimal: ...
+    def entry_block_reason(self, symbol: str) -> str | None: ...
+
+
 class Engine:
     def __init__(
         self,
@@ -106,8 +117,11 @@ class Engine:
         strategy: Strategy,
         should_cancel: Callable[[], bool] | None = None,
         on_progress: Callable[[int, int], None] | None = None,
+        risk: RiskEngine | None = None,
+        hooks: PortfolioHooks | None = None,
     ) -> None:
         self.cfg = cfg
+        self.hooks = hooks
         self.strategy = strategy
         self.series = series
         self.should_cancel = should_cancel
@@ -135,7 +149,7 @@ class Engine:
         self.marks: dict[str, Decimal] = {}  # keyed by symbol
         self.base_marks: dict[str, Decimal] = {}  # keyed by base asset (ledger valuation)
         self.ledger: Ledger | None = None
-        self.risk = RiskEngine(cfg.risk)
+        self.risk = risk if risk is not None else RiskEngine(cfg.risk)
         self.orders: list[SimOrder] = []
         self.open: dict[str, list[SimOrder]] = {s: [] for s in cfg.symbols}
         self.fills: list[SimFill] = []
@@ -157,6 +171,20 @@ class Engine:
         self._fill_id = 0
         self.last_bar_ts: dict[str, datetime] = {}
         self.stale_mark_steps = 0
+        self.warm_bars = 0
+        self.trade_idx: int | None = None
+        self.last_ts: datetime | None = None
+
+    @classmethod
+    def live(
+        cls,
+        cfg: EngineConfig,
+        strategy: Strategy,
+        risk: RiskEngine | None = None,
+        hooks: PortfolioHooks | None = None,
+    ) -> Engine:
+        """Incrementally driven engine (paper trading): bars arrive through begin()/step()."""
+        return cls(cfg, {s: [] for s in cfg.symbols}, strategy, risk=risk, hooks=hooks)
 
     # ------------------------------------------------------------------ helpers
     def _base(self, symbol: str) -> str:
@@ -270,8 +298,15 @@ class Engine:
             return reject("MIN_NOTIONAL")
         base = self._base(sym)
         if intent.side == Side.BUY:
-            after_asset = self._exposure(sym) + qty * ref
-            after_total = self._total_exposure() + qty * ref
+            extra_a = extra_t = ZERO
+            if self.hooks is not None:
+                blocked = self.hooks.entry_block_reason(sym)
+                if blocked:
+                    return reject(blocked)
+                extra_a = self.hooks.extra_asset_exposure(base)
+                extra_t = self.hooks.extra_total_exposure()
+            after_asset = self._exposure(sym) + qty * ref + extra_a
+            after_total = self._total_exposure() + qty * ref + extra_t
             why = self.risk.check_buy(after_asset, after_total)
             if why:
                 return reject(why)
@@ -541,73 +576,72 @@ class Engine:
         return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
     # ------------------------------------------------------------------ main loop
-    def run(self) -> RunResult:
+    def begin(self, t0: datetime) -> None:
+        """Open the ledger at t0 and notify the strategy. Call exactly once before step()."""
         cfg = self.cfg
-        n = len(self.timeline)
-        if n == 0:
-            raise EngineError("no bars to simulate")
-        t0 = self.timeline[0]
         self.ledger = Ledger.open(cfg.quote_asset, cfg.starting_cash, t0)
-        led = self.ledger
-        warm_bars = 0
-        trade_idx: int | None = None
-        self.strategy.on_start(self._ctx(t0 - self.tf, -1, frozenset(), True, led.initial_cash))
+        self.strategy.on_start(
+            self._ctx(t0 - self.tf, -1, frozenset(), True, self.ledger.initial_cash)
+        )
 
-        for k, ts in enumerate(self.timeline):
-            if self.should_cancel and k % 256 == 0 and self.should_cancel():
-                raise RunCancelled()
-            if self.on_progress and k % 256 == 0:
-                self.on_progress(k, n)
-            present: set[str] = set()
-            self.fills_this_step = []
-            warm = cfg.trade_start is not None and ts < cfg.trade_start
-            if not warm and trade_idx is None:
-                trade_idx = k
-            if warm:
-                warm_bars += 1
-            # 1. fills against the bar that just closed
-            for sym in cfg.symbols:
-                i = self.ptr[sym]
-                bars = self.series[sym]
-                if i < len(bars) and bars[i].open_time == ts:
-                    bar = bars[i]
-                    self.ptr[sym] = i + 1
-                    present.add(sym)
-                    self._process_bar(sym, bar)
-                    self.hist[sym].append(bar)
-                    self.marks[sym] = bar.close
-                    self.base_marks[self._base(sym)] = bar.close
-                    self.last_bar_ts[sym] = ts
-            if len(present) < len(cfg.symbols):
-                self.stale_mark_steps += 1
-            # 2/3. equity + risk (not during warm-up: nothing can have traded)
-            eq = led.equity(self.base_marks)
-            close_ts = ts + self.tf
-            if not warm:
-                pv = led.positions_value(self.base_marks)
-                self.equity_curve.append(
-                    EquityPoint(
-                        close_ts,
-                        eq,
-                        led.balance(cfg.quote_asset),
-                        pv,
-                        led.reserved(cfg.quote_asset),
-                        self._total_exposure(),
-                    )
+    def step(self, k: int, ts: datetime, bars: dict[str, Bar]) -> None:
+        """Process one timeline step: the bars that just CLOSED (open time ts), then decide."""
+        cfg = self.cfg
+        led = self._led()
+        present: set[str] = set()
+        self.fills_this_step = []
+        warm = cfg.trade_start is not None and ts < cfg.trade_start
+        if not warm and self.trade_idx is None:
+            self.trade_idx = k
+        if warm:
+            self.warm_bars += 1
+        # 1. fills against the bar that just closed
+        for sym in cfg.symbols:
+            bar = bars.get(sym)
+            if bar is not None and bar.open_time == ts:
+                present.add(sym)
+                self._process_bar(sym, bar)
+                self.hist[sym].append(bar)
+                self.marks[sym] = bar.close
+                self.base_marks[self._base(sym)] = bar.close
+                self.last_bar_ts[sym] = ts
+        if len(present) < len(cfg.symbols):
+            self.stale_mark_steps += 1
+        # 2/3. equity + risk (not during warm-up: nothing can have traded)
+        eq = led.equity(self.base_marks)
+        close_ts = ts + self.tf
+        if not warm:
+            pv = led.positions_value(self.base_marks)
+            self.equity_curve.append(
+                EquityPoint(
+                    close_ts,
+                    eq,
+                    led.balance(cfg.quote_asset),
+                    pv,
+                    led.reserved(cfg.quote_asset),
+                    self._total_exposure(),
                 )
-                if self.risk.on_equity(ts, eq):
-                    self._cancel_open_buys(close_ts, "RISK_TRIP")
-            # 4. strategy decision at bar close
-            ctx = self._ctx(ts, k, frozenset(present), warm, eq)
-            for act in self.strategy.on_bar(ctx):
-                if isinstance(act, CancelIntent):
-                    self._cancel(act.client_id, close_ts)
-                else:
-                    self._submit(act, close_ts, warm)
-            if cfg.checkpoint_every and k % cfg.checkpoint_every == 0:
-                self.checkpoints.append(Checkpoint(k, close_ts, self._digest(k, ts)))
+            )
+            eq_risk = self.hooks.equity_for_risk(eq) if self.hooks is not None else eq
+            if self.risk.on_equity(ts, eq_risk):
+                self._cancel_open_buys(close_ts, "RISK_TRIP")
+        # 4. strategy decision at bar close
+        ctx = self._ctx(ts, k, frozenset(present), warm, eq)
+        for act in self.strategy.on_bar(ctx):
+            if isinstance(act, CancelIntent):
+                self._cancel(act.client_id, close_ts)
+            else:
+                self._submit(act, close_ts, warm)
+        if cfg.checkpoint_every and k % cfg.checkpoint_every == 0:
+            self.checkpoints.append(Checkpoint(k, close_ts, self._digest(k, ts)))
+        self.last_ts = ts
 
-        end_ts = self.timeline[-1] + self.tf
+    def finish(self, n_steps: int) -> RunResult:
+        """Cancel what is still open, reconcile and package the result."""
+        cfg = self.cfg
+        led = self._led()
+        assert self.last_ts is not None
+        end_ts = self.last_ts + self.tf
         for sym in cfg.symbols:
             for o in list(self.open[sym]):
                 self._finish(o, OrderStatus.CANCELLED, end_ts, "END_OF_DATA")
@@ -635,11 +669,39 @@ class Engine:
             final_marks=dict(self.marks),
             liquidation_equity=liq,
             reconcile=rec,
-            bars_processed=n,
-            warmup_bars=warm_bars,
-            trade_start_index=trade_idx,
+            bars_processed=n_steps,
+            warmup_bars=self.warm_bars,
+            trade_start_index=self.trade_idx,
             stale_mark_steps=self.stale_mark_steps,
         )
 
+    def run(self) -> RunResult:
+        n = len(self.timeline)
+        if n == 0:
+            raise EngineError("no bars to simulate")
+        self.begin(self.timeline[0])
+        for k, ts in enumerate(self.timeline):
+            if self.should_cancel and k % 256 == 0 and self.should_cancel():
+                raise RunCancelled()
+            if self.on_progress and k % 256 == 0:
+                self.on_progress(k, n)
+            bars: dict[str, Bar] = {}
+            for sym in self.cfg.symbols:
+                i = self.ptr[sym]
+                sb = self.series[sym]
+                if i < len(sb) and sb[i].open_time == ts:
+                    bars[sym] = sb[i]
+                    self.ptr[sym] = i + 1
+            self.step(k, ts, bars)
+        return self.finish(n)
 
-__all__ = ["QUANTUM", "Engine", "EngineConfig", "EngineError", "RunCancelled", "RunResult"]
+
+__all__ = [
+    "QUANTUM",
+    "Engine",
+    "EngineConfig",
+    "EngineError",
+    "PortfolioHooks",
+    "RunCancelled",
+    "RunResult",
+]
