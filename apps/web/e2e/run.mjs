@@ -18,6 +18,8 @@ const baseEnv = {
   ASTA_DATABASE_URL: dbUrl,
   ASTA_SECRET_KEY: "e2e-only-secret-key-not-a-real-secret",
   ASTA_API_PORT: "4640",
+  ASTA_DATA_DIR: path.join(repo, "data", "e2e", "store"),
+  ASTA_IMPORT_DIR: path.join(repo, "data", "e2e", "import"),
   ASTA_ARGON2_MEMORY_KIB: "7168",
   ASTA_ARGON2_TIME_COST: "5",
   PYTHONUTF8: "1",
@@ -70,16 +72,20 @@ try {
   mkdirSync(path.resolve(repo, "docs/evidence/m0-r1/screenshots"), { recursive: true });
   psql("DROP DATABASE IF EXISTS asta_e2e WITH (FORCE)");
   if (psql("CREATE DATABASE asta_e2e").status !== 0) throw new Error("cannot create asta_e2e");
-  run(py, [path.join(repo, "scripts/e2e_seed.py"), secrets], { cwd: repo, env: baseEnv });
+  rmSync(path.join(repo, "data", "e2e"), { recursive: true, force: true });
+  run(py, [path.join(repo, "scripts/e2e_seed.py"), secrets, path.join(repo, "data", "e2e", "import")], { cwd: repo, env: baseEnv });
 
   run(process.execPath, [path.join(web, "node_modules/next/dist/bin/next"), "build"], { cwd: web });
   webProc = start("web", process.execPath, [path.join(web, "node_modules/next/dist/bin/next"), "start", "-H", "127.0.0.1", "-p", "3640"], { cwd: web });
   await waitFor("http://127.0.0.1:3640/login");
 
   const results = [];
-  results.push(["live", await phase("live", "@live", { ASTA_FIXTURE_VENUES: "OKX" })]);
-  results.push(["nodata", await phase("nodata", "@nodata", { ASTA_ENABLE_MARKET_INGEST: "false", ASTA_FIXTURE_VENUES: "" })]);
-  results.push(["aging", await phase("aging", "@aging", { ASTA_FIXTURE_VENUES: "BINANCE,OKX", ASTA_STALE_AFTER_SECONDS: "1" })]);
+  const only = (process.env.E2E_PHASES ?? "").split(",").filter(Boolean); // e.g. E2E_PHASES=research
+  const want = (n) => only.length === 0 || only.includes(n);
+  if (want("live")) results.push(["live", await phase("live", "@live", { ASTA_FIXTURE_VENUES: "OKX" })]);
+  if (want("nodata")) results.push(["nodata", await phase("nodata", "@nodata", { ASTA_ENABLE_MARKET_INGEST: "false", ASTA_FIXTURE_VENUES: "" })]);
+  if (want("aging")) results.push(["aging", await phase("aging", "@aging", { ASTA_FIXTURE_VENUES: "BINANCE,OKX", ASTA_STALE_AFTER_SECONDS: "1" })]);
+  if (want("research")) results.push(["research", await phase("research", "@research", { ASTA_ENABLE_MARKET_INGEST: "false", ASTA_FIXTURE_VENUES: "" })]);
   console.log("\nPHASE RESULTS:", JSON.stringify(results));
   ok = results.every(([, v]) => v);
 } catch (e) {

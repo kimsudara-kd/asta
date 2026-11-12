@@ -14,3 +14,23 @@ h1 { font-size:20px; } .grid { display:grid; gap:12px; grid-template-columns:rep
 table { width:100%; border-collapse:collapse; } th,td { text-align:left; padding:6px 8px; border-bottom:1px solid var(--line); font-variant-numeric:tabular-nums; }
 .scroll { overflow-x:auto; } input,button { font:inherit; padding:8px; border-radius:6px; border:1px solid var(--line); background:var(--panel); color:var(--text); }
 button { cursor:pointer; } form { display:grid; gap:10px; max-width:340px; } .err { color:var(--bad); }
+.sim-banner { margin: 0 0 8px; padding: 8px 12px; text-align: center; font-weight: 700; letter-spacing: .03em; border: 2px dashed var(--warn); border-radius: 6px; color: var(--text); }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin: 8px 0 14px; border-bottom: 1px solid var(--line); }
+.tabs .sp { flex: 1; }
+.tab { padding: 8px 12px; color: var(--text); text-decoration: none; border-bottom: 3px solid transparent; }
+.tab.active { border-bottom-color: var(--warn); font-weight: 700; }
+.progress { height: 10px; background: var(--line); border-radius: 6px; overflow: hidden; }
+.progress > div { height: 100%; background: var(--warn); transition: width .3s; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; align-items: end; margin: 8px 0; }
+.row label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); min-width: 0; max-width: 100%; }
+.row label input, .row label textarea, .row label select { max-width: 100%; min-width: 0; box-sizing: border-box; }
+textarea { font: inherit; padding: 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--text); width: 100%; min-height: 70px; }
+select { font: inherit; padding: 8px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--text); max-width: 100%; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.pill.na { background: var(--muted); }
+.kv { display: grid; grid-template-columns: minmax(140px, 1fr) 2fr; gap: 4px 12px; font-size: 14px; }
+.kv > div:nth-child(odd) { color: var(--muted); }
+.mono { font-family: ui-monospace, Consolas, monospace; font-size: 12px; word-break: break-all; }
+.warnbox { border-left: 4px solid var(--warn); padding: 6px 10px; background: var(--panel); margin: 6px 0; }
+.badbox { border-left: 4px solid var(--bad); padding: 6px 10px; background: var(--panel); margin: 6px 0; }
+@media (max-width: 600px) { .kv { grid-template-columns: 1fr; } main { padding: 10px; } }

@@ -52,3 +52,41 @@ export function canSee(role: string, page: "audit" | "status"): boolean {
   if (page === "status") return ["viewer", "operator", "reviewer", "admin"].includes(role);
   return role === "reviewer" || role === "admin";
 }
+
+/** A metric is either a plain value or an N/A object carrying the reason. N/A is never shown as 0. */
+export function isNa(v: unknown): v is { value: null; na_reason: string } {
+  return typeof v === "object" && v !== null && "na_reason" in (v as Record<string, unknown>);
+}
+
+/** Trim a Decimal STRING to `dp` places by text (never through Number()), keeping the sign. */
+export function trimDecimal(s: string, dp = 2): string {
+  const m = /^(-?)(\d+)(?:\.(\d+))?(?:[eE]([+-]?\d+))?$/.exec(s.trim());
+  if (!m) return s;
+  if (m[4] !== undefined) return s; // exponent form: leave untouched rather than guess
+  const frac = (m[3] ?? "").padEnd(dp, "0").slice(0, dp);
+  const neg = m[1] === "-" && /[1-9]/.test(m[2] + frac) ? "-" : "";
+  return dp > 0 ? `${neg}${m[2]}.${frac}` : `${neg}${m[2]}`;
+}
+
+/** Fraction string (0.0478) -> "4.78%" using string shifting, not floating point. */
+export function pctText(s: string, dp = 2): string {
+  const m = /^(-?)(\d+)(?:\.(\d+))?$/.exec(s.trim());
+  if (!m) return s;
+  const frac = (m[3] ?? "").padEnd(dp + 2, "0");
+  const intPart = (m[2] + frac.slice(0, 2)).replace(/^0+(?=\d)/, "");
+  const rest = frac.slice(2, 2 + dp);
+  const neg = m[1] === "-" && /[1-9]/.test(intPart + rest) ? "-" : "";
+  return `${neg}${intPart}${dp > 0 ? "." + rest : ""}%`;
+}
+
+export function metricText(v: unknown, kind: "money" | "pct" | "plain" = "plain"): string {
+  if (isNa(v)) return `N/A — ${v.na_reason}`;
+  if (v === null || v === undefined) return "—";
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  const s = String(v);
+  if (kind === "money") return trimDecimal(s, 2);
+  if (kind === "pct") return pctText(s);
+  return s;
+}
+
+export const RESEARCH_BANNER = "SIMULATED · HISTORICAL DATA · ESTIMATED FILLS · NOT LIVE TRADING";

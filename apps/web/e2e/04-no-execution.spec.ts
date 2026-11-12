@@ -32,7 +32,7 @@ test.describe("@live no execution controls and no live-trading routes", () => {
   }) => {
     await login(page, "rev1");
     const probes = ["orders", "order", "live", "trade", "execute", "withdraw", "transfer",
-      "controls/resume", "controls/halt", "demo-runs", "paper-runs", "backtests"];
+      "controls/resume", "controls/halt", "demo-runs", "paper-runs"];
     for (const p of probes) {
       for (const method of ["get", "post"] as const) {
         const r = await page.request[method](`/api/v1/${p}`, {
