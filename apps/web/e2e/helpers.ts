@@ -8,10 +8,10 @@ export const creds: Creds = JSON.parse(
   readFileSync(path.join(__dirname, ".secrets.json"), "utf-8"),
 );
 
-// M0 acceptance screenshots are frozen evidence; later runs write to the M1-R1 folder.
+// M0/M1 acceptance screenshots are frozen evidence; M2 runs write to the M2 folder.
 export const SHOTS = path.resolve(
   __dirname,
-  process.env.E2E_SHOTS_DIR ?? "../../../docs/evidence/m1-r1/screenshots",
+  process.env.E2E_SHOTS_DIR ?? "../../../docs/evidence/m2/screenshots",
 );
 
 const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";

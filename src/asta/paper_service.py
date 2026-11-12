@@ -324,7 +324,11 @@ class PaperService:
             for venue, why in self.enabled.items():
                 if why:
                     continue
-                gaps = await self._db(lambda db, v=venue: self.collector.open_gaps(db, v)[:3])
+                try:
+                    gaps = await self._db(lambda db, v=venue: self.collector.open_gaps(db, v)[:3])
+                except Exception as exc:  # noqa: BLE001 - DB outage: try again next cycle
+                    log.warning("gap listing failed (%s)", exc)
+                    continue
                 for g in gaps:
                     try:
                         need = min(g.missing + 5, 1000 if venue == "BINANCE" else 300)
