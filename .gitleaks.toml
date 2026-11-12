@@ -1,0 +1,14 @@
+# Extends the default gitleaks ruleset; excludes ONLY untracked, git-ignored, generated/vendored
+# directories (verified: `git ls-files` contains none of them). Source, config, docs and git
+# history are scanned with the full default rules.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "generated / third-party content that is never committed"
+paths = [
+  '''(^|/)\.venv/''',
+  '''(^|/)node_modules/''',
+  '''(^|/)apps/web/\.next/''',
+  '''(^|/)infra/data/''',
+]
