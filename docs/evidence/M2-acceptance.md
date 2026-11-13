@@ -375,3 +375,45 @@ The observation is 10.9 / 72 h and the window cannot be completed inside this wo
 * **Python (`ASTA_RUN_NETWORK_TESTS=1`): 462 passed, 0 failed, 1 skipped.** The skip is the OKX live contract probe: *"OKX unreachable from this machine: ConnectError"* — it is the DNS sinkhole of R-1 (OKX resolves to 127.0.0.1 again) and is reported as not passed, not worked around. Binance live tests pass.
 * **Browser:** paper 9/9, research 12/12, nodata 1/1, aging 1/1, live 15/16 in the full run — one **transient failure** (`viewer signs in; sign-out ends the session`, URL stayed `/` for 20 s); an isolated rerun of the live phase passed **16/16** (`/tmp` log not committed). I treat it as a timing flake in an M0 test unrelated to this pass; it is disclosed rather than hidden (`docs/evidence/m2/e2e-full-run-r3.log` shows the failed run).
 * **Static/security:** ruff + format clean; pyright 0 errors; mypy strict clean (144 files); `pip-audit` and `pnpm audit` clean; secret scan 0; gitleaks re-run at the closing commit; `git diff 773b604` over gateway/egress/environment code and all M0/M1 evidence is empty; 15 live-lock tests pass.
+
+---
+
+# M2-R4 / R4A evidence addendum — observation continuation and Task Scheduler launch repair
+
+**Status: BUILT — NOT ACCEPTED.** The observation window (start `2026-11-12T20:11:22Z`, earliest completion `2026-11-15T20:11:22Z`) is **not** complete: at the R4A gate run it had **10.59 of 72 h**. No M2 tag, no push, no credential, no authenticated or demo/real order path, no strategy/fee/risk change, no M3, OKX network restriction not bypassed. The original sessions were never recreated (ids/config hashes unchanged).
+
+## R4A-1. Decoding and root cause of the task failure
+
+* `LastTaskResult 2147946720` = `0x800710E0` = `ERROR_REQUEST_REFUSED` ("the operator or administrator has refused the request"): Task Scheduler's answer when a new launch is refused under `MultipleInstances = IgnoreNew` because an earlier instance of the task is still running. It is a *symptom*: each keep-alive launch was refused because the previous instance had not yet finished starting.
+* **Root cause of the slow/"hung" launches:** the task was registered with Task Scheduler's default **priority 7 (BELOW_NORMAL process class plus low background I/O priority)** while the PC's CPU was saturated (100 % during the investigation: Code/Docker Desktop/other workloads). The task-launched `cmd` → `python` processes ran at BelowNormal and needed 25-45 s just to reach the lock check (the identical interpreter launched from an interactive shell starts in 0.2 s, imports in ~1 s). The same starvation explains the earlier flapping of supervised processes started by the task. The wrapper, interpreter path, venv, working directory and permissions were checked and are **not** at fault (a direct launch is not justified, so the `.cmd` wrapper is kept); the supervisor and service it spawns inherit Normal priority after the fix.
+* **Fix:** task `Settings.Priority = 4` (Normal). `scripts/register_supervisor_task.ps1` now registers with `-Priority 4`. After the fix the task-launched python reaches the lock check in ~1 s (cmd 13:40:45 → python 13:40:46 local).
+* Task configuration before/after: `docs/evidence/m2/r4a-task-before.xml` / `r4a-task-after.xml` (only `Priority` changed: 7 → 4; action, triggers, principal, `IgnoreNew`, 2-minute keep-alive unchanged).
+
+## R4A-2. Controlled handover (06:39:58 → 06:40:45 UTC, 2026-11-13)
+
+The manually started supervisor (PID 48040) and its service were terminated, the stale task instance (cmd 44340 chain, BelowNormal) was ended, and `Start-ScheduledTask` was issued. The task-launched supervisor took the lock within seconds and started the service. Ownership evidence: process chain `cmd.exe /c scripts\run_paper_supervisor.cmd` (4484, parent = Task Scheduler service) → `python.exe scripts\paper_supervisor.py` (46820) → supervisor (48160, lock holder) → `python -m asta.paper_service` (39028); all Normal priority; exactly one supervisor and one service. The handover gap is unmonitored time in the accounting (not uptime). Single instance: lock file plus `IgnoreNew`; extra keep-alive launches log "another ASTA paper supervisor is already running; exiting".
+
+## R4A-3. Recovery tests (under the task-owned supervisor)
+
+| Test | Result |
+|---|---|
+| Service force-killed 06:41:07 | `SERVICE_DOWN` 06:41:10 → `SERVICE_RECOVERED` 06:41:21: **11 s**, fresh Binance feed verified (OKX disabled, so excluded from the recovery rule), both sessions RUNNING, replay verified |
+| Supervisor force-killed 06:42:37 (service left orphaned) | first keep-alive relaunch (06:42:45) started but died silently (`LastTaskResult 0xC000013A`, cause not established: it overlapped the end of the killed instance); the next keep-alive (06:44:45) succeeded: lock taken, orphan service terminated and recorded as an incident, preflight reconciled, service restarted, samples resumed 06:45:5x. **≈ 3 min 15 s of unmonitored time** counted against coverage |
+
+Residual: the keep-alive can lose one 2-minute interval after a forced supervisor kill (budget impact only); no data was lost, both sessions resumed from verified replay.
+
+## R4A-4. Integrity (before/after: `r4a-integrity-before.json` / `r4a-integrity-after.json`, tool `scripts/paper_integrity.py`, read-only)
+
+Session ids, config hashes, states (RUNNING), reconciliation discrepancies (0) identical before and after. observe-1h `afec3e2b-…` hash `dd59484f…`: 314 → verified replay of every stored checkpoint digest (0 fills, fills digest unchanged). observe-5m `489d0990-…` hash `f06aaf1a…`: replay verified (471 → 472 steps, cursor advanced normally), 8 fills, fills digest `405b0d183e76ad6f` unchanged. No risk halt has occurred; unresolved critical incidents: 0.
+
+## R4A-5. Observation metrics (gate with `--since 2026-11-12T20:11:22Z`, `r4a-gate-1h.json`, `r4a-gate-5m.json`, `r4a-observation-measure.json`)
+
+Elapsed 10.59 h of 72 h; window 38,114 s; **supervisor coverage 82.9 %** (unmonitored 6,528 s); **service availability 82.4 %**; unavailable (monitored) 172 s; reconciliation discrepancies 0; duplicate postings 0; dead-letter jobs 0; open/unrecoverable gaps 0; unresolved critical incidents 0; risk halts 0; daily reports reproducible. Per-venue: Binance feed outage intervals coincide with service/supervisor restarts (seconds each); **OKX is blocked continuously since 2026-11-13 03:00:16 UTC** (open interval; reason `ConnectError: All connection attempts failed`, the R-1 upstream DNS sinkhole; `VENUE_DISABLED` incident; no new entries on OKX, virtual inventory/ledger preserved) — see `feed_outage_intervals` in the gate JSON. `gate_pass: false` (duration, supervision coverage).
+
+## R4A-6. Regression (after the last code/script change)
+
+Python with `ASTA_RUN_NETWORK_TESTS=1`: **465 passed, 1 skipped** (OKX live probe, DNS sinkhole), 0 failed; ruff check/format clean; secret scan 0; `git diff 773b604` over `src/asta/risk`, egress, environment and M0/M1 evidence is empty. Not re-run in R4A (no product code changed since the R4 run of 39 browser tests / mypy strict / audits; only a priority setting, a read-only script and one test-free script line were changed): browser suite, mypy-in-container, gitleaks, pip-audit/pnpm audit — to be re-run at completion.
+
+## R4A-7. Next steps
+
+Keep the task running; at/after 2026-11-15T20:11:22Z run `measure` and `gate` for both sessions, re-run the full regression, update this addendum and request CEO review. Recommendation unchanged: **BUILT — NOT ACCEPTED**.
