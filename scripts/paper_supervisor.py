@@ -106,9 +106,69 @@ def incident(factory, kind, sev, detail, key, resolved=False):  # type: ignore[n
             time.sleep(5)
 
 
+LOCK = LOG_DIR / "supervisor.lock"
+
+
+def _pid_running(pid: int) -> bool:
+    r = subprocess.run(  # noqa: S603,S607 - fixed argv
+        ["tasklist", "/FI", f"PID eq {pid}", "/FO", "CSV", "/NH"], capture_output=True, text=True
+    )
+    return f'"{pid}"' in r.stdout
+
+
+def acquire_single_instance() -> bool:
+    """One supervisor per machine: an exclusive lock file holding our PID; a stale lock (its PID no
+    longer exists) is taken over."""
+    import os
+
+    try:
+        fd = os.open(LOCK, os.O_CREAT | os.O_EXCL | os.O_WRONLY)
+    except FileExistsError:
+        try:
+            other = int(LOCK.read_text().strip() or 0)
+        except ValueError:
+            other = 0
+        if other and _pid_running(other):
+            return False
+        LOCK.unlink(missing_ok=True)
+        return acquire_single_instance()
+    os.write(fd, str(os.getpid()).encode())
+    os.close(fd)
+    return True
+
+
+def kill_orphan_services() -> list[int]:
+    """A previous supervisor that died abruptly may have left its service child running. Only
+    processes whose command line contains `asta.paper_service` are terminated (ASTA-specific)."""
+    ps = (
+        "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'asta\.paper_service' }"
+        " | ForEach-Object { $_.ProcessId }"
+    )
+    r = subprocess.run(  # noqa: S603,S607
+        ["powershell", "-NoProfile", "-Command", ps], capture_output=True, text=True
+    )
+    pids = [int(x) for x in r.stdout.split() if x.isdigit()]
+    for pid in pids:
+        subprocess.run(["taskkill", "/PID", str(pid), "/T", "/F"], capture_output=True)  # noqa: S603,S607
+    return pids
+
+
 def main() -> int:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
+    if not acquire_single_instance():
+        print("another ASTA paper supervisor is already running; exiting", file=sys.stderr)
+        return 3
     factory = make_session_factory(make_engine(load_settings().database_url))
+    orphans = kill_orphan_services()
+    if orphans:
+        incident(
+            factory,
+            "SERVICE_DOWN",
+            "WARNING",
+            f"supervisor start: terminated orphaned service process(es) {orphans} left by a previous supervisor",
+            f"orphan:{int(time.time())}",
+            resolved=True,
+        )
     out = SAMPLES.open("a", encoding="utf-8")
     child: subprocess.Popen | None = None  # type: ignore[type-arg]
     restarts = 0
@@ -199,6 +259,7 @@ def main() -> int:
         if child is not None and child.poll() is None:
             child.terminate()
         out.close()
+        LOCK.unlink(missing_ok=True)
     return 0
 
 

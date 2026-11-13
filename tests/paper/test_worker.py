@@ -564,3 +564,35 @@ def test_a_risk_trip_halts_the_session_opens_incidents_and_keeps_history(factory
         "MAX_DRAWDOWN",
     }
     assert cursor(factory, sid) == N - 1  # observation continues while halted (bars still absorbed)
+
+
+def test_a_risk_halt_persists_across_a_worker_restart_and_is_never_auto_resumed(factory):
+    from asta.research.sim.risk import SimRiskLimits
+
+    tight = SimRiskLimits(
+        D("1000"), D("0.10"), D("0.30"), D("0.0001"), D("0.0001"), "RISK_COMPLIANT", "test-tight"
+    )
+    cfg = CFG.__class__(**{**CFG.__dict__, "risk": tight})
+    sid = new_session(factory, cfg)
+    enqueue_steps(factory, sid, 0, 380)
+    w1 = late_ok_worker(factory)
+    drain_steps(w1, factory, sid, 380)
+    with factory() as db:
+        assert store.get_session(db, sid).state == "RISK_HALTED"
+    enqueue_steps(factory, sid, 380, 410)
+    w2 = late_ok_worker(factory)  # restart: empty cache, state rebuilt by verified replay
+    drain_steps(w2, factory, sid, 410)
+    assert cursor(factory, sid) == 409
+    with factory() as db:
+        sess = store.get_session(db, sid)
+        assert sess.state == "RISK_HALTED"  # still halted; only an operator can change it
+        rt, _ = store.rebuild_runtime(db, sid)
+        assert rt.halted()
+        log = [
+            r
+            for (r,) in db.execute(
+                text("select to_state from paper_session_states where session_id=:s order by id"),
+                {"s": str(sid)},
+            )
+        ]
+    assert log[-1] == "RISK_HALTED" and "RUNNING" not in log[log.index("RISK_HALTED") + 1 :]
