@@ -67,18 +67,18 @@ def build() -> dict[str, object]:
     return {
         "generated_from_commit": head(),
         "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
-        "files": {f.relative_to(ROOT).as_posix(): digest(f) for f in files()},
+        "files": [{"path": f.relative_to(ROOT).as_posix(), "sha256": digest(f)} for f in files()],
     }
 
 
 def main() -> int:
     if "--write" in sys.argv:
         MANIFEST.write_text(json.dumps(build(), indent=1) + "\n", encoding="utf-8")
-        print(f"wrote {MANIFEST} ({len(build()['files'])} files)")  # type: ignore[arg-type]
+        print(f"wrote {MANIFEST}")
         return 0
     m = json.loads(MANIFEST.read_text(encoding="utf-8"))
     problems = []
-    pinned: dict[str, str] = m["files"]
+    pinned: dict[str, str] = {e["path"]: e["sha256"] for e in m["files"]}
     for rel, want in pinned.items():
         f = ROOT / rel
         if not f.exists():

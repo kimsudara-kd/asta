@@ -90,3 +90,10 @@ OKX remains **BLOCKED** (upstream DNS sinkhole, R-1), not bypassed, and document
 Binance Spot Testnet only; one connector instance bound to `EXCHANGE_DEMO`/Binance; READ + SPOT_TRADE demo key, no withdrawal/transfer; hard per-order notional cap and a daily order-count cap far below the demo balance; kill switch and `RISK_HALT` integration; deterministic client order ids; reconciliation after every timeout; reset-aware bookkeeping; paper-vs-demo comparison reporting only (no performance claims); exact-once order submission verified against duplicate signals; OKX excluded until separately authorized.
 
 > **R2 note on OKX:** the upstream DNS block lifted on 2026-11-13; OKX public endpoints answered through the boundary (see the R2 observation in `EXCHANGE-CAPABILITY-MATRIX.md`). OKX remains excluded from the proposed first M3-B scope and its authenticated/demo behaviour is still UNVERIFIED.
+
+
+---
+
+# R3 update (M3A-R3): credential readiness
+
+**Credential readiness: NO-GO. M3-B: NOT AUTHORIZED, not started.** F-01, F-02 and F-03 are unchanged and OPEN: no dedicated infrastructure exists (single Windows 11 Home laptop, no admin rights, no hypervisor; hypervisor installation and hardware purchase are not authorized), and no independent reviewer has been designated (see `HOST-INVENTORY-AND-FEASIBILITY.md`, `REVIEWER-ENGAGEMENT.md`, `RESIDUAL-RISK-REGISTER.md`). Ready on the day infrastructure exists: reproducible seeds, hypervisor scripts, deploy/rollback, acceptance suite (controls C1..C10 with a real reboot matrix), synthetic-secret vault validation, and the database part of the M2 migration rehearsal (passed). Binance-only scope (R2) remains the proposed first M3-B scope once every gate closes; OKX stays out of the first scope.

@@ -99,12 +99,14 @@ def test_hypervisor_scripts_are_dry_run_by_default_and_never_target_this_pc():
     "script", ["deploy.sh", "rollback.sh", "virtualbox-create.sh", "libvirt-create.sh"]
 )
 def test_shell_scripts_have_valid_syntax(script):
+    assert BASH is not None
     r = subprocess.run([BASH, "-n", str(PROV / script)], capture_output=True, text=True)  # noqa: S603,S607
     assert r.returncode == 0, r.stderr
 
 
 @pytest.mark.skipif(BASH is None, reason="Git Bash not available")
 def test_deploy_dry_run_prints_the_plan_and_changes_nothing():
+    assert BASH is not None
     r = subprocess.run(  # noqa: S603,S607
         [BASH, str(PROV / "deploy.sh"), "firewall", str(ROOT)],
         capture_output=True,

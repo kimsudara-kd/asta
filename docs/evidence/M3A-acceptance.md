@@ -1,6 +1,6 @@
 # M3-A acceptance evidence (ASTA-M3A-IMPLEMENTATION-01)
 
-> **Superseded in status by the M3A-R2 section at the end of this file (R2: BUILT — NOT ACCEPTED, credential readiness NO-GO).**
+> **Superseded in status by the M3A-R3 section at the end of this file (R3: BUILT — NOT ACCEPTED, credential readiness NO-GO).**
 
 **Final status: `ACCEPTANCE CANDIDATE` for M3-A engineering scope, with credential readiness explicitly NOT granted.** Credential/authenticated-demo readiness is **BLOCKED** by three open High findings (independent security review outstanding, legacy M2 host processes outside the boundary, proxy egress not independently firewalled). M3-A is **not accepted** (needs CEO review), **no M3-A acceptance tag was created**, **M3-B was not started**, nothing was pushed (no remote exists).
 
@@ -143,3 +143,57 @@ Package complete and extended (`INDEPENDENT-REVIEW-PACKAGE.md` R2): architecture
 
 ## R2-7. Recommendation
 **NO-GO** for credential introduction and for M3-B. The security work that can be done without CEO decisions and host changes is done; what remains is decisions and external actions: designate the independent reviewer; choose the dedicated security-host technology and authorize its provisioning; (later) approve any migration of the legacy processes; then, if the gates close, authorize a Binance-only M3-B with its own acceptance gates. Nothing in this repository can currently place an order.
+
+
+---
+
+# M3A-R3 — Dedicated security host provisioning and independent verification (evidence update)
+
+**R3 final status: `BUILT — NOT ACCEPTED`. Credential readiness: NO-GO.** The three mandatory High findings **F-01, F-02, F-03 remain OPEN**; M3-A is not accepted and no acceptance tag exists. No credential, authenticated call or order of any kind; no M3-B work; no push; no change to the Windows host, hypervisor, disks, shared Docker or Windows network policy; no purchase; no migration of live M2 processes; paper-session configurations and the supervisor untouched. Baseline `e71706f`; R3 commits are local (`git log --oneline e71706f..HEAD`).
+
+## R3-1. Actual host resource inventory
+`docs/m3a/HOST-INVENTORY-AND-FEASIBILITY.md` (read-only inspection): one ASUS ROG Zephyrus G14 laptop, Windows 11 **Home**, Ryzen AI 9 HX 370 (12C/24T), 31.1 GB RAM (**4.5 GB free**), one 954 GB NVMe (C: 224 GB free, E: 155 GB free), a single usable uplink (Wi-Fi 7), **no administrator rights**, no hypervisor tooling (no Hyper-V manager, VirtualBox, VMware, QEMU, Multipass). No other machine is available to this session. **Conclusion: no dedicated infrastructure exists, and the authorizations that would create it (hypervisor on this PC, hardware purchase) are withheld.** A VM pair on this laptop would still share its failure domain (not an independent boundary); the smallest configuration that genuinely closes F-02 is a separate small Linux host with two NICs (Option A, needs a purchase decision).
+
+## R3-2. Final deployment topology
+Unchanged from the verified design (`VM-BOUNDARY-DESIGN.md` R2/R3): private switch `asta-prot` (no uplink) -> `asta-rt` runtime VM (10.77.0.10, no route, no DNS) -> `asta-fw` firewall/proxy VM (10.77.0.1 on `prot0`, only uplink `up0`). **Deployed today: only the in-Docker kernel gate** (`infra/egress/`, F-02 mitigation, still running and re-verified). **Designed and statically validated, not deployed: the dedicated-host topology.**
+
+## R3-3. Network and firewall rules
+`infra/security-host/firewall-vm/nftables.conf` and `runtime-vm/nftables.conf` (default DROP in all hooks, IPv6 only loopback; firewall VM never forwards, outputs only to the resolved allowlist set on 443/9443 plus root-only DNS/NTP to one pinned upstream; runtime VM outputs only to `10.77.0.1:3128`), both `nft -c` validated; netplan files; hardened systemd units; allowlist refresh job (public IPv4 only). The proxy user has no DNS egress (hosts-file resolution).
+
+## R3-4. Security acceptance evidence and credential-isolation verification
+* **Executed (Docker boundary, re-run after every change):** protected-runtime negative suite **78/78** and compromised-proxy suite **39/39** (`r3-public-data-probe` run, final runs in this round); restart/fail-closed matrix from R1 (`r1-boundary-verification.json`).
+* **Prepared, NOT executed (no dedicated infrastructure):** acceptance controls C1..C10 including the reboot matrix, `vm_acceptance.py` (pre/post with `boot_id`, ruleset-hash and route comparison), hypervisor-side checks.
+* **Credential isolation:** synthetic-secret vault validation **23/23 PASS on Linux** (unprivileged container, file modes 0600/0700, core dumps off, no secret in environment/cmdline, logs, crash text, stdout/stderr, vault files or access log) and 19 PASS + 4 SKIPPED (POSIX-only) on Windows; 40 vault/binding tests; 5 legacy-isolation policy tests (legacy processes never reference the vault/demo environment, launcher sets four dev-only variables, settings refuse exchange-credential variables, no import of `asta.security`). Runtime isolation of legacy hosts from the credential store is **not verifiable without the dedicated host**.
+
+## R3-5. Reboot and recovery results
+Verified in Docker: service restart, container restart, gate restart (dependents recreated), gate stopped = zero connectivity (fail closed), recovery. **Not performed:** guest/host reboot, snapshot revert, power loss, Docker Desktop/VM restart or Windows reboot (would interrupt every other project and the M2 database; not authorized). F-14 stays open.
+
+## R3-6. M2 migration readiness
+Rehearsal executed read-only on a copy (`scripts/m2_migration_rehearsal.py`, `r3-m2-migration-rehearsal.json`): dump of the live database restored to a scratch database; session ids and config hashes identical; 887 checkpoints in the copy, 0 missing in the source, 0 digest differences; replay verified every checkpoint; 0 reconciliation discrepancies; latest report revisions reproducible; scratch database dropped, dump deleted. **Database part: ready. Not yet rehearsed: service start against the copy on the new host, cutover gap, rollback timing.** Live migration not performed and not authorized.
+
+## R3-7. Independent reviewer findings
+**None: no reviewer has been designated and no review has been performed (F-03 OPEN).** The package is organized for review: `REVIEW-INDEX.md` (reading order, package map, reproduction), `REVIEWER-ENGAGEMENT.md` (qualification, scope, rules of engagement, questions, deliverable), `INDEPENDENT-REVIEW-PACKAGE.md`, manifests (`REVIEW-MANIFEST.json`, `FROZEN-EVIDENCE.json`). Approval after remediation cannot be recorded.
+
+## R3-8. Public-data verification (permitted, executed)
+Through the gated boundary, runtime profile (`r3-public-data-probe.json`): Binance production market-data REST (`exchangeInfo`, `depth`) 200 and WebSocket upgrade 101; OKX public REST (`time`, `instruments`) 200 and WebSocket upgrade 101; testnet hosts correctly **blocked** in the runtime profile (they are only in the reviewed `capability_probe` profile; testnet public endpoints were runtime-verified in R1/R2). M2 feeds: Binance and OKX `CONNECTED/LIVE`.
+
+## R3-9. Complete regression (final tree)
+| Check | Result |
+|---|---|
+| Full Python (`ASTA_RUN_NETWORK_TESTS=1`, `r3-pytest-full.log`) | **579 passed, 0 skipped, 0 failed** (563 + 16 new: provisioning 11, legacy isolation 5) |
+| Browser (`r3-e2e-full-run.log`) | **39/39**; no tracked file modified |
+| Ruff check + format | clean |
+| mypy strict (container) | no issues, 155 files (a typing error in my new test was found and fixed) |
+| Pyright | `src` 0 errors |
+| pip-audit / pnpm audit | no known vulnerabilities / no known vulnerabilities |
+| Secret scan | 0 findings |
+| **Full-history gitleaks** | **3 findings, NOT suppressed**: SHA-256 file digests in the review manifest committed in R2 (`e71706f`, `REVIEW-MANIFEST.json` lines 43, 44, 82) sitting next to file names containing the word CREDENTIAL; they are file hashes, not secrets. I did not add suppressions (R2 directive: do not expand suppression rules; the attempt to add three fingerprints was also refused by the sandbox). The manifest format was changed so new manifests no longer produce the pattern. **Decision needed from the owner:** approve three more single-fingerprint exceptions, or approve rewriting the unpushed local commits from `e71706f`. Until then this check is reported as FAILING |
+| Infrastructure negative tests | 78/78 and 39/39 |
+| M0-M2 safety | live-lock/contract tests inside the full suite; `git diff fe8194c -- src/asta/risk src/asta/core` empty; frozen-evidence verifier intact |
+| Paper ledger | both sessions RUNNING, same ids/hashes, replay verified (322 / 568 checkpoints), 0 reconciliation discrepancies (`r3-paper-integrity.json`); supervisor lock PID 43108 unchanged |
+
+## R3-10. Incident disclosed: WSL started by a test
+While adding tests for the shell scripts, my test called `bash` from PATH. On this PC that resolves to the **WSL launcher**, so running the test started WSL: afterwards `Ubuntu-24.04` (a shared distribution that belongs to other work and had been stopped at the start of this session) showed **Running**. I cannot prove I was the only possible starter, but I treat it as my side effect: the test now uses Git Bash only and refuses the WSL launcher; the distribution was **not stopped** by me (another task might now rely on it). Owner action if unwanted: `wsl --terminate Ubuntu-24.04`.
+
+## R3-11. Residual-risk register and recommendation
+`docs/m3a/RESIDUAL-RISK-REGISTER.md` (all findings with owner, mitigation, closure, status). **M3-B: NO-GO.** What remains is decisions and external actions: (1) designate and engage the independent reviewer (`REVIEWER-ENGAGEMENT.md`); (2) decide on dedicated infrastructure (recommended Option A: a separate small Linux host with two NICs) and authorize its purchase/provisioning; then execute C1..C10 including a real reboot matrix; (3) decide the gitleaks question above; (4) later, authorize migration of the legacy processes and, if every gate closes, a Binance-only M3-B.

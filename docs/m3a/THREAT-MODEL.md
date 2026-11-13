@@ -78,3 +78,7 @@ Status after R1: **Critical 0; High 3 open (F-01, F-02 mitigated-not-closed, F-0
 | F-07 | Monitoring/backup/restore plan written (`VM-BOUNDARY-DESIGN.md` R2-4); implementation still open |
 
 Remaining High after R2: **F-01, F-02, F-03** (unchanged count). Critical: 0. Credential readiness: **NO-GO**.
+
+
+## 6. R3 status
+F-01, F-02, F-03: **OPEN** (no dedicated infrastructure, no reviewer). Deployable artifacts, acceptance controls C1..C10, F-01 policy tests, M2 rehearsal and a consolidated register (`RESIDUAL-RISK-REGISTER.md`) were added. New disclosed item OP-2 (a test started the WSL launcher). Full-history gitleaks currently reports 3 unsuppressed findings (SHA-256 digests in the R2 review manifest, not secrets) awaiting an owner decision. Credential readiness: **NO-GO**.
