@@ -1,0 +1,128 @@
+{
+ "synthetic_secrets_generated": 5,
+ "platform": "win32",
+ "checks": [
+  {
+   "check": "store two separate identities",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "withdrawal permission refused",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "STRATEGY denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "AI_MODULE denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "UI denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "OPERATOR denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "connector without grant denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "granted connector leases (values are masked objects)",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in log",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in crash",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in stdout",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in stderr",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in access_log",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in vault_file:vault__binance__spot-testnet.enc",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in vault_file:vault__okx__demo.enc",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "vault files exist and are not plaintext",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "access log chain verifies",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "revoked credential cannot be leased",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "revoke destroys the material",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no secret in own environment/cmdline",
+   "result": "SKIPPED",
+   "detail": "POSIX-only check; must be run on the Linux runtime VM"
+  },
+  {
+   "check": "vault files not group/world accessible",
+   "result": "SKIPPED",
+   "detail": "POSIX-only check; must be run on the Linux runtime VM"
+  },
+  {
+   "check": "vault directory 0700",
+   "result": "SKIPPED",
+   "detail": "POSIX-only check; must be run on the Linux runtime VM"
+  },
+  {
+   "check": "core dumps disabled",
+   "result": "SKIPPED",
+   "detail": "POSIX-only check; must be run on the Linux runtime VM"
+  }
+ ],
+ "failed": [],
+ "skipped": [
+  "no secret in own environment/cmdline",
+  "vault files not group/world accessible",
+  "vault directory 0700",
+  "core dumps disabled"
+ ]
+}

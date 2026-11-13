@@ -15,7 +15,9 @@ import ssl
 import sys
 import time
 
-PROXY = ("asta-egress-proxy", 3128)
+# the same suite runs in Docker (default) and on the dedicated VMs (ASTA_PROXY=10.77.0.1:3128)
+_PX = os.environ.get("ASTA_PROXY", "asta-egress-proxy:3128").rsplit(":", 1)
+PROXY = (_PX[0], int(_PX[1]))
 OUT: list[dict[str, object]] = []
 
 

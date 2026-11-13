@@ -1,0 +1,123 @@
+{
+ "synthetic_secrets_generated": 5,
+ "platform": "linux",
+ "checks": [
+  {
+   "check": "store two separate identities",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "withdrawal permission refused",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "STRATEGY denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "AI_MODULE denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "UI denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "OPERATOR denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "connector without grant denied",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "granted connector leases (values are masked objects)",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in log",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in crash",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in stdout",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in stderr",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in access_log",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in vault_file:vault__okx__demo.enc",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no synthetic secret in vault_file:vault__binance__spot-testnet.enc",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "vault files exist and are not plaintext",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "access log chain verifies",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "revoked credential cannot be leased",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "revoke destroys the material",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "no secret in own environment/cmdline",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "vault files are not group/world accessible",
+   "result": "PASS",
+   "detail": "{'vault__binance__spot-testnet.enc': 384, 'vault__okx__demo.enc': 384}"
+  },
+  {
+   "check": "vault directory is 0700",
+   "result": "PASS",
+   "detail": "0o700"
+  },
+  {
+   "check": "core dumps disabled (RLIMIT_CORE == 0)",
+   "result": "PASS",
+   "detail": "soft=0"
+  }
+ ],
+ "failed": [],
+ "skipped": []
+}

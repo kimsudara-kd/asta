@@ -15,7 +15,9 @@ import socket
 import ssl
 import sys
 
-PROXY = ("asta-egress-proxy", 3128)
+# the same suite runs in Docker (default) and on the dedicated VMs (ASTA_PROXY=10.77.0.1:3128)
+_PX = os.environ.get("ASTA_PROXY", "asta-egress-proxy:3128").rsplit(":", 1)
+PROXY = (_PX[0], int(_PX[1]))
 RESULTS: list[dict[str, object]] = []
 
 
@@ -135,9 +137,9 @@ def main() -> int:
         st,
         denied(st) or st.startswith("error") or st == "EMPTY",
     )
-    expect_denied_via_proxy("N06", "tunnel to the proxy itself", "asta-egress-proxy:3128")
+    expect_denied_via_proxy("N06", "tunnel to the proxy itself", f"{PROXY[0]}:{PROXY[1]}")
     for p in (1080, 3129, 8080, 8888, 9050):
-        r = direct("asta-egress-proxy", p, timeout=2)
+        r = direct(PROXY[0], p, timeout=2)
         record("N06", f"alternative proxy port {p}", "closed", r, r != "CONNECTED")
     st = raw_proxy(b"CONNECT data-api.binance.vision:443@evil.example:443 HTTP/1.1\r\n\r\n")
     record("N06", "userinfo/host confusion in CONNECT target", "proxy refuses", st, denied(st))
