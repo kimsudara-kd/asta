@@ -59,8 +59,11 @@ def health(factory, child: subprocess.Popen | None, since: datetime | None = Non
                 if w.heartbeat_at >= since
             ]
             feeds = {}
+            disabled = []
             for v in ("BINANCE", "OKX"):
                 f = db.get(MarketFeedConnection, v)
+                if f is not None and f.state == "DISABLED":
+                    disabled.append(v)
                 feeds[v] = bool(
                     f is not None
                     and f.source == "LIVE"
@@ -69,7 +72,7 @@ def health(factory, child: subprocess.Popen | None, since: datetime | None = Non
                     and f.last_event_at >= since
                     and (now - f.last_event_at) <= timedelta(seconds=FEED_FRESH_S)
                 )
-        return Sample(now, alive, True, bool(workers), feeds)
+        return Sample(now, alive, True, bool(workers), feeds, tuple(disabled))
     except Exception:  # noqa: BLE001 - database unreachable
         return Sample(now, alive, False, False, {})
 
@@ -92,6 +95,26 @@ def preflight(factory) -> tuple[bool, str]:  # type: ignore[no-untyped-def]
         return True, f"{len(rows)} active session(s) reconcile"
     except Exception as exc:  # noqa: BLE001
         return False, f"database not reachable: {type(exc).__name__}"
+
+
+def release_stale_db_locks(factory) -> int:  # type: ignore[no-untyped-def]
+    """After the service was killed its backends may linger 'idle in transaction' holding row locks
+    (found live in M2-R4: the new worker blocked on them, the supervisor killed it again, creating
+    more). Terminate ONLY this database's abandoned transactions older than 15 s, before restart."""
+    try:
+        with factory() as db:
+            rows = db.execute(
+                text(
+                    "select pg_terminate_backend(pid) from pg_stat_activity "
+                    "where datname = current_database() and pid <> pg_backend_pid() "
+                    "and state like 'idle in transaction%' "
+                    "and now() - state_change > interval '15 seconds'"
+                )
+            ).all()
+            db.commit()
+        return len(rows)
+    except Exception:  # noqa: BLE001
+        return 0
 
 
 def incident(factory, kind, sev, detail, key, resolved=False):  # type: ignore[no-untyped-def]
@@ -185,6 +208,7 @@ def main() -> int:
     backoff = 1.0
     unhealthy_since: datetime | None = None
     child_started: datetime | None = None
+    hung_key: str | None = None
     try:
         while True:
             if child is None or child.poll() is not None:
@@ -198,6 +222,16 @@ def main() -> int:
                         "WARNING",
                         f"paper service exited unexpectedly (code {code}); supervisor restarting",
                         down_key,
+                    )
+                freed = release_stale_db_locks(factory)
+                if freed:
+                    incident(
+                        factory,
+                        "SERVICE_DOWN",
+                        "INFO",
+                        f"released {freed} abandoned database transaction(s) of the dead service",
+                        f"locks:{int(time.time())}",
+                        resolved=True,
                     )
                 ok, why = preflight(factory)
                 if not ok:
@@ -229,7 +263,7 @@ def main() -> int:
             s = health(factory, child, child_started)
             out.write(json.dumps(s.to_json()) + "\n")
             out.flush()
-            if s.available and all(s.feeds.get(v, False) for v in ("BINANCE", "OKX")):
+            if s.available and all(ok for v, ok in s.feeds.items() if v not in s.disabled):
                 backoff = 1.0
                 unhealthy_since = None
                 if down_since is not None and down_key is not None:
@@ -243,6 +277,11 @@ def main() -> int:
                         resolved=True,
                     )
                     incident(factory, "SERVICE_DOWN", "WARNING", "closed", down_key, resolved=True)
+                    if hung_key:
+                        incident(
+                            factory, "SERVICE_DOWN", "WARNING", "closed", hung_key, resolved=True
+                        )
+                        hung_key = None
                     down_since = down_key = None
             elif child.poll() is None:
                 unhealthy_since = unhealthy_since or utcnow()
@@ -250,12 +289,13 @@ def main() -> int:
                     not s.worker_ok
                     and (utcnow() - unhealthy_since).total_seconds() > 3 * HUNG_WORKER_S
                 ):
+                    hung_key = f"svc-hung:{int(time.time())}"
                     incident(
                         factory,
                         "SERVICE_DOWN",
                         "WARNING",
                         "worker heartbeat stale; supervisor terminating the service for a safe restart",
-                        f"svc-hung:{int(time.time())}",
+                        hung_key,
                     )
                     child.terminate()
                     down_since = utcnow()

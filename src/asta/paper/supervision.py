@@ -27,6 +27,7 @@ class Sample:
     db_ok: bool
     worker_ok: bool
     feeds: dict[str, bool] = field(default_factory=dict)
+    disabled: tuple[str, ...] = ()  # venues the service itself reports as suspended (reason stored)
 
     @property
     def available(self) -> bool:
@@ -39,6 +40,7 @@ class Sample:
             "db_ok": self.db_ok,
             "worker_ok": self.worker_ok,
             "feeds": self.feeds,
+            "disabled": list(self.disabled),
         }
 
     @staticmethod
@@ -49,6 +51,7 @@ class Sample:
             bool(d["db_ok"]),
             bool(d["worker_ok"]),
             {k: bool(v) for k, v in d.get("feeds", {}).items()},
+            tuple(d.get("disabled", ())),
         )
 
 
