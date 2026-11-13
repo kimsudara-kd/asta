@@ -394,7 +394,8 @@ def test_a_defective_report_is_superseded_by_a_new_revision_never_edited(client,
     new, created = reports.store_report(db, sid, day, supersede=True)
     db.commit()
     assert created and new.revision == 1 and reports.verify_report(db, new)
-    assert reports.latest_report(db, sid, day).id == new.id
+    latest = reports.latest_report(db, sid, day)
+    assert latest is not None and latest.id == new.id
     assert (
         db.execute(text("select count(*) from daily_paper_reports")).scalar_one() == 2
     )  # old row kept

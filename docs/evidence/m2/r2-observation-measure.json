@@ -1,5 +1,5 @@
 {
- "measured_at": "2026-11-13T01:07:38.217379+00:00",
+ "measured_at": "2026-11-13T01:34:02.028911+00:00",
  "since": "2026-11-12T16:21:00+00:00",
  "sessions": [
   {
@@ -8,9 +8,9 @@
    "state": "RUNNING",
    "timeframe": "1h",
    "started_at": "2026-11-12 16:23:20.916397+00:00",
-   "elapsed_hours": 8.738,
+   "elapsed_hours": 9.178,
    "live_steps": 9,
-   "expected_steps_approx": 8,
+   "expected_steps_approx": 9,
    "muted_late_or_paused_steps": 0,
    "steps_with_blocked_markets": 1,
    "fills": 0,
@@ -29,7 +29,7 @@
     "config_hash": "dd59484ff7d1da598c9a946ecf5662955372d0eda40cd2ea5ecd9266febefb84",
     "window": {
      "start": "2026-11-13T00:00:00+00:00",
-     "end": "2026-11-13T01:07:38.217379+00:00",
+     "end": "2026-11-13T01:34:02.028911+00:00",
      "timezone": "UTC",
      "partial": true
     },
@@ -159,7 +159,7 @@
      "risk_compliant_period": true,
      "market_data": "STORED_PUBLIC_OBSERVATIONS",
      "observation_sources": {
-      "LIVE": 402
+      "LIVE": 561
      },
      "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
      "statement": "Simulated net P&L 0.00000000 USDT on 1000.00000000 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
@@ -173,15 +173,15 @@
    "state": "RUNNING",
    "timeframe": "5m",
    "started_at": "2026-11-12 16:24:16.954683+00:00",
-   "elapsed_hours": 8.723,
-   "live_steps": 105,
-   "expected_steps_approx": 104,
+   "elapsed_hours": 9.163,
+   "live_steps": 110,
+   "expected_steps_approx": 109,
    "muted_late_or_paused_steps": 0,
    "steps_with_blocked_markets": 3,
    "fills": 7,
    "reconciliation_discrepancies": 0,
    "last_reconcile_ok": true,
-   "equity": "999.016318787200000000",
+   "equity": "999.269774203600000000",
    "partial_day_report": {
     "report_version": "paper-report-1",
     "labels": [
@@ -194,24 +194,24 @@
     "config_hash": "f06aaf1a8f6b4595349ee6b591390480ddddee94de0689aec824e58ce42eae72",
     "window": {
      "start": "2026-11-13T00:00:00+00:00",
-     "end": "2026-11-13T01:07:38.217379+00:00",
+     "end": "2026-11-13T01:34:02.028911+00:00",
      "timezone": "UTC",
      "partial": true
     },
     "kind": "OBSERVED_PAPER_SIMULATION",
     "financial": {
      "opening_equity": "999.445967845200000000",
-     "closing_equity": "999.016318787200000000",
-     "net_pnl": "-0.429649058000000000",
+     "closing_equity": "999.269774203600000000",
+     "net_pnl": "-0.176193641600000000",
      "realized_pnl": "0",
-     "unrealized_pnl_movement": "-0.429649058000000000",
+     "unrealized_pnl_movement": "-0.176193641600000000",
      "fees": "0",
      "estimated_slippage": "0",
-     "return_pct": "-0.0004298872293479966723954704922",
+     "return_pct": "-0.0001762913126558232262528087316",
      "max_drawdown_window": "0.0005620127134886365505598713855",
      "max_drawdown_since_start": "0.001876239563209032498945483542",
      "cash": "909.450710670000000000",
-     "exposure": "89.565608117200000000",
+     "exposure": "89.819063533600000000",
      "inventory_by_account": {
       "BINANCE:regime_grid": {
        "USDT": "166.666666680000000000"
@@ -236,8 +236,8 @@
       }
      },
      "venue_contribution": {
-      "BINANCE": "-0.4296489540000000000000000",
-      "OKX": "-0.0000001040000000000000000"
+      "BINANCE": "-0.1761936000000000000000000",
+      "OKX": "-0.0000000416000000000000000"
      },
      "account_equity": {
       "BINANCE:regime_grid": {
@@ -252,8 +252,8 @@
       },
       "BINANCE:sma_cross": {
        "open": "166.7923261980000000000000000",
-       "close": "166.3626772440000000000000000",
-       "pnl": "-0.4296489540000000000000000"
+       "close": "166.6161325980000000000000000",
+       "pnl": "-0.1761936000000000000000000"
       },
       "OKX:regime_grid": {
        "open": "166.66666668",
@@ -267,15 +267,15 @@
       },
       "OKX:sma_cross": {
        "open": "165.9869749672000000000000000",
-       "close": "165.9869748632000000000000000",
-       "pnl": "-0.0000001040000000000000000"
+       "close": "165.9869749256000000000000000",
+       "pnl": "-0.0000000416000000000000000"
       }
      }
     },
     "trading": {
-     "signals_generated": 20,
-     "signals_rejected": 15,
-     "orders_created": 21,
+     "signals_generated": 25,
+     "signals_rejected": 19,
+     "orders_created": 26,
      "orders_filled": 0,
      "partial_fills": 0,
      "orders_cancelled": 5,
@@ -286,7 +286,7 @@
      "average_loss": "N/A",
      "strategy_pnl": {
       "regime_grid": "0.00000000",
-      "sma_cross": "-0.4296490580000000000000000",
+      "sma_cross": "-0.1761936416000000000000000",
       "trend_pullback": "0.00000000"
      },
      "benchmarks": {
@@ -297,27 +297,27 @@
       },
       "BENCH:hold_constrained": {
        "open": "999.0535607360000000000000000",
-       "close": "997.1035821665000000000000000",
-       "pnl": "-1.9499785695000000000000000"
+       "close": "998.2254435821000000000000000",
+       "pnl": "-0.8281171539000000000000000"
       },
       "BENCH:hold_unconstrained": {
        "open": "997.5932011260000000000000000",
-       "close": "992.6926965360000000000000000",
-       "pnl": "-4.9005045900000000000000000"
+       "close": "995.4895730598000000000000000",
+       "pnl": "-2.1036280662000000000000000"
       }
      },
      "strategies_are_deployment_candidates": false
     },
     "operations": {
-     "steps_processed": 13,
-     "steps_expected": 13,
+     "steps_processed": 18,
+     "steps_expected": 18,
      "uptime_fraction": "1",
      "feed_availability": {
       "BINANCE": "1",
       "OKX": "1"
      },
      "data_gaps": [],
-     "worker_restarts_recoveries": 3,
+     "worker_restarts_recoveries": 4,
      "reconciliation_failures": 0,
      "risk_incidents": [],
      "unresolved_alerts": [
@@ -333,10 +333,10 @@
      "risk_compliant_period": true,
      "market_data": "STORED_PUBLIC_OBSERVATIONS",
      "observation_sources": {
-      "LIVE": 402
+      "LIVE": 561
      },
      "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
-     "statement": "Simulated net P&L -0.42964906 USDT on 999.44596785 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
+     "statement": "Simulated net P&L -0.17619364 USDT on 999.44596785 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
      "ai_commentary": null
     }
    }
@@ -344,64 +344,64 @@
  ],
  "feeds": {
   "BINANCE:BTC-USDT": {
-   "candles": 525,
-   "span_minutes": 525,
+   "candles": 552,
+   "span_minutes": 552,
    "present_fraction": 1.0,
    "from_backfill": 9,
-   "realtime_candles_within_180s": 516,
-   "realtime_fraction": 0.98286,
+   "realtime_candles_within_180s": 543,
+   "realtime_fraction": 0.9837,
    "first": "2026-11-12 16:22:00+00:00",
-   "last": "2026-11-13 01:06:00+00:00"
+   "last": "2026-11-13 01:33:00+00:00"
   },
   "BINANCE:ETH-USDT": {
-   "candles": 525,
-   "span_minutes": 525,
+   "candles": 552,
+   "span_minutes": 552,
    "present_fraction": 1.0,
    "from_backfill": 9,
-   "realtime_candles_within_180s": 516,
-   "realtime_fraction": 0.98286,
+   "realtime_candles_within_180s": 543,
+   "realtime_fraction": 0.9837,
    "first": "2026-11-12 16:22:00+00:00",
-   "last": "2026-11-13 01:06:00+00:00"
+   "last": "2026-11-13 01:33:00+00:00"
   },
   "BINANCE:SOL-USDT": {
-   "candles": 525,
-   "span_minutes": 525,
+   "candles": 552,
+   "span_minutes": 552,
    "present_fraction": 1.0,
    "from_backfill": 9,
-   "realtime_candles_within_180s": 516,
-   "realtime_fraction": 0.98286,
+   "realtime_candles_within_180s": 543,
+   "realtime_fraction": 0.9837,
    "first": "2026-11-12 16:22:00+00:00",
-   "last": "2026-11-13 01:06:00+00:00"
+   "last": "2026-11-13 01:33:00+00:00"
   },
   "OKX:BTC-USDT": {
-   "candles": 526,
-   "span_minutes": 526,
+   "candles": 553,
+   "span_minutes": 553,
    "present_fraction": 1.0,
    "from_backfill": 5,
-   "realtime_candles_within_180s": 519,
-   "realtime_fraction": 0.98669,
+   "realtime_candles_within_180s": 546,
+   "realtime_fraction": 0.98734,
    "first": "2026-11-12 16:21:00+00:00",
-   "last": "2026-11-13 01:06:00+00:00"
+   "last": "2026-11-13 01:33:00+00:00"
   },
   "OKX:ETH-USDT": {
-   "candles": 526,
-   "span_minutes": 526,
+   "candles": 552,
+   "span_minutes": 552,
    "present_fraction": 1.0,
    "from_backfill": 5,
-   "realtime_candles_within_180s": 519,
-   "realtime_fraction": 0.98669,
+   "realtime_candles_within_180s": 545,
+   "realtime_fraction": 0.98732,
    "first": "2026-11-12 16:21:00+00:00",
-   "last": "2026-11-13 01:06:00+00:00"
+   "last": "2026-11-13 01:32:00+00:00"
   },
   "OKX:SOL-USDT": {
-   "candles": 526,
-   "span_minutes": 526,
+   "candles": 552,
+   "span_minutes": 552,
    "present_fraction": 1.0,
    "from_backfill": 5,
-   "realtime_candles_within_180s": 519,
-   "realtime_fraction": 0.98669,
+   "realtime_candles_within_180s": 545,
+   "realtime_fraction": 0.98732,
    "first": "2026-11-12 16:21:00+00:00",
-   "last": "2026-11-13 01:06:00+00:00"
+   "last": "2026-11-13 01:32:00+00:00"
   }
  },
  "gaps": [
@@ -449,6 +449,20 @@
   }
  ],
  "incidents": [
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:13:00.918506+00:00",
+   "resolved": "2026-11-13T01:13:00.916433+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T01:12:49.825978+00:00",
+   "resolved": "2026-11-13T01:13:00.937281+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
   {
    "kind": "RECOVERY",
    "severity": "INFO",
@@ -523,8 +537,22 @@
    "kind": "DATA_GAP",
    "severity": "WARNING",
    "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.346573+00:00",
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
    "resolved": "2026-11-12T18:00:19.340377+00:00",
    "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.334052+00:00",
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
   },
   {
    "kind": "RECOVERY",
@@ -532,13 +560,6 @@
    "opened": "2026-11-12T17:02:32.690020+00:00",
    "resolved": "2026-11-12T17:02:32.880966+00:00",
    "detail": "runtime restored by verified replay of 300 steps (digest 6798fb36f634)"
-  },
-  {
-   "kind": "DATA_GAP",
-   "severity": "WARNING",
-   "opened": "2026-11-12T17:02:32.690020+00:00",
-   "resolved": "2026-11-12T18:00:19.328671+00:00",
-   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
   },
   {
    "kind": "DATA_GAP",
@@ -558,15 +579,29 @@
    "kind": "DATA_GAP",
    "severity": "WARNING",
    "opened": "2026-11-12T17:02:32.690020+00:00",
-   "resolved": "2026-11-12T18:00:19.334052+00:00",
-   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+   "resolved": "2026-11-12T18:00:19.328671+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
   },
   {
-   "kind": "DATA_GAP",
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:15:19.532367+00:00",
+   "resolved": "2026-11-13T01:15:19.732323+00:00",
+   "detail": "runtime restored by verified replay of 406 steps (digest 8c2fe6972904)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:13:00.918506+00:00",
+   "resolved": "2026-11-13T01:13:00.916433+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
    "severity": "WARNING",
-   "opened": "2026-11-12T17:02:32.690020+00:00",
-   "resolved": "2026-11-12T18:00:19.346573+00:00",
-   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+   "opened": "2026-11-13T01:12:49.825978+00:00",
+   "resolved": "2026-11-13T01:13:00.937281+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
   },
   {
    "kind": "RECOVERY",
@@ -663,13 +698,6 @@
    "kind": "DATA_GAP",
    "severity": "WARNING",
    "opened": "2026-11-12T16:45:30.378617+00:00",
-   "resolved": "2026-11-12T16:46:35.566222+00:00",
-   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
-  },
-  {
-   "kind": "DATA_GAP",
-   "severity": "WARNING",
-   "opened": "2026-11-12T16:45:30.378617+00:00",
    "resolved": "2026-11-12T16:46:35.560604+00:00",
    "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
   },
@@ -711,6 +739,13 @@
   {
    "kind": "DATA_GAP",
    "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.566222+00:00",
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
    "opened": "2026-11-12T16:26:34.283317+00:00",
    "resolved": "2026-11-12T16:30:05.381824+00:00",
    "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
@@ -731,16 +766,16 @@
   }
  ],
  "availability": {
-  "window_seconds": 31598.217379,
-  "samples": 1752,
-  "available_seconds": 17458.32706,
-  "unavailable_seconds": 60.06922900000001,
+  "window_seconds": 33182.028911,
+  "samples": 1909,
+  "available_seconds": 19029.851148999995,
+  "unavailable_seconds": 80.09423100000001,
   "unmonitored_seconds": 14071.093379,
-  "service_availability": 0.5525098726487877,
-  "monitored_fraction": 0.5546871138258713,
+  "service_availability": 0.5734987212518372,
+  "monitored_fraction": 0.5759423446727405,
   "feed_fresh_fraction": {
-   "BINANCE": 0.9965710771688779,
-   "OKX": 0.9965710771688779
+   "BINANCE": 0.9958087671415419,
+   "OKX": 0.9958087671415419
   },
   "downtime_episodes": [
    {
@@ -778,12 +813,24 @@
     "end": "2026-11-13T00:46:58.096899+00:00",
     "cause": "worker_heartbeat",
     "recovery_seconds": 10.013514
+   },
+   {
+    "start": "2026-11-13T01:12:50.897573+00:00",
+    "end": "2026-11-13T01:13:00.907520+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.009947
+   },
+   {
+    "start": "2026-11-13T01:14:47.996671+00:00",
+    "end": "2026-11-13T01:14:58.011726+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.015055
    }
   ]
  },
  "queue": {
   "counts": {
-   "DONE": 790
+   "DONE": 799
   },
   "backlog": 0,
   "dead": 0,
@@ -853,7 +900,17 @@
   {
    "id": "worker-35908",
    "started": "2026-11-13 00:46:49.098921+00:00",
-   "last_heartbeat": "2026-11-13 01:07:34.876463+00:00"
+   "last_heartbeat": "2026-11-13 01:12:42.294030+00:00"
+  },
+  {
+   "id": "worker-43580",
+   "started": "2026-11-13 01:12:52.019009+00:00",
+   "last_heartbeat": "2026-11-13 01:14:22.741935+00:00"
+  },
+  {
+   "id": "worker-36372",
+   "started": "2026-11-13 01:14:49.202370+00:00",
+   "last_heartbeat": "2026-11-13 01:33:59.103822+00:00"
   }
  ],
  "feed_status": [
@@ -864,10 +921,10 @@
    "reason": "",
    "reconnects": 0,
    "since": "2026-11-12T16:21:14.188856+00:00",
-   "last_event_at": "2026-11-13T01:07:34.559851+00:00",
-   "last_event_age_s": 3.955911,
-   "clock_offset_ms": -689,
-   "connection_id": "svc-3ab1a5c869"
+   "last_event_at": "2026-11-13T01:33:57.673391+00:00",
+   "last_event_age_s": 4.854412,
+   "clock_offset_ms": -701,
+   "connection_id": "svc-1d224ade68"
   },
   {
    "venue": "OKX",
@@ -876,10 +933,10 @@
    "reason": "",
    "reconnects": 0,
    "since": "2026-11-12T16:21:14.770743+00:00",
-   "last_event_at": "2026-11-13T01:07:36.043078+00:00",
-   "last_event_age_s": 2.472684,
-   "clock_offset_ms": -875,
-   "connection_id": "svc-3ab1a5c869"
+   "last_event_at": "2026-11-13T01:33:57.942148+00:00",
+   "last_event_age_s": 4.585655,
+   "clock_offset_ms": -903,
+   "connection_id": "svc-1d224ade68"
   }
  ]
 }

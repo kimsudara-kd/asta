@@ -1,12 +1,12 @@
 {
  "gate_pass": false,
- "elapsed_hours": 8.77,
+ "elapsed_hours": 9.18,
  "required_hours": 72.0,
  "duration_met": false,
  "session_state": "RUNNING",
  "state_is_operating": true,
  "steps_processed": 9,
- "steps_expected_approx": 8,
+ "steps_expected_approx": 9,
  "reconciliation_discrepancies": 0,
  "duplicate_fill_postings": 0,
  "open_data_gaps": 0,
@@ -17,21 +17,19 @@
  "unexplained_state_changes": [],
  "risk_halt_events": 0,
  "daily_reports_missing_days": [],
- "daily_reports_not_reproducible": [
-  "2026-11-12"
- ],
+ "daily_reports_not_reproducible": [],
  "supervision_demonstrated": false,
  "availability": {
-  "window_seconds": 31565.723336,
-  "samples": 1763,
-  "available_seconds": 17568.441006999994,
-  "unavailable_seconds": 60.06922900000001,
+  "window_seconds": 33042.994729,
+  "samples": 1909,
+  "available_seconds": 19029.851148999995,
+  "unavailable_seconds": 80.09423100000001,
   "unmonitored_seconds": 13930.176981999999,
-  "service_availability": 0.5565670338041512,
-  "monitored_fraction": 0.5586929267002431,
+  "service_availability": 0.5759118174690914,
+  "monitored_fraction": 0.5784226854663915,
   "feed_fresh_fraction": {
-   "BINANCE": 0.996592495440861,
-   "OKX": 0.996592495440861
+   "BINANCE": 0.9958087671415419,
+   "OKX": 0.9958087671415419
   },
   "downtime_episodes": [
    {
@@ -69,6 +67,18 @@
     "end": "2026-11-13T00:46:58.096899+00:00",
     "cause": "worker_heartbeat",
     "recovery_seconds": 10.013514
+   },
+   {
+    "start": "2026-11-13T01:12:50.897573+00:00",
+    "end": "2026-11-13T01:13:00.907520+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.009947
+   },
+   {
+    "start": "2026-11-13T01:14:47.996671+00:00",
+    "end": "2026-11-13T01:14:58.011726+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.015055
    }
   ]
  },

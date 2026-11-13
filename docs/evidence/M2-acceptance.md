@@ -239,3 +239,86 @@ M2-G1 (72 h gate) **open**; the supervisor is not installed as a system service 
 ## R1-H. Recommendation
 
 **BUILT — NOT ACCEPTED.** To finish: keep the supervised service running (preferably install the optional Task Scheduler entry), let both sessions run until the later of 2026-11-15 16:24 UTC and supervisor coverage ≥ 95 % (about 2026-11-15 20:30 UTC), then run `scripts/paper_observation.py measure` and `gate` for both session ids, attach the output, confirm the daily-report check (the first completed day closes at 2026-11-13 00:00 UTC) and re-run the regression. Acceptance can be recommended only if every criterion is met with all interruptions recorded and recovered. No acceptance tag without CEO authorization.
+
+---
+
+# M2-R2 evidence addendum — scheduled-task supervisor and observation continuation (ASTA-M2-R2)
+
+**Status: BUILT — NOT ACCEPTED.** The supervisor is installed and verified, the original observation continues untouched, but at 2026-11-13 01:34 UTC it covers **9.2 of the 72 required hours** and supervisor coverage of the window is 57.6 %. The gate has not passed and is not claimed. No M2 tag; nothing pushed; no credentials or authenticated access; no M3.
+
+## R2-A. Scheduled task: review, installation, verification
+
+* **Review of the registration scripts** (`scripts/register_supervisor_task.ps1`, `unregister_supervisor_task.ps1`, launcher `scripts/run_paper_supervisor.cmd`): they create/remove **one** per-user task named `ASTA-Paper-Supervisor` and touch nothing else — no power plan, sleep, security or execution policy, no other task or service (the rollback script's process kill matches only command lines containing `paper_supervisor` / `asta.paper_service`). Least privilege: runs as the current user, `LogonType Interactive`, `RunLevel Limited` (no elevation, no stored password). The launcher sets only the dev-only local values already published in `infra/docker-compose.yml`; no exchange credential exists.
+* **Single instance (two layers):** task setting `MultiplePolicy IgnoreNew` **and** a lock file with PID/liveness check inside the supervisor. Verified live: a manually started second supervisor exited with code 3 ("already running"); after repeated 2-minute keep-alive launches the process tree always showed exactly one supervisor chain and one `paper_service` chain.
+* **Safe restart behaviour:** the supervisor (R1) starts the service only after the pre-resume reconciliation gate; after a restart it requires **fresh-process evidence** (heartbeat and feed event newer than the new process) before declaring recovery; it never changes a session's state. New in R2: on start it **terminates orphaned `asta.paper_service` processes** left by a previous supervisor (ASTA-specific match) and records that as an incident.
+* **Finding (not assumed):** Task Scheduler's *restart on failure* does **not** fire when the process is force-killed (`LastTaskResult 0xFFFFFFFF`; the supervisor stayed dead). The registration therefore adds a **2-minute repeating keep-alive trigger** (plus log-on); `IgnoreNew` + the lock make extra launches harmless. Verified: after killing the supervisor at 00:39:24 the task relaunched it at 00:43:30 (at the next interval after re-registration), which terminated the orphaned service (`SERVICE_DOWN` incident, resolved), reconciled, restarted the service and resumed sampling.
+* **Existing sessions untouched:** both session ids, config hashes, states and cursors are unchanged across every task start/kill/rollback (R2-C); nothing was recreated and no row rewritten.
+* **Registered state:** `Get-ScheduledTask ASTA-Paper-Supervisor` → enabled, triggers `AtLogOn` + `PT2M` repetition, action `cmd.exe /c scripts\run_paper_supervisor.cmd`.
+
+## R2-B. Rollback procedure (tested)
+
+```powershell
+# remove ONLY the ASTA task and stop ASTA's supervisor/service processes (sessions and data stay):
+powershell -NoProfile -ExecutionPolicy Bypass -File E:\Dev\asta\scripts\unregister_supervisor_task.ps1
+# manual equivalent:
+Unregister-ScheduledTask -TaskName "ASTA-Paper-Supervisor" -Confirm:$false
+Get-CimInstance Win32_Process | ? { $_.CommandLine -match 'paper_supervisor|asta\.paper_service' } | % { Stop-Process -Id $_.ProcessId -Force }
+Remove-Item E:\Dev\asta\data\paper\supervisor.lock -ErrorAction SilentlyContinue
+# re-install later:  scripts\register_supervisor_task.ps1  then  Start-ScheduledTask ASTA-Paper-Supervisor
+```
+Tested live at 00:46:40 UTC: the task disappeared, 0 ASTA processes, lock removed, both sessions still RUNNING at the same cursors; re-registration at 00:46:44 resumed supervision and the sessions within a minute (the ≈ 1-minute gap is unmonitored/unavailable time in the accounting, not uptime).
+
+## R2-C. Recovery tests under the installed supervisor (all recorded as incidents / unavailable samples)
+
+| Test | Result |
+|---|---|
+| Duplicate supervisor | refused, exit 3 |
+| Supervisor force-killed (service orphaned) | no relaunch by restart-on-failure (finding above); relaunched by keep-alive within the interval; orphan terminated + recorded; reconcile OK (`last_reconciled_at` advanced at restart); service healthy; **fresh-process evidence required** |
+| Service force-killed under the task | `SERVICE_DOWN` 00:44:21 → `SERVICE_RECOVERED` 00:44:32 (**11 s**), both sessions reconcile OK, RUNNING, continuous steps |
+| Full rollback + re-register | see R2-B |
+| Planned service restart to load code (01:12:44) | recorded; verified-replay recovery; sessions continued |
+| Risk halt across restart | covered by tests (`test_a_risk_halt_persists_across_a_worker_restart_and_is_never_auto_resumed`: halted session stays `RISK_HALTED` after a worker restart with verified replay; no auto-resume anywhere). **No live risk halt has occurred** (limits never reached), so this is evidenced by tests only. |
+
+## R2-D. Observation evidence at 01:34 UTC (genuine, not accelerated)
+
+Window since session start (≈ 16:21 UTC 2026-11-12); raw data `docs/evidence/m2/r2-observation-measure.json`, gates `r2-gate-1h.json`, `r2-gate-5m.json`; supervisor samples in `data/paper/supervisor.jsonl` (local).
+
+| Measure | Result |
+|---|---|
+| Real elapsed duration | **9.18 h (1h session) / 9.16 h (5m session)** of 72 h |
+| Supervisor coverage of the window | **57.6 %** (monitored 19,111 s of 33,182 s). The first 3.9 h (before the supervisor existed) is **unmonitored and not counted as uptime**; within the monitored time: 80 s unavailable across 8 episodes (all recovered), service availability over the whole window 57.3 % |
+| Candles, eventual completeness | 1.000 on all six markets |
+| Candles, real-time (≤ 180 s after close) | Binance 0.984, OKX 0.987 (the shortfall is the recorded outages) |
+| Feed gaps | 6 detected (the 9-minute hard-kill test), 6 backfilled, 0 open, 0 unrecoverable; 0 reconnects |
+| Reconciliation | 0 discrepancies, both sessions |
+| Duplicate fills | 0 |
+| Dead-letter jobs | 0 (799 jobs DONE, backlog 0) |
+| Risk incidents | 0 halts |
+| Fills (virtual) | 5m: 7, 1h: 0; equity 999.27 / 1,000.00 (meaningless as performance) |
+| Unexplained state changes | none |
+| Daily reports | first completed day (2026-11-12) exists as **revision 1 for both sessions, reproducible**; see R2-E for why revision 0 was superseded; 2026-11-13 closes at 00:00 UTC next day |
+| Gate (`gate --hours 72`) | `gate_pass: false` — `duration_met: false`, `supervision_demonstrated: false` (57.6 % < 95 %); every other criterion currently satisfied |
+
+**Earliest honest pass:** supervisor coverage reaches 95 % of the window at about 2026-11-15 20:30 UTC (it started 3.9 h into the window; that deficit needs ≈ 76 h to dilute below 5 %), provided it keeps running; the 72-hour minimum falls earlier (2026-11-15 16:24 UTC). Nothing was done to accelerate, reset or re-baseline the clock, and the thresholds are the unchanged constants of `paper_observation.py gate`.
+
+## R2-E. Defects found and fixed in this pass
+
+1. **Daily reports for the first live day were wrong forever (found by the gate).** The report job ran at 00:00 UTC, before the last hourly step of the day (the 23:00 bar closes at 24:00 and is processed minutes later), so the stored 2026-11-12 reports contained 7 of 8 steps and could not be reproduced; the operations section also depended on the time of computation (alerts, gap status). Fixes: report jobs now wait until the session has processed every step of the day (`window_is_covered`), the report inputs are evaluated **as of the window end** (unresolved alerts, gap status, observation ingestion), and a defective report is corrected by an explicit, audited **new revision** (`daily_paper_reports.revision`, migration 0005; `scripts/paper_observation.py reports-repair`) — old rows stay (append-only), readers use the latest revision. Revision 1 was created for both sessions and verifies; revision 0 remains as the documented defective record. Regression tests added (later-resolved incident, supersede-only-when-unreproducible, job waits for coverage).
+2. Task Scheduler restart-on-failure does not recover a force-killed process → keep-alive trigger (R2-A).
+3. Standing from R1: the two immutable 2026-11-11 pre-session reports remain (ignored by the gate; the scheduler no longer creates such reports).
+
+## R2-F. Regression and verification (regression of record, final code)
+
+* **Python:** `ASTA_RUN_NETWORK_TESTS=1` → **462 passed, 0 failed, 0 skipped** (R1: 458; +report revision/coverage tests, +halt-persistence test). Default network-off run not repeated (previous: 447 passed / 4 skipped).
+* **Browser:** live 16 + nodata 1 + aging 1 + research 12 + paper 9 = **39/39** (`docs/evidence/m2/e2e-full-run-r2.log`).
+* **Static/security:** ruff + format clean; pyright 0 errors; **mypy strict clean (144 files)**; `pip-audit` / `pnpm audit` no known vulnerabilities; secret scan 0; gitleaks re-run at the closing commit.
+* **Live-lock / immutability:** `git diff 773b604` over `src/asta/risk`, `src/asta/core/egress.py`, `src/asta/core/environment.py` and all M0/M1 evidence (`m0-r1`, `m1`, `m1-r1`, the M0/M1 acceptance documents and records) is empty; 15 live-lock tests pass (no credential/signing vocabulary, import boundaries, gateway DENY, no LIVE, route allow-list). Migration 0005 is an additive change to the paper reports table only.
+* **Data sources:** Binance and OKX CONNECTED / LIVE with fresh events (public endpoints only).
+
+## R2-G. Remaining blockers / residual risks
+
+M2-G1: **observation incomplete (9.2 / 72 h; supervisor coverage 57.6 %)**; the supervisor depends on the machine staying awake and the user session staying logged on (the task is per-user *AtLogOn* + keep-alive; no Windows-wide power or logon policy was modified — a PC sleep or log-off will appear as unmonitored time and would have to be re-evaluated); R-1 OKX, R-2 hosted CI, **R-3 infrastructure egress (before any credential)**, R-11 assumed fees, M2-1…M2-5, the immutable defective report revisions.
+
+## R2-H. Recommendation
+
+**BUILT — NOT ACCEPTED.** Leave the machine awake and the task running; re-run `scripts/paper_observation.py measure 2026-11-12T16:21:00+00:00` and `… gate <session-id> --hours 72` for both sessions at or after ≈ 2026-11-15 20:30 UTC, attach the output, confirm every completed day has a reproducible report, re-run the regression, and only then request acceptance. Any interruption in the meantime will be visible as incidents and availability episodes and must be evaluated honestly. No acceptance tag without separate CEO authorization.
