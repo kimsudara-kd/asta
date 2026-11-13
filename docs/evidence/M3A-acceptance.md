@@ -1,6 +1,6 @@
 # M3-A acceptance evidence (ASTA-M3A-IMPLEMENTATION-01)
 
-> **Superseded in status by the M3A-R3 section at the end of this file (R3: BUILT — NOT ACCEPTED, credential readiness NO-GO).**
+> **Superseded in status by the M3A-MAC-01 section at the end of this file (MAC-01: BUILT — NOT ACCEPTED, credential readiness NO-GO).**
 
 **Final status: `ACCEPTANCE CANDIDATE` for M3-A engineering scope, with credential readiness explicitly NOT granted.** Credential/authenticated-demo readiness is **BLOCKED** by three open High findings (independent security review outstanding, legacy M2 host processes outside the boundary, proxy egress not independently firewalled). M3-A is **not accepted** (needs CEO review), **no M3-A acceptance tag was created**, **M3-B was not started**, nothing was pushed (no remote exists).
 
@@ -197,3 +197,44 @@ While adding tests for the shell scripts, my test called `bash` from PATH. On th
 
 ## R3-11. Residual-risk register and recommendation
 `docs/m3a/RESIDUAL-RISK-REGISTER.md` (all findings with owner, mitigation, closure, status). **M3-B: NO-GO.** What remains is decisions and external actions: (1) designate and engage the independent reviewer (`REVIEWER-ENGAGEMENT.md`); (2) decide on dedicated infrastructure (recommended Option A: a separate small Linux host with two NICs) and authorize its purchase/provisioning; then execute C1..C10 including a real reboot matrix; (3) decide the gitleaks question above; (4) later, authorize migration of the legacy processes and, if every gate closes, a Binance-only M3-B.
+
+
+---
+
+# ASTA-M3A-MAC-01 — Mac mini M4 deployment preparation (evidence update)
+
+**Status: M3-A `BUILT — NOT ACCEPTED`; credential readiness `NO-GO`.** F-01, F-02, F-03 remain **OPEN**; I declare none of them closed (the directive text is cut off at "Do not declare F-01"). Baseline `98b1c7d`; local commit `78f7d73` plus the final documentation commit (`git log --oneline 98b1c7d..HEAD`). **No change was made on any Mac, on the Windows host or on shared Docker; no credentials; no authenticated trading; the original Windows paper sessions and supervisor were not stopped or modified; no push; no M3-B work.** The earlier x86 Linux-host procurement proposal is withdrawn; design document: `docs/m3a/MAC-MINI-DEPLOYMENT-DESIGN.md`.
+
+## MAC-1. Phase A (read-only Mac inventory): prepared, not performed
+This session has no access to the Mac, so **no Mac attribute was verified** (model, RAM, SSD, macOS, encryption, adapters, tools, backups, power/remote management are the directive's statements or unknown). `infra/security-host/mac/mac-inventory.sh` is the read-only collector (no sudo, no install, no setting change - statically tested). **Owner action:** run `sh mac-inventory.sh > mac-inventory.txt` on the Mac and return it; Phase A completes from that file.
+
+## MAC-2. Phase B (ARM64 deployment design): delivered
+* **Topology:** three Linux ARM64 VMs on QEMU + Hypervisor.framework - `asta-fw` (the only uplink, bridged Ethernet via a root `socket_vmnet` group socket; never forwards), `asta-app` (paper service, supervisor, API, PostgreSQL 16 on a unix socket with peer auth, encrypted backups; never holds credentials), `asta-cred` (vault + future connector only). Links are point-to-point **unix-socket L2 links in a 0700 directory** (no vmnet interface, no host address); the app<->cred link is not attached until M3-B is authorized. Proxmox is not used.
+* **Egress:** per-VM nftables (default DROP, IPv6 only loopback; fw never forwards; app and cred output only to the fw proxy; no inbound anywhere), proxy user without DNS egress, systemd `IPAddressDeny=any`; approved destinations are the public Binance/OKX data hosts only. All three rule sets pass `nft -c`.
+* **Supervision, recovery, backup, monitoring, reboot, rollback:** systemd units (`Restart=always`), `paper_supervisor_posix.py` (the Windows supervisor is unmodified), launchd boot daemons, age-encrypted daily dumps to a dedicated backup disk, restore drill into a scratch database with the integrity tooling, monitoring list, FileVault vs unattended-recovery trade-off (decision needed), rollback to the Windows environment.
+* **Adapted:** x86/Windows-only items inventoried and handled (hypervisor scripts replaced for the Mac; Windows-only supervisor helpers given a POSIX entry point; browser/e2e tooling made ARM64-safe with Windows behaviour unchanged).
+* **Tests:** `tests/m3a/test_mac_deployment.py` (26): read-only inventory, QEMU script (dry run by default, unix-socket links only, no file sharing/USB/NAT, uplink only on fw, L3 not attached), rule sets, app/cred isolation, PostgreSQL peer auth, unit hardening, launchd plists, reproducible seeds, POSIX supervisor on a fake `/proc` tree (never touches real processes), ARM64 audit, `nft -c` for the three rule sets.
+
+## MAC-3. ARM64 compatibility evidence (what could be verified from the Windows PC)
+79 locked Python packages: 67 pure Python, 12 native with aarch64/arm64 wheels, **only `pgserver` (dev/test helper) lacks a Linux aarch64 wheel**; **36 runtime wheels downloaded for manylinux2014 aarch64 without compilation** (`mac-arm64-dependency-audit.json`, `mac-arm64-runtime-wheels.sha256`); Next.js/sharp ARM64 packages are in the lockfile; PostgreSQL 16 and all container images used are multi-arch; **ASTA's real REST and WebSocket clients work through the egress proxy from the protected network using only `HTTPS_PROXY`, and fail without it** (`mac-real-clients-via-proxy.json`; x86 container on this PC). **Not verifiable here (UNVERIFIED, risk R-X):** cross-architecture determinism of replay/checkpoint digests and ledger arithmetic; running the test suite on ARM64 (no arm64 emulation on this PC's Docker and enabling it would change the shared Docker VM).
+
+## MAC-4. Phase C (isolated validation): NOT started
+Needs separate provisioning authorization; the ten-step plan (build, full suite on a scratch VM, boundary tests inside the runtime, compromised-proxy tests, VM and host restart matrix, synthetic-credential validation, restore of an M2 database copy, replay of every checkpoint and ledger reconciliation on ARM64, restored test sessions without touching the originals, evidence for the independent reviewer) is in the design document section 9, and section 10 lists exactly what provisioning would change on the Mac.
+
+## MAC-5. Regression (final tree)
+| Check | Result |
+|---|---|
+| Full Python (`ASTA_RUN_NETWORK_TESTS=1`, `mac-pytest-full.log`) | **605 passed, 0 skipped, 0 failed** (579 + 26 new) |
+| Browser, after the portable-tooling edits (`mac-e2e-full-run.log`) | **39/39**, Windows behaviour unchanged, no tracked file modified |
+| Ruff check + format | clean |
+| mypy strict (container) | no issues, 156 files |
+| Pyright (`src`) | 0 errors |
+| pip-audit / pnpm audit | no known vulnerabilities / no known vulnerabilities |
+| Secret scan | 0 findings (after removing a hash-next-to-"api" pattern from my own new evidence file; the HEAD commit was amended once, locally, to do so) |
+| **Full-history gitleaks** | **3 findings remain, unsuppressed and unchanged since R3**: SHA-256 digests in the R2 review manifest (`e71706f`). Owner decision still needed (approve three fingerprints or approve rewriting the unpushed local commits from `e71706f`); reported as FAILING |
+| Boundary negative tests | 78/78 (protected runtime) and 39/39 (compromised proxy) re-run |
+| M0-M2 safety | live-lock/contract tests in the suite; `git diff fe8194c -- src/asta/risk src/asta/core` empty; frozen-evidence verifier intact |
+| Paper ledger | both sessions RUNNING, same ids/hashes, replay verified (323 / 577 checkpoints), 0 reconciliation discrepancies (`mac-paper-integrity.json`); supervisor lock PID 43108 unchanged |
+
+## MAC-6. Remaining High findings and recommendation
+**F-01** (legacy Windows processes outside any boundary; the three-VM design is the strongest planned form, unverified), **F-02** (no dedicated boundary deployed or tested; the Mac is the chosen host but Phase A is unperformed and the macOS host itself is the trust base - new F-19), **F-03** (no independent review). New items: F-19, R-X. **M3-B: NO-GO.** Next steps are decisions and actions outside this session: run the read-only inventory on the Mac; decide FileVault vs unattended recovery; authorize provisioning (Phase C) with the change list in design section 10; designate the independent reviewer; decide the gitleaks question.
