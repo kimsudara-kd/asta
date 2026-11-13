@@ -1,0 +1,552 @@
+{
+ "total": 78,
+ "failed": 0,
+ "results": [
+  {
+   "test": "N01",
+   "desc": "unapproved exchange host (runtime profile): CONNECT api.kraken.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N01",
+   "desc": "unapproved exchange host (runtime profile): CONNECT app.okx.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N01",
+   "desc": "unapproved exchange host (runtime profile): CONNECT us.okx.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N01",
+   "desc": "unapproved exchange host (runtime profile): CONNECT testnet.binance.vision:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N01",
+   "desc": "unapproved exchange host: direct api.kraken.com:443",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT api.binance.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT api1.binance.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT api.binance.us:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT fapi.binance.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT www.binance.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT stream.binance.com:9443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT api.okx.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT wspap.okx.com:8443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production/other trading host or port: CONNECT ws.okx.com:8443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N02",
+   "desc": "production trading host: direct api.binance.com:443",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N03",
+   "desc": "plain HTTP proxying request",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 405 Method Not Allowed",
+   "pass": true
+  },
+  {
+   "test": "N03",
+   "desc": "arbitrary external service: CONNECT example.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N03",
+   "desc": "arbitrary external service: CONNECT example.com:80",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N03",
+   "desc": "arbitrary external service: CONNECT httpbin.org:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N03",
+   "desc": "arbitrary external service: CONNECT ifconfig.me:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N03",
+   "desc": "arbitrary external HTTP: direct example.com:80",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "direct external IP: direct 1.1.1.1:443",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "IP literal via proxy: CONNECT 1.1.1.1:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "direct external IP: direct 8.8.8.8:53",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "IP literal via proxy: CONNECT 8.8.8.8:53",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "direct external IP: direct 93.184.216.34:80",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "IP literal via proxy: CONNECT 93.184.216.34:80",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "direct external IP: direct 104.18.32.47:443",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N04",
+   "desc": "IP literal via proxy: CONNECT 104.18.32.47:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N05",
+   "desc": "unapproved WebSocket endpoint: CONNECT stream.binance.com:9443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N05",
+   "desc": "unapproved WebSocket endpoint: CONNECT data-stream.binance.vision:8443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N05",
+   "desc": "unapproved WebSocket endpoint: CONNECT ws.okx.com:8443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N05",
+   "desc": "unapproved WebSocket endpoint: CONNECT wspap.okx.com:8443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "bypass the proxy to an ALLOWED host: direct data-api.binance.vision:443",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "SOCKS handshake to the proxy port",
+   "expected": "proxy refuses/closes",
+   "observed": "error:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "tunnel to the proxy itself: CONNECT asta-egress-proxy:3128",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "alternative proxy port 1080",
+   "expected": "closed",
+   "observed": "blocked:ConnectionRefusedError",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "alternative proxy port 3129",
+   "expected": "closed",
+   "observed": "blocked:ConnectionRefusedError",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "alternative proxy port 8080",
+   "expected": "closed",
+   "observed": "blocked:ConnectionRefusedError",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "alternative proxy port 8888",
+   "expected": "closed",
+   "observed": "blocked:ConnectionRefusedError",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "alternative proxy port 9050",
+   "expected": "closed",
+   "observed": "blocked:ConnectionRefusedError",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "userinfo/host confusion in CONNECT target",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N06",
+   "desc": "case/trailing-dot variant on a wrong port",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service: direct host.docker.internal:5640",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service via proxy: CONNECT host.docker.internal:5640",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service: direct host.docker.internal:2375",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service via proxy: CONNECT host.docker.internal:2375",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service: direct gateway.docker.internal:22",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service via proxy: CONNECT gateway.docker.internal:22",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service: direct kubernetes.docker.internal:6443",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "host-only service via proxy: CONNECT kubernetes.docker.internal:6443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "loopback via proxy: CONNECT localhost:5432",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "loopback IP via proxy: CONNECT 127.0.0.1:5432",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N07",
+   "desc": "docker socket absent in container",
+   "expected": "no /var/run/docker.sock",
+   "observed": "False",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint: direct 169.254.169.254:80",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint via proxy: CONNECT 169.254.169.254:80",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint: direct 169.254.169.254:443",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint via proxy: CONNECT 169.254.169.254:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint: direct metadata.google.internal:80",
+   "expected": "no connection",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint via proxy: CONNECT metadata.google.internal:80",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint: direct 100.100.100.200:80",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N08",
+   "desc": "metadata endpoint via proxy: CONNECT 100.100.100.200:80",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N09",
+   "desc": "external IPv6: direct 2606:4700:4700::1111:443",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "N09",
+   "desc": "IPv6 literal via proxy",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N09",
+   "desc": "IPv6 loopback via proxy",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N09",
+   "desc": "no global IPv6 address on the container",
+   "expected": "none",
+   "observed": "[]",
+   "pass": true
+  },
+  {
+   "test": "N10",
+   "desc": "redirect target (unapproved) must be refused: CONNECT example.org:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N10",
+   "desc": "redirect target (unapproved) must be refused: CONNECT evil.example:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N10",
+   "desc": "redirect target (unapproved) must be refused: CONNECT api.binance.com:443",
+   "expected": "proxy refuses",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N11",
+   "desc": "approved public data host reachable via proxy",
+   "expected": "tunnel opens",
+   "observed": "HTTP/1.1 200 Connection Established",
+   "pass": true
+  },
+  {
+   "test": "N11",
+   "desc": "GET /api/v3/time over TLS via the tunnel (public, unauthenticated)",
+   "expected": "HTTP 200",
+   "observed": "HTTP/1.1 200 OK",
+   "pass": true
+  },
+  {
+   "test": "N11",
+   "desc": "OKX public host via proxy (informational; upstream DNS sinkhole R-1)",
+   "expected": "200 if lawfully reachable, else refused",
+   "observed": "HTTP/1.1 403 Forbidden",
+   "pass": true
+  },
+  {
+   "test": "N12",
+   "desc": "not root",
+   "expected": "uid != 0",
+   "observed": "65534",
+   "pass": true
+  },
+  {
+   "test": "N12",
+   "desc": "no effective capabilities",
+   "expected": "CapEff == 0",
+   "observed": "0000000000000000",
+   "pass": true
+  },
+  {
+   "test": "N12",
+   "desc": "no-new-privileges",
+   "expected": "1",
+   "observed": "1",
+   "pass": true
+  },
+  {
+   "test": "N12",
+   "desc": "root filesystem read-only",
+   "expected": "read-only",
+   "observed": "read-only:OSError",
+   "pass": true
+  },
+  {
+   "test": "N12",
+   "desc": "no host mounts except the single read-only test file",
+   "expected": "none",
+   "observed": "[]",
+   "pass": true
+  },
+  {
+   "test": "N13",
+   "desc": "direct DNS resolution of an external name from the protected network",
+   "expected": "informational",
+   "observed": "no-resolve:gaierror",
+   "pass": true
+  }
+ ]
+}

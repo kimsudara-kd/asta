@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "note": "Version-controlled egress allowlist (host NAME + port). Public market-data destinations only. No authenticated or trading destination is permitted by the proxy. Changes require review (see docs/m3a/EGRESS-ENFORCEMENT.md). IP literals are never allowed.",
+  "profiles": {
+    "runtime": [
+      { "host": "data-api.binance.vision", "ports": [443] },
+      { "host": "data-stream.binance.vision", "ports": [443, 9443] },
+      { "host": "www.okx.com", "ports": [443] },
+      { "host": "ws.okx.com", "ports": [443] }
+    ],
+    "capability_probe": [
+      { "host": "data-api.binance.vision", "ports": [443] },
+      { "host": "data-stream.binance.vision", "ports": [443, 9443] },
+      { "host": "www.okx.com", "ports": [443] },
+      { "host": "ws.okx.com", "ports": [443] },
+      { "host": "testnet.binance.vision", "ports": [443] },
+      { "host": "stream.testnet.binance.vision", "ports": [443, 9443] }
+    ]
+  }
+}

@@ -1,0 +1,75 @@
+# ASTA protected execution boundary (M3A-1). Own compose project; touches no other project's
+# containers or networks. No ports are published to the host. No exchange credentials exist here.
+#
+#   protected runtime  --(internal network, NO route out)-->  egress proxy  --(egress bridge)--> Internet
+#
+# `asta_protected` is a Docker *internal* network: containers on it have no gateway and no
+# NAT, so a process that ignores the proxy cannot reach anything outside the network.
+name: asta-egress
+
+networks:
+  asta_protected:
+    name: asta_protected
+    driver: bridge
+    internal: true
+    enable_ipv6: false
+  asta_egress:
+    name: asta_egress
+    driver: bridge
+    enable_ipv6: false
+
+x-hardening: &hardening
+  read_only: true
+  cap_drop: [ALL]
+  security_opt: ["no-new-privileges:true"]
+  pids_limit: 128
+  mem_limit: 256m
+  privileged: false
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,size=16m
+
+services:
+  egress-proxy:
+    <<: *hardening
+    image: python:3.12-slim
+    container_name: asta-egress-proxy
+    restart: unless-stopped
+    user: "65534:65534"
+    command: ["python", "-u", "/app/proxy.py"]
+    environment:
+      ASTA_EGRESS_PROFILE: ${ASTA_EGRESS_PROFILE:-runtime}
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ./proxy.py:/app/proxy.py:ro
+      - ./allowlist.json:/etc/asta-egress/allowlist.json:ro
+    networks:
+      asta_protected:
+      asta_egress:
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 3128), 3).close()"]
+      interval: 10s
+      timeout: 4s
+      retries: 5
+
+  # Stand-in for the protected runtime: the same constraints the real ASTA runtime container will have.
+  # Used to run the negative tests from INSIDE the restricted boundary.
+  protected-probe:
+    <<: *hardening
+    image: python:3.12-slim
+    container_name: asta-protected-probe
+    restart: unless-stopped
+    user: "65534:65534"
+    command: ["sleep", "infinity"]
+    environment:
+      HTTPS_PROXY: http://asta-egress-proxy:3128
+      HTTP_PROXY: http://asta-egress-proxy:3128
+      NO_PROXY: ""
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ./negative_tests.py:/app/negative_tests.py:ro
+      - ./capability_probe.py:/app/capability_probe.py:ro
+    networks:
+      asta_protected:
+    depends_on:
+      egress-proxy:
+        condition: service_healthy

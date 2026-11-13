@@ -1,0 +1,16 @@
+agitated_roentgen Created
+asta-db Up 15 hours (healthy)
+asta-db-test Up 2 hours (healthy)
+bda-proxy Up 3 hours
+bosia-pms-local-postgres Exited (255) 24 hours ago
+cool_yalow Created
+elegant_elbakyan Created
+pethhub-postgres Up 22 hours (healthy)
+asta_default bridge false
+bda-internal bridge true
+bda-internal-dock-10d0-mwejiqv6-9fb9 bridge true
+bosia-pms-local-net bridge false
+bridge bridge false
+host host false
+none null false
+pethhub_default bridge false
