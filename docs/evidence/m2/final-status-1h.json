@@ -1,0 +1,3 @@
+afec3e2b-c5dc-4306-a98d-82da6ea38346 observe-1h               RUNNING      step=314   last=2026-11-13 06:00:00+00:00 reconcile_ok=True
+489d0990-6cf9-4120-9ad7-c6d370374dc2 observe-5m               RUNNING      step=478   last=2026-11-13 07:10:00+00:00 reconcile_ok=True
+{"worker_online": true, "queue": {"DONE": 912}, "open_incidents": 9, "feeds": [["BINANCE", "CONNECTED", 0], ["OKX", "DISABLED", 0]]}

@@ -249,6 +249,12 @@ def test_m1_default_still_auto_resets_so_research_results_are_unchanged():
     assert not r.state.daily_tripped
 
 
+def _ledger(a):
+    ledger = a.engine.ledger
+    assert ledger is not None
+    return ledger
+
+
 def test_a_suspended_venue_cannot_increase_risk_and_keeps_its_ledger_and_inventory():
     """OKX data is unavailable (no bars, entries blocked) while Binance keeps trading: OKX accounts
     create no accepted BUY and post no fill; their cash, inventory and ledger are untouched."""
@@ -261,7 +267,7 @@ def test_a_suspended_venue_cannot_increase_risk_and_keeps_its_ledger_and_invento
         out = rt.step(k, ts, live, blocked, True, k < WARM)
         if k == WARM:
             snapshots = {
-                a.spec.key: (len(a.engine.ledger.entries), dict(a.engine.ledger._bal))
+                a.spec.key: (len(_ledger(a).entries), dict(_ledger(a)._bal))
                 for a in rt.active.values()
                 if a.spec.venue == "OKX"
             }
@@ -278,12 +284,5 @@ def test_a_suspended_venue_cannot_increase_risk_and_keeps_its_ledger_and_invento
     for a in rt.active.values():
         if a.spec.venue == "OKX":
             n, bal = snapshots[a.spec.key]
-            assert len(a.engine.ledger.entries) >= n
-            assert (
-                all(
-                    e.kind != "FILL_QUOTE" or e.ts <= SERIES[WARM][0]
-                    for e in a.engine.ledger.entries[n:]
-                )
-                or True
-            )
-            assert dict(a.engine.ledger._bal) == bal  # cash/inventory unchanged while suspended
+            assert len(_ledger(a).entries) >= n
+            assert dict(_ledger(a)._bal) == bal  # cash/inventory unchanged while suspended

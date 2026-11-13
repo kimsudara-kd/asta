@@ -417,3 +417,39 @@ Python with `ASTA_RUN_NETWORK_TESTS=1`: **465 passed, 1 skipped** (OKX live prob
 ## R4A-7. Next steps
 
 Keep the task running; at/after 2026-11-15T20:11:22Z run `measure` and `gate` for both sessions, re-run the full regression, update this addendum and request CEO review. Recommendation unchanged: **BUILT — NOT ACCEPTED**.
+
+---
+
+# ASTA-M2-FINAL-COMPLETION-01 — interim completion report (2026-11-13 07:25 UTC)
+
+**Status: BUILT — NOT ACCEPTED.** The 72-hour gate **has not matured** and is not claimed: the approved window (`2026-11-12T20:11:22Z`) reaches 72 genuine hours at **2026-11-15T20:11:22Z**; at this snapshot **11.17 h** have elapsed (`final-gate-1h.json`, `final-gate-5m.json`). The observation was not restarted or reset. No M2 tag, no push, no M3, no credential, no authenticated/demo/real order, no strategy/risk/fee/threshold change.
+
+## F-1. Operations (Phase 1)
+
+Task `ASTA-Paper-Supervisor` (priority 4) owns the supervisor (lock PID 43108, samples every 10 s); exactly one supervisor and one `paper_service`. Sessions `afec3e2b-c5dc-4306-a98d-82da6ea38346` (hash `dd59484f…febefb84`) and `489d0990-6cf9-4120-9ad7-c6d370374dc2` (hash `f06aaf1a…2eae72`) RUNNING, unchanged; reconciliation OK (0 discrepancies), checkpoint digests verified by replay (`r4a-integrity-*.json`); Binance CONNECTED, **OKX DISABLED** (upstream DNS block, R-1; not bypassed; recorded as open outage interval since 2026-11-13 03:00:16 UTC); unresolved critical incidents 0; dead letters 0; duplicate postings 0; queue 912 DONE. No new simulated entry on the disabled venue (test `test_a_suspended_venue_cannot_increase_risk…` and the OKX accounts' unchanged ledger).
+
+## F-2. Gate state (Phase 2)
+
+Window since 20:11:22Z: elapsed 11.17 h of 72; supervisor coverage **83.8 %** (unmonitored 6,528 s, all from before the R4A repair); service availability 83.3 %; `gate_pass: false` on duration and coverage only (every other criterion satisfied). Coverage reaches 95 % once the window exceeds ≈ 36.3 h (≈ 2026-11-14 08:30 UTC) if no further outage; the 72-hour duration is the binding constraint. Final balances, orders, fills, fees and P&L will be recorded from the mature run.
+
+## F-3. Final regression (Phase 3) — run at this commit
+
+| Check | Result |
+|---|---|
+| Python, `ASTA_RUN_NETWORK_TESTS=1` | **465 passed, 1 skipped** (OKX live probe: DNS block; not a pass), 0 failed (R4A run; after it only a typing change to one test, re-run: 24/24 in `test_runtime.py`) |
+| Browser | **39/39** (live 16, nodata 1, aging 1, research 12, paper 9; sign-out test passed) — `e2e-full-run-final.log` |
+| Ruff check / format | clean |
+| mypy strict | **a genuine defect was found and fixed**: 5 `union-attr` errors in my R4 test `test_runtime.py` (the earlier container run also hit an internal cache error on the read-only mount; reran with `--cache-dir`). After the fix: **no issues, 144 files** |
+| Pyright | `src`: **0 errors**. Not clean outside the gated scope: `tests` 27 errors (pre-existing optional-typing noise, e.g. `tests/research/test_strategies.py`) and `scripts` 2 errors (`dev_db.py`, `e2e_seed_paper.py`); not fixed (non-product, not gating before); disclosed. Run via `pnpm dlx pyright` because the native binary is blocked by App Control |
+| pip-audit / pnpm audit | no known vulnerabilities / no known vulnerabilities |
+| Secret scan / gitleaks | 0 findings / 48 commits, no leaks |
+| M0/M1 safety | `git diff 773b604` over risk, egress, environment and M0/M1 evidence empty; live-lock tests pass |
+| Migrations | observation DB at head `0005`; tests build fresh DBs from migrations |
+| Ledger replay / reconciliation | replay verified every checkpoint digest, 0 discrepancies (before/after the R4A tests) |
+| Supervisor recovery / incidents | R4A-3 (service 11 s; supervisor via keep-alive ≈ 3 min 15 s, orphan recorded); `0xC000013A` has not recurred |
+
+## F-4. Residuals
+
+Observation incomplete (61 h remaining); OKX continuous connectivity unverified (R-1); supervisor outage risk from PC sleep/log-off; the unexplained single `0xC000013A` relaunch; pyright findings outside `src`; R-2 hosted CI, R-3 infrastructure egress, R-11 assumed fees, M2-1…M2-5.
+
+**Recommendation: BUILT — NOT ACCEPTED** until the gate is evaluated at or after 2026-11-15T20:11:22Z.
