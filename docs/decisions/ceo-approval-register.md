@@ -24,3 +24,12 @@ M0 implementation and remediation authorised (demo-only scope, no live trading, 
 - **Prospective criteria:** `docs/evidence/M2-acceptance.md` (section "ASTA-DECISION-005") lists the revised mandatory gates (reconciliation, duplicates, balances, risk, incidents, reports, regression/security, M0/M1 safeguards, no credentials). The `paper_observation.py gate` thresholds were **not edited**; the waiver is a policy decision recorded here.
 - **Retained residuals:** unverified 24/7 long-duration reliability; OKX continuous public connectivity (R-1); infrastructure egress enforcement (R-3, mandatory before any credentials); unverified fee/trading-rule assumptions (R-11); hosted CI not executed (R-2); noncritical operational/typing items.
 - **Not authorised:** M2 acceptance tag (separate approval), M3, demo/real orders, credentials, GitHub push.
+
+## ASTA-DECISION-006 — M2 formal acceptance closure (2026-11-13)
+- **Decision:** approve M2 (Continuous Paper Trading & Market Observation) as `ACCEPTED_WITH_RESIDUAL` under the revised policy of ASTA-DECISION-005, on the evidence at commit `a99eb3c`.
+- **Original 72-hour observation gate and 95 % supervisor-coverage gate: NOT PASSED - WAIVED** (measured: 11.29 h / 83.9 % in the approved window; 15.1 h / 62.8 % from session start). Not claimed as achieved.
+- **Not demonstrated:** profitability of any strategy; sustained 24/7 reliability. Engineering acceptance only.
+- **Carry-forward residuals:** R-3 infrastructure egress enforcement (mandatory before any credential); R-1 OKX continuous public connectivity (blocked since 2026-11-13 03:00:16 UTC); R-11 fee/trading-rule assumptions; R-2 hosted CI not executed; unexplained `0xC000013A` relaunch; 29 noncritical pyright findings in tests/scripts; M2-1..M2-5.
+- **Mandatory gates before any authenticated exchange demo integration:** infrastructure egress restrictions; credential storage/isolation verification; independent security review; exchange demo API capability verification; explicit CEO authorization.
+- **Not authorised:** M3 implementation, credentials, authenticated exchange operations, demo or real orders, real-money trading, GitHub push.
+- **Record:** `docs/evidence/M2-ACCEPTANCE-RECORD.md` · tag `m2-accepted-with-residual` (local, annotated).
