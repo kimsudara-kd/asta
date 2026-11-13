@@ -1,0 +1,4 @@
+# 2026-11-12T08:45:39Z mypy strict (container python:3.12-slim, repo ro mount; files=src+tests)
+
+mypy 2.4.1 (compiled: yes)
+Success: no issues found in 52 source files

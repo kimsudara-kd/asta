@@ -4,7 +4,7 @@
 // API (3 configurations) and the web server, runs Playwright (system Chrome) per phase, then
 // stops only the processes it started, deletes the secrets file and drops the e2e database.
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, rmSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, rmSync } from "node:fs";
 import path from "node:path";
 
 const web = path.resolve(import.meta.dirname, "..");
@@ -25,6 +25,20 @@ const baseEnv = {
   PYTHONUTF8: "1",
 };
 const started = [];
+
+// Screenshots are separated by milestone and run and never written into frozen accepted evidence
+// (m0-r1, m1, m1-r1, m2). E2E_MILESTONE names the current milestone (default m3a); E2E_PUBLISH=1
+// copies the finished run into docs/evidence/<milestone>/screenshots/<run> (refused when frozen).
+const FROZEN = new Set(["m0-r1", "m1", "m1-r1", "m2"]);
+const milestone = (process.env.E2E_MILESTONE ?? "m3a").toLowerCase();
+const runId = `run-${new Date().toISOString().replace(/[:.]/g, "-")}`;
+if (FROZEN.has(milestone) || !/^[a-z0-9-]+$/.test(milestone)) {
+  console.error(`refusing: milestone "${milestone}" is frozen or invalid; screenshots must not touch accepted evidence`);
+  process.exit(2);
+}
+const shotsDir = path.join(repo, "data", "e2e-shots", milestone, runId);
+process.env.E2E_SHOTS_DIR = shotsDir;
+baseEnv.E2E_SHOTS_DIR = shotsDir;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function run(cmd, args, opts = {}) {
@@ -69,7 +83,7 @@ async function phase(label, grep, apiEnv) {
 let ok = false;
 let webProc;
 try {
-  mkdirSync(path.resolve(repo, "docs/evidence/m2/screenshots"), { recursive: true });
+  mkdirSync(shotsDir, { recursive: true });
   psql("DROP DATABASE IF EXISTS asta_e2e WITH (FORCE)");
   if (psql("CREATE DATABASE asta_e2e").status !== 0) throw new Error("cannot create asta_e2e");
   rmSync(path.join(repo, "data", "e2e"), { recursive: true, force: true });

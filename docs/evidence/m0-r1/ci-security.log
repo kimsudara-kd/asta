@@ -1,0 +1,21 @@
+# 2026-11-12T08:47:12Z HEAD=6f96602 (+ uncommitted secret_scan.py robustness fix)
+$ ruff check . ; ruff format --check .
+All checks passed!
+66 files already formatted
+$ pyright src
+0 errors, 0 warnings, 0 informations
+$ pip-audit
+No known vulnerabilities found
+$ pnpm audit (apps/web)
+No known vulnerabilities found
+$ web typecheck / unit / build
+$ tsc --noEmit
+ℹ tests 4 ℹ pass 4 ℹ fail 0 ℹ skipped 0 
+✓ Compiled successfully in 165ms
+  Finished TypeScript in 866ms ...
+✓ Generating static pages using 8 workers (7/7) in 423ms
+$ python scripts/secret_scan.py (dependency-free; tree + full history incl. binary diffs)
+secret scan: 0 finding(s)
+$ prohibited-capability scan of src/ outside the 3 guard modules (margin|leverage|borrow|withdraw|transfer|futures|place_order|api_key|hmac|signature)
+src/asta/api/app.py:1:"""FastAPI app. M0 routes are read-only status + auth. There is NO order, transfer or live route."""
+(the api/app.py docstring match, if listed, states that these routes do NOT exist)

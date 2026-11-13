@@ -8,11 +8,16 @@ export const creds: Creds = JSON.parse(
   readFileSync(path.join(__dirname, ".secrets.json"), "utf-8"),
 );
 
-// M0/M1 acceptance screenshots are frozen evidence; M2 runs write to the M2 folder.
+// Screenshot output is separated by milestone and by test run (set by e2e/run.mjs as
+// E2E_SHOTS_DIR). Accepted M0/M1/M2 evidence folders are FROZEN: a run can never write into them.
+const FROZEN_EVIDENCE = /docs[\\/]+evidence[\\/]+(m0-r1|m1|m1-r1|m2)([\\/]|$)/;
 export const SHOTS = path.resolve(
   __dirname,
-  process.env.E2E_SHOTS_DIR ?? "../../../docs/evidence/m2/screenshots",
+  process.env.E2E_SHOTS_DIR ?? "../../../data/e2e-shots/adhoc",
 );
+if (FROZEN_EVIDENCE.test(SHOTS)) {
+  throw new Error(`refusing to write screenshots into frozen accepted evidence: ${SHOTS}`);
+}
 
 const B32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 function base32Decode(s: string): Buffer {

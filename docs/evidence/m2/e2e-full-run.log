@@ -1,0 +1,938 @@
+DROP DATABASE
+NOTICE:  database "asta_e2e" does not exist, skipping
+CREATE DATABASE
+seeded viewer1, op1, rev1
+seeded paper session 6dfe3b25-c18f-445a-a2fe-9947027191c2
+▲ Next.js 16.4.3 (Turbopack)
+✓ Running next.config.mjs took 16ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 350ms
+  Running TypeScript ...
+  Finished TypeScript in 1175ms ...
+  Collecting page data using 18 workers ...
+  Generating static pages using 18 workers (0/17) ...
+  Generating static pages using 18 workers (4/17) 
+  Generating static pages using 18 workers (8/17) 
+  Generating static pages using 18 workers (12/17) 
+✓ Generating static pages using 18 workers (17/17) in 619ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /audit
+├ ○ /login
+├ ○ /markets
+├ ○ /paper
+├ ○ /paper/orders
+├ ○ /paper/performance
+├ ○ /paper/portfolio
+├ ○ /paper/risk
+├ ○ /research
+├ ○ /research/compare
+├ ○ /research/datasets
+├ ○ /research/lab
+├ ○ /research/results
+└ ○ /risk
+
+
+○  (Static)  prerendered as static content
+
+[web] ▲ Next.js 16.4.3
+[web] - Local:         http://127.0.0.1:3640
+- Network:       http://127.0.0.1:3640
+✓ Ready in 111ms
+[web] ✓ Running next.config.mjs took 15ms
+
+===== PHASE live =====
+[api:live] INFO:     Started server process [40476]
+INFO:     Waiting for application startup.
+[api:live] INFO:     Application startup complete.
+[api:live] INFO:     Uvicorn running on http://127.0.0.1:4640 (Press CTRL+C to quit)
+[api:live] INFO:     127.0.0.1:59252 - "GET /health HTTP/1.1" 200 OK
+
+Running 16 tests using 1 worker
+
+  ok  1 e2e\01-auth.spec.ts:5:7 › @live authentication and MFA › protected pages redirect an anonymous visitor to sign-in (809ms)
+  ok  2 e2e\01-auth.spec.ts:15:7 › @live authentication and MFA › wrong password is rejected with a generic message (369ms)
+  ok  3 e2e\01-auth.spec.ts:24:7 › @live authentication and MFA › operator needs MFA: password alone gives no access; wrong code fails; right code works (883ms)
+  ok  4 e2e\01-auth.spec.ts:49:7 › @live authentication and MFA › viewer (no MFA role) signs in; sign-out ends the session (670ms)
+  ok  5 e2e\01-auth.spec.ts:58:7 › @live authentication and MFA › session cookie is HttpOnly and SameSite=Strict (not readable by page scripts) (528ms)
+  ok  6 e2e\02-overview-markets.spec.ts:7:7 › @live overview and markets with real Binance public data › overview: banner, disclaimer, execution disabled, honest venue labels (625ms)
+  ok  7 e2e\02-overview-markets.spec.ts:29:7 › @live overview and markets with real Binance public data › markets: Binance = real-time public data (cross-checked against the public API), OKX = fixture (1.3s)
+  ok  8 e2e\02-overview-markets.spec.ts:64:7 › @live overview and markets with real Binance public data › risk: gateway DENY, live trading DISABLED, no breach label does not imply execution (533ms)
+  ok  9 e2e\03-audit-and-roles.spec.ts:5:7 › @live audit trail and role visibility › reviewer sees the verified hash chain with the earlier auth events (680ms)
+  ok 10 e2e\03-audit-and-roles.spec.ts:21:7 › @live audit trail and role visibility › viewer and operator cannot see or open the audit trail (1.1s)
+  ok 11 e2e\04-no-execution.spec.ts:7:7 › @live no execution controls and no live-trading routes › no page offers any trading/funds control (1.1s)
+  ok 12 e2e\04-no-execution.spec.ts:30:7 › @live no execution controls and no live-trading routes › API exposes no order/live/transfer routes, even to an authenticated reviewer (783ms)
+  ok 13 e2e\04-no-execution.spec.ts:50:7 › @live no execution controls and no live-trading routes › security headers present on pages (228ms)
+  ok 14 e2e\05-responsive.spec.ts:12:9 › @live responsive layout › desktop 1280x800: no horizontal page overflow, banner + nav usable (988ms)
+  ok 15 e2e\05-responsive.spec.ts:12:9 › @live responsive layout › tablet 768x1024: no horizontal page overflow, banner + nav usable (955ms)
+  ok 16 e2e\05-responsive.spec.ts:12:9 › @live responsive layout › mobile 390x844: no horizontal page overflow, banner + nav usable (1.2s)
+
+  16 passed (13.8s)
+[api:live] INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51289 - "GET /v1/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51287 - "GET /v1/markets HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "GET /v1/audit?limit=100 HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "POST /v1/auth/login HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "POST /v1/auth/mfa HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "POST /v1/auth/logout HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 401 Unauthorized
+INFO:     127.0.0.1:51288 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/audit?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/audit?limit=100 HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:51289 - "GET /v1/audit HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:51289 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/audit?limit=100 HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:51287 - "GET /v1/audit HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:51287 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/audit?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51289 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/orders HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/orders HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/order HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/order HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/live HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/live HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/trade HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/trade HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/execute HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/execute HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/withdraw HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/withdraw HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/transfer HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/transfer HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/controls/resume HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/controls/resume HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/controls/halt HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/controls/halt HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/demo-runs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/demo-runs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "GET /v1/paper-runs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/paper-runs HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:64472 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/audit?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/audit?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/audit?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51287 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64472 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51288 - "GET /v1/auth/me HTTP/1.1" 200 OK
+
+===== PHASE nodata =====
+[api:nodata] INFO:     Started server process [34376]
+[api:nodata] INFO:     Waiting for application startup.
+[api:nodata] INFO:     Application startup complete.
+[api:nodata] INFO:     Uvicorn running on http://127.0.0.1:4640 (Press CTRL+C to quit)
+[api:nodata] INFO:     127.0.0.1:53037 - "GET /health HTTP/1.1" 200 OK
+
+Running 1 test using 1 worker
+
+  ok 1 e2e\06-stale.spec.ts:5:7 › @nodata stale-data warnings: no market data at all (fail-closed) › every row is NO DATA + STALE, the banner is the red risk halt (962ms)
+
+  1 passed (1.7s)
+[api:nodata] INFO:     127.0.0.1:52495 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52495 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52497 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52496 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52496 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52497 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52495 - "GET /v1/markets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52495 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52497 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52497 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52497 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52496 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52495 - "GET /v1/risk HTTP/1.1" 200 OK
+
+===== PHASE aging =====
+[api:aging] INFO:     Started server process [9236]
+INFO:     Waiting for application startup.
+[api:aging] INFO:     Application startup complete.
+[api:aging] INFO:     Uvicorn running on http://127.0.0.1:4640 (Press CTRL+C to quit)
+[api:aging] INFO:     127.0.0.1:52507 - "GET /health HTTP/1.1" 200 OK
+
+Running 1 test using 1 worker
+
+  ok 1 e2e\06-stale.spec.ts:29:7 › @aging fresh data becomes stale when updates stop › a row goes fresh -> STALE while still labelled FIXTURE (868ms)
+
+  1 passed (1.7s)
+[api:aging] INFO:     127.0.0.1:63844 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63844 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63845 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63844 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63846 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63846 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63849 - "GET /v1/markets HTTP/1.1" 200 OK
+
+===== PHASE research =====
+[api:research] INFO:     Started server process [35476]
+INFO:     Waiting for application startup.
+[api:research] INFO:     Application startup complete.
+[api:research] INFO:     Uvicorn running on http://127.0.0.1:4640 (Press CTRL+C to quit)
+[api:research] INFO:     127.0.0.1:63858 - "GET /health HTTP/1.1" 200 OK
+
+Running 12 tests using 1 worker
+
+  ok  1 e2e\07-research.spec.ts:18:7 › @research viewer: read-only research › viewer can read datasets/lab but has no import, derive, validate or run controls (714ms)
+  ok  2 e2e\07-research.spec.ts:38:7 › @research operator workflow: import -> derive -> run -> compare -> results › import synthetic datasets: quality, provenance and honest labels (25.1s)
+  ok  3 e2e\07-research.spec.ts:60:7 › @research operator workflow: import -> derive -> run -> compare -> results › derive a coarser timeframe: the derived label keeps the synthetic root (8.8s)
+  ok  4 e2e\07-research.spec.ts:79:7 › @research operator workflow: import -> derive -> run -> compare -> results › lab: settings validation warns about synthetic data and unverified assumptions (643ms)
+  ok  5 e2e\07-research.spec.ts:92:7 › @research operator workflow: import -> derive -> run -> compare -> results › run a strategy with baselines: identical data/costs, flags, overlay chart, export (17.8s)
+  ok  6 e2e\07-research.spec.ts:117:7 › @research operator workflow: import -> derive -> run -> compare -> results › results: simulated, never realised; reproducibility facts; fills CSV export (2.1s)
+  ok  7 e2e\07-research.spec.ts:146:7 › @research operator workflow: import -> derive -> run -> compare -> results › short runs show N/A with the reason, never zero (2.8s)
+  ok  8 e2e\07-research.spec.ts:162:7 › @research operator workflow: import -> derive -> run -> compare -> results › cancel: a queued run is cancelled before it starts and is shown as CANCELLED (10.3s)
+  ok  9 e2e\07-research.spec.ts:186:7 › @research operator workflow: import -> derive -> run -> compare -> results › stored studies: import once, repeat is a no-op, sample types and provenance are explicit (1.5s)
+  ok 10 e2e\07-research.spec.ts:223:7 › @research operator workflow: import -> derive -> run -> compare -> results › viewer sees stored studies but has no import control (463ms)
+  ok 11 e2e\07-research.spec.ts:230:7 › @research operator workflow: import -> derive -> run -> compare -> results › research pages expose no execution controls and carry the simulation banner (843ms)
+  ok 12 e2e\07-research.spec.ts:245:7 › @research operator workflow: import -> derive -> run -> compare -> results › research pages are usable on a phone (no horizontal overflow) (804ms)
+
+  12 passed (1.2m)
+[api:research] INFO:     127.0.0.1:57036 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57036 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57039 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57038 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57038 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57039 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57036 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57039 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57042 - "GET /v1/datasets/importable HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57039 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57042 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57039 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57036 - "GET /v1/strategies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57038 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57036 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57047 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "POST /v1/datasets/import HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:57044 - "POST /v1/backtests HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:57044 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57047 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57036 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57047 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57036 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57038 - "GET /v1/datasets/importable HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "POST /v1/datasets/import HTTP/1.1" 201 Created
+INFO:     127.0.0.1:57044 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "POST /v1/datasets/import HTTP/1.1" 201 Created
+INFO:     127.0.0.1:57044 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57044 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /v1/datasets/importable HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "POST /v1/datasets/import HTTP/1.1" 201 Created
+INFO:     127.0.0.1:53180 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /v1/datasets/97fe4d7c-c175-49b9-a188-18e6152d2a1e/quality HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50389 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50389 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53180 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50390 - "GET /v1/datasets/importable HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "POST /v1/datasets/97fe4d7c-c175-49b9-a188-18e6152d2a1e/derive HTTP/1.1" 201 Created
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "POST /v1/datasets/5d14f1b2-3104-42f4-a90c-426e5271abf8/derive HTTP/1.1" 422 Unprocessable Entity
+INFO:     127.0.0.1:50388 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/strategies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "GET /v1/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/strategies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59056 - "POST /v1/backtests HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:59056 - "POST /v1/backtests HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:59056 - "POST /v1/backtests HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:59056 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59052 - "GET /v1/validations?rev=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/equity?max_points=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/equity?max_points=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84/equity?max_points=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/equity?max_points=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/741bc256-e767-4a46-8619-847703cbfd84/equity?max_points=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/e284bd8b-6b25-4d79-87da-182334371451/equity?max_points=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/equity?max_points=1500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/trades?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59054 - "GET /v1/backtests/a6b80eec-3693-4196-8842-2cdeb9ede609/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56008 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56008 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50388 - "GET /v1/strategies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56009 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /v1/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/backtests HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:56009 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /v1/backtests/258edb6b-7c08-48c8-9c23-4470d4778c0d HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests/258edb6b-7c08-48c8-9c23-4470d4778c0d HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests/258edb6b-7c08-48c8-9c23-4470d4778c0d/results HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests/258edb6b-7c08-48c8-9c23-4470d4778c0d/equity?max_points=1500 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests/258edb6b-7c08-48c8-9c23-4470d4778c0d/trades?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests/258edb6b-7c08-48c8-9c23-4470d4778c0d/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56009 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56009 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/backtests HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:59053 - "POST /v1/backtests HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:59053 - "POST /v1/backtests/79f2ecd8-2317-44c3-8080-852bd758c1b0/cancel HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/backtests/79f2ecd8-2317-44c3-8080-852bd758c1b0/cancel HTTP/1.1" 409 Conflict
+INFO:     127.0.0.1:56009 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56010 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56009 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/validations?rev=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/validations/import HTTP/1.1" 201 Created
+INFO:     127.0.0.1:59053 - "GET /v1/validations?rev=1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "POST /v1/validations/import HTTP/1.1" 201 Created
+INFO:     127.0.0.1:59053 - "GET /v1/validations?rev=2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/validations/b2c1ea7c-a12b-4d43-8f5b-3044dae12473 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/validations/e0dc35ae-5cf7-4524-a05f-0615bd022f07 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/validations/bd48c87a-19d8-4089-a248-aa91f9efc672 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/validations?rev=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60565 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/validations?rev=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58599 - "GET /v1/datasets/importable HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58599 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/strategies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/validations?rev=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60564 - "GET /v1/backtests HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58599 - "GET /v1/datasets/importable HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58599 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/strategies HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62615 - "GET /v1/profiles HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60566 - "GET /v1/datasets HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57314 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62615 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62615 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60807 - "GET /v1/validations?rev=0 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59053 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62615 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58254 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58254 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60807 - "GET /v1/backtests HTTP/1.1" 200 OK
+
+===== PHASE paper =====
+[api:paper] INFO:     Started server process [31936]
+[api:paper] INFO:     Waiting for application startup.
+[api:paper] INFO:     Application startup complete.
+[api:paper] INFO:     Uvicorn running on http://127.0.0.1:4640 (Press CTRL+C to quit)
+[api:paper] INFO:     127.0.0.1:51921 - "GET /health HTTP/1.1" 200 OK
+
+Running 9 tests using 1 worker
+
+  ok 1 e2e\08-paper.spec.ts:24:7 › @paper viewer: read-only › viewer sees the session but has no create/control buttons, and the server refuses direct calls (750ms)
+  ok 2 e2e\08-paper.spec.ts:41:7 › @paper operator: pages and session lifecycle › overview: feeds, session status, equity, risk status, open paper orders, recent activity (770ms)
+  ok 3 e2e\08-paper.spec.ts:55:7 › @paper operator: pages and session lifecycle › portfolio: totals match the overview; wallet slices; shadow benchmarks are not portfolio (745ms)
+  ok 4 e2e\08-paper.spec.ts:69:7 › @paper operator: pages and session lifecycle › signals and simulated orders: rejected signals carry reasons; filters work (1.1s)
+  ok 5 e2e\08-paper.spec.ts:84:7 › @paper operator: pages and session lifecycle › risk and incidents: limits, latched-halt policy, data health, incidents, acknowledge an alert (961ms)
+  ok 6 e2e\08-paper.spec.ts:97:7 › @paper operator: pages and session lifecycle › performance and reports: equity vs benchmarks, strategy table, daily report is reproducible (1.1s)
+  ok 7 e2e\08-paper.spec.ts:119:7 › @paper operator: pages and session lifecycle › session lifecycle from the UI: pause, resume (validated), then stop; create form is validated (2.1s)
+  ok 8 e2e\08-paper.spec.ts:140:7 › @paper operator: pages and session lifecycle › paper pages show the banner and expose no execution controls (1.2s)
+  ok 9 e2e\08-paper.spec.ts:154:7 › @paper operator: pages and session lifecycle › paper pages are usable on a phone (no horizontal overflow) (1.3s)
+
+  9 passed (10.8s)
+[api:paper] INFO:     127.0.0.1:59818 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "POST /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/pause HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:59820 - "POST /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/stop HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:59820 - "POST /v1/paper/sessions HTTP/1.1" 403 Forbidden
+INFO:     127.0.0.1:59820 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=300&accepted=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=300&status=FILLED HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/incidents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "POST /v1/paper/alerts/1/ack HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/incidents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/reports/daily?session_id=6dfe3b25-c18f-445a-a2fe-9947027191c2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "POST /v1/reports/daily HTTP/1.1" 201 Created
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/reports/daily?session_id=6dfe3b25-c18f-445a-a2fe-9947027191c2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "POST /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/pause HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59823 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59818 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59820 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59819 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "POST /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/resume HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51651 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "POST /v1/paper/sessions HTTP/1.1" 201 Created
+INFO:     127.0.0.1:55791 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "POST /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/stop HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/orders?limit=100 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/paper/sessions/6dfe3b25-c18f-445a-a2fe-9947027191c2/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59824 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62163 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58325 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:55791 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53062 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/portfolio HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53062 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/signals?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/orders?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53062 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/incidents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54194 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/reports/daily?session_id=1ad7105f-f101-45f3-972d-89d35d6552a1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "POST /v1/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "POST /v1/auth/mfa HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/overview HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53062 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65350 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53062 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/signals?limit=8 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53061 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61713 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52926 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52926 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61713 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/orders?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/signals?limit=300 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61713 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/market-feeds/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49282 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/incidents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49282 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49282 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/risk HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/paper/sessions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52925 - "GET /v1/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49282 - "GET /v1/reports/daily?session_id=1ad7105f-f101-45f3-972d-89d35d6552a1 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:49680 - "GET /v1/paper/sessions/1ad7105f-f101-45f3-972d-89d35d6552a1/performance HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50824 - "GET /v1/paper/health HTTP/1.1" 200 OK
+
+PHASE RESULTS: [["live",true],["nodata",true],["aging",true],["research",true],["paper",true]]
+DROP DATABASE

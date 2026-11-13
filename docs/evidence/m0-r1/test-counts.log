@@ -1,0 +1,24 @@
+# 2026-11-12T08:47:31Z HEAD=6f96602 (+ uncommitted scripts/secret_scan.py fix)   DB = compose db_test, PostgreSQL 16.4
+
+$ pytest --collect-only -q
+110 tests collected in 0.64s
+
+per directory: collected -> default run
+unit: collected 49 -> 49 passed
+contracts: collected 20 -> 17 passed, 3 skipped
+live_lock: collected 5 -> 5 passed
+integration: collected 36 -> 35 passed, 1 skipped
+
+$ pytest tests -rs  (default; network tests are opt-in)
+SKIPPED [1] tests\contracts\test_live_public.py:30: set ASTA_RUN_NETWORK_TESTS=1
+SKIPPED [1] tests\contracts\test_live_public.py:46: set ASTA_RUN_NETWORK_TESTS=1
+SKIPPED [1] tests\contracts\test_live_public.py:68: set ASTA_RUN_NETWORK_TESTS=1
+SKIPPED [1] tests\integration\test_e2e_live.py:29: set ASTA_RUN_NETWORK_TESTS=1
+106 passed, 4 skipped, 4 warnings in 5.29s
+
+$ ASTA_RUN_NETWORK_TESTS=1 pytest tests -rs
+SKIPPED [1] tests\contracts\test_live_public.py:74: OKX unreachable from this machine: ConnectError
+109 passed, 1 skipped, 4 warnings in 20.11s
+
+web unit (node:test): 4 pass / 0 fail   (see ci-security.log)
+browser (Playwright, system Chrome): live 16 + nodata 1 + aging 1 = 18 passed / 0 failed   (see e2e-run.log)

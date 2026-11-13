@@ -15,5 +15,6 @@ node_modules/
 secrets/
 infra/data/
 *.log
+!docs/evidence/**/*.log
 dist/
 data/

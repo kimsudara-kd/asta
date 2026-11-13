@@ -1,0 +1,11 @@
+# 2026-11-12T08:49:45Z gitleaks v8.30.1 (official image), HEAD=5ae4d90, commits=12, config=.gitleaks.toml
+# NOTE: an earlier run WITHOUT the allowlist: history 0 leaks; working tree 216 generic-api-key hits, ALL under untracked/git-ignored .venv/Lib/site-packages (208) and apps/web/.next (8); 0 in source files. The allowlist excludes only those generated/vendored dirs.
+$ gitleaks git (full history)
+8:49AM INF 12 commits scanned.
+8:49AM INF scanned ~980243 bytes (980.24 KB) in 3.5s
+8:49AM INF no leaks found
+exit=0
+$ gitleaks dir (working tree)
+8:49AM INF scanned ~1207620 bytes (1.21 MB) in 796ms
+8:49AM INF no leaks found
+exit=0

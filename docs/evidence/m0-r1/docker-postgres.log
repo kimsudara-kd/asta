@@ -1,0 +1,44 @@
+# 2026-11-12T08:30:51Z docker compose validation (ASTA project only)
+$ docker compose -f infra/docker-compose.yml --profile test down   (no -v: volume kept)
+ Container asta-db-test Stopped 
+ Container asta-db-test Removing 
+ Container asta-db-test Removed 
+ Container asta-db Stopped 
+ Container asta-db Removing 
+ Container asta-db Removed 
+ Network asta_default Removing 
+ Network asta_default Removed 
+
+$ docker compose -f infra/docker-compose.yml --profile test up -d --wait db db_test
+ Container asta-db-test Created 
+ Container asta-db Created 
+ Container asta-db Starting 
+ Container asta-db-test Starting 
+ Container asta-db-test Started 
+ Container asta-db Started 
+ Container asta-db-test Waiting 
+ Container asta-db Waiting 
+ Container asta-db-test Healthy 
+ Container asta-db Healthy 
+
+$ docker compose ps
+NAME           STATUS                   PORTS
+asta-db        Up 6 seconds (healthy)   127.0.0.1:5640->5432/tcp
+asta-db-test   Up 6 seconds             127.0.0.1:5641->5432/tcp
+
+$ pg_isready
+/var/run/postgresql:5432 - accepting connections
+
+$ select version()
+PostgreSQL 16.4 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20240309) 13.2.1 20240309, 64-bit
+PostgreSQL 16.4 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20240309) 13.2.1 20240309, 64-bit
+
+$ docker logs asta-db --tail 8
+PostgreSQL Database directory appears to contain a database; Skipping initialization
+
+2026-11-12 08:30:54.796 UTC [1] LOG:  starting PostgreSQL 16.4 on x86_64-pc-linux-musl, compiled by gcc (Alpine 13.2.1_git20240309) 13.2.1 20240309, 64-bit
+2026-11-12 08:30:54.797 UTC [1] LOG:  listening on IPv4 address "0.0.0.0", port 5432
+2026-11-12 08:30:54.808 UTC [1] LOG:  listening on IPv6 address "::", port 5432
+2026-11-12 08:30:54.819 UTC [1] LOG:  listening on Unix socket "/var/run/postgresql/.s.PGSQL.5432"
+2026-11-12 08:30:54.827 UTC [29] LOG:  database system was shut down at 2026-11-12 08:30:51 UTC
+2026-11-12 08:30:54.833 UTC [1] LOG:  database system is ready to accept connections
