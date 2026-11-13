@@ -1,0 +1,165 @@
+{
+ "started": 1794561390.3869538,
+ "results": [
+  {
+   "kind": "REST GET",
+   "host": "testnet.binance.vision",
+   "path": "/api/v3/ping",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:29 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "9f687e8a-d2c4-4b86-8b92-b63bdfb7e21f",
+    "x-mbx-used-weight": "1",
+    "x-mbx-used-weight-1m": "1"
+   },
+   "body_prefix": "{}",
+   "body_bytes": 2,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "testnet.binance.vision",
+   "path": "/api/v3/time",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:29 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "bfd4da58-5658-4101-a5d8-4c7b2f07bd1d",
+    "x-mbx-used-weight": "2",
+    "x-mbx-used-weight-1m": "2"
+   },
+   "body_prefix": "{\"serverTime\":1794561389400}",
+   "body_bytes": 28,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "testnet.binance.vision",
+   "path": "/api/v3/exchangeInfo?symbol=BTCUSDT",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:29 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "bfd4da58-5658-4101-a5d8-4c7b2f07bd1d",
+    "x-mbx-used-weight": "22",
+    "x-mbx-used-weight-1m": "22"
+   },
+   "body_prefix": "{\"timezone\":\"UTC\",\"serverTime\":1794561389625,\"rateLimits\":[{\"rateLimitType\":\"REQUEST_WEIGHT\",\"interval\":\"MINUTE\",\"intervalNum\":1,\"limit\":6000},{\"rateLimitType\":\"ORDERS\",\"interval\":\"SECOND\",\"intervalNum\":10,\"limit\":50},{\"rateLimitType\":\"ORDERS\",\"interval\":\"DAY\",\"intervalNum\":1,\"limit\":160000},{\"rateLimitType\":\"RAW_REQUESTS\",\"interval\":\"MINUTE\",\"intervalNum\":5,\"limit\":300000}],\"exchangeFilters\":[],\"symbols\":[{\"symbol\":\"BTCUSDT\",\"status\":\"TRADING\",\"baseAsset\":\"BTC\",\"baseAssetPrecision\":8,\"quoteAsset\":\"USDT\",\"quotePrecision\":8,\"quoteAssetPrecision\":8,\"baseCommissionPrecision\":8,\"quoteCommissionPre",
+   "body_bytes": 2318,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "testnet.binance.vision",
+   "path": "/api/v3/depth?symbol=BTCUSDT&limit=5",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:29 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "9f687e8a-d2c4-4b86-8b92-b63bdfb7e21f",
+    "x-mbx-used-weight": "27",
+    "x-mbx-used-weight-1m": "27"
+   },
+   "body_prefix": "{\"lastUpdateId\":16281170,\"bids\":[[\"68902.53000000\",\"28.82756000\"],[\"68902.52000000\",\"0.00288000\"],[\"68902.32000000\",\"0.00044000\"],[\"68902.11000000\",\"1.83295000\"],[\"68902.10000000\",\"1.57007000\"]],\"asks\":[[\"68902.54000000\",\"2.80220000\"],[\"68902.55000000\",\"0.58042000\"],[\"68902.81000000\",\"0.00064000\"],[\"68902.82000000\",\"0.78232000\"],[\"68902.99000000\",\"0.00064000\"]]}",
+   "body_bytes": 364,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "testnet.binance.vision",
+   "path": "/api/v3/klines?symbol=BTCUSDT&interval=1m&limit=2",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:30 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "9f687e8a-d2c4-4b86-8b92-b63bdfb7e21f",
+    "x-mbx-traceid": "11fed43071c787f0",
+    "x-mbx-used-weight": "29",
+    "x-mbx-used-weight-1m": "29"
+   },
+   "body_prefix": "[[1794561300000,\"68804.31000000\",\"68869.93000000\",\"68804.31000000\",\"68869.93000000\",\"0.24584000\",1794561359999,\"16923.41038180\",30,\"0.22708000\",\"15631.90924540\",\"0\"],[1794561360000,\"68869.94000000\",\"68900.00000000\",\"68869.93000000\",\"68899.99000000\",\"0.04570000\",1794561419999,\"3147.96002710\",26,\"0.03263000\",\"2247.44888120\",\"0\"]]",
+   "body_bytes": 329,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "data-api.binance.vision",
+   "path": "/api/v3/exchangeInfo?symbol=BTCUSDT",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:30 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "46743e24-997a-4f4a-9946-56e6de7abd1b",
+    "x-mbx-used-weight": "21",
+    "x-mbx-used-weight-1m": "21"
+   },
+   "body_prefix": "{\"timezone\":\"UTC\",\"serverTime\":1794561390498,\"rateLimits\":[{\"rateLimitType\":\"REQUEST_WEIGHT\",\"interval\":\"MINUTE\",\"intervalNum\":1,\"limit\":6000},{\"rateLimitType\":\"ORDERS\",\"interval\":\"SECOND\",\"intervalNum\":10,\"limit\":100},{\"rateLimitType\":\"ORDERS\",\"interval\":\"DAY\",\"intervalNum\":1,\"limit\":200000},{\"rateLimitType\":\"RAW_REQUESTS\",\"interval\":\"MINUTE\",\"intervalNum\":5,\"limit\":300000}],\"exchangeFilters\":[],\"symbols\":[{\"symbol\":\"BTCUSDT\",\"status\":\"TRADING\",\"baseAsset\":\"BTC\",\"baseAssetPrecision\":8,\"quoteAsset\":\"USDT\",\"quotePrecision\":8,\"quoteAssetPrecision\":8,\"baseCommissionPrecision\":8,\"quoteCommissionPr",
+   "body_bytes": 5349,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "data-api.binance.vision",
+   "path": "/api/v3/depth?symbol=BTCUSDT&limit=5",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 200 OK",
+   "headers_of_interest": {
+    "date": "Fri, 13 Nov 2026 09:16:30 GMT",
+    "server": "nginx",
+    "x-mbx-uuid": "ae4116a2-4653-43e1-bd51-9dc4477d452c",
+    "x-mbx-used-weight": "26",
+    "x-mbx-used-weight-1m": "26"
+   },
+   "body_prefix": "{\"lastUpdateId\":102751119854,\"bids\":[[\"68902.54000000\",\"6.05169000\"],[\"68902.53000000\",\"4.29195000\"],[\"68902.12000000\",\"0.00161000\"],[\"68902.11000000\",\"0.65943000\"],[\"68902.10000000\",\"0.39252000\"]],\"asks\":[[\"68902.55000000\",\"0.94699000\"],[\"68902.56000000\",\"0.00072000\"],[\"68902.99000000\",\"0.00016000\"],[\"68903.00000000\",\"0.08060000\"],[\"68903.37000000\",\"0.00234000\"]]}",
+   "body_bytes": 367,
+   "result": "OK"
+  },
+  {
+   "kind": "REST GET",
+   "host": "www.okx.com",
+   "path": "/api/v5/public/time",
+   "proxy": "HTTP/1.1 403 Forbidden",
+   "result": "BLOCKED"
+  },
+  {
+   "kind": "REST GET",
+   "host": "www.okx.com",
+   "path": "/api/v5/public/instruments?instType=SPOT&instId=BTC-USDT",
+   "proxy": "HTTP/1.1 403 Forbidden",
+   "result": "BLOCKED"
+  },
+  {
+   "kind": "WS upgrade",
+   "host": "stream.testnet.binance.vision",
+   "port": 443,
+   "path": "/ws/btcusdt@trade",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 101 Switching Protocols",
+   "result": "OK"
+  },
+  {
+   "kind": "WS upgrade",
+   "host": "data-stream.binance.vision",
+   "port": 443,
+   "path": "/ws/btcusdt@trade",
+   "proxy": "HTTP/1.1 200 Connection Established",
+   "status": "HTTP/1.1 101 Switching Protocols",
+   "result": "OK"
+  },
+  {
+   "kind": "WS upgrade",
+   "host": "ws.okx.com",
+   "port": 443,
+   "path": "/ws/v5/public",
+   "proxy": "HTTP/1.1 403 Forbidden",
+   "result": "BLOCKED"
+  }
+ ]
+}

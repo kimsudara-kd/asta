@@ -1,5 +1,7 @@
 # Infrastructure egress enforcement (M3A-1)
 
+> **M3A-R1 update:** the boundary was hardened with a kernel-enforced gate (section 8). Sections 2-4 describe the original M3-A design; where they differ (the proxy now runs inside the gate's network namespace, subnets pinned, DNS allowlist-only) section 8 and `docs/m3a/VM-BOUNDARY-DESIGN.md` are authoritative. F-02 stays OPEN: no dedicated VM exists.
+
 Status: implemented and verified for the **protected container runtime**; **not yet applied to the running M2 processes** (see section 7). Everything is version-controlled in `infra/egress/`.
 
 ## 1. Design decision
@@ -81,3 +83,21 @@ Docker state before/after (`docs/evidence/m3a/docker-before.txt` vs now): the on
 4. Resolution is performed by the proxy against the PC's upstream resolvers, which currently sinkhole OKX; correctness of DNS answers for allowed names is trusted only to the extent that non-public answers are refused (no DNSSEC; a malicious *public* answer for an allowed name would be accepted - TLS certificate validation by the client is the remaining control).
 5. Not tested: container escape, kernel/Docker vulnerabilities, Docker Desktop reboot persistence, behaviour if the Docker backend itself is replaced, WebSocket frame-level content.
 6. Port 9443 is allowed for the Binance data stream host as documented; it is not used by the M2 adapter (which uses 443) and may be removed.
+
+
+## 8. M3A-R1 hardening and verification (kernel gate)
+
+Added `infra/egress/gate/` (Alpine image, nftables + dnsmasq + jq) and moved the proxy into the gate's network namespace (`network_mode: service:egress-gate`). Result: the proxy process (non-root, no capabilities, read-only filesystem) is bound by kernel rules it cannot change: default DROP in input/output/forward (IPv6 included), outbound only TCP to addresses the gate resolved for allowlisted names (public unicast IPv4 only, 443/9443), inbound only 3128 from `172.31.250.0/24`, DNS only for allowlisted names (REFUSED otherwise), `resolv.conf` pinned to the local resolver. Full design, residual shared-kernel limits and the dedicated-VM plan: `docs/m3a/VM-BOUNDARY-DESIGN.md`.
+
+Verification (`python infra/egress/verify_boundary.py`, evidence `docs/evidence/m3a/r1-boundary-verification.json`):
+| Phase | Protected-runtime negative checks | Compromised-proxy checks (unprivileged process in the proxy's namespace) |
+|---|---|---|
+| baseline | 78/78 | 39/39 |
+| after proxy restart | 78/78 | 39/39 |
+| after gate restart (dependents recreated) | 78/78 | 39/39 |
+| gate stopped | protected runtime has zero connectivity (proxy alias unresolvable): fail closed | - |
+| after recovery | 78/78, `CONNECT data-api.binance.vision:443` -> 200 | 39/39 |
+
+Compromised-proxy checks (`infra/egress/gate_tests.py`) cover direct public IPs and ports (443/80/22/25/9443), UDP DNS to public resolvers (no answer), local resolver for non-allowlisted and tunnelling-style names (REFUSED), allowed address on other ports (blocked), IPv6 (blocked, no global address), cloud metadata, the Docker host side of both bridges, the LAN router, `host.docker.internal`, and self-weakening attempts (no capabilities, raw socket refused, sysctl write refused, no `nft`/`iptables`/`ip` binary in the image). Kernel drop counters after the runs: tens of input and over a hundred output packets dropped, forward 0 (counters in the JSON), so the refusals are the kernel's, not application checks. Positive control: allowlisted name resolves via the gate, TCP 443 connects, TLS `GET /api/v3/time` returns 200.
+
+Not done (UNVERIFIED): Docker Desktop/VM restart and Windows reboot (would interrupt all other projects and the M2 database), container-escape testing, a hypervisor-level (VM) boundary. OKX: the gate refuses the sinkholed answer, so OKX is never reachable and nothing was bypassed.

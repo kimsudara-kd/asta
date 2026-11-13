@@ -67,7 +67,10 @@ def tag_files(commit: str, spec: dict[str, object]) -> list[str]:
 
 
 def build() -> dict[str, object]:
-    m: dict[str, object] = {"note": "Frozen accepted evidence. Do not edit by hand.", "milestones": {}}
+    m: dict[str, object] = {
+        "note": "Frozen accepted evidence. Do not edit by hand.",
+        "milestones": {},
+    }
     for name, spec in FROZEN.items():
         commit = tag_commit(str(spec["tag"]))
         files = {p: sha(p, git("show", f"{commit}:{p}")) for p in tag_files(commit, spec)}
@@ -104,7 +107,9 @@ def verify() -> list[str]:
             problems.append(f"{name}: tag {spec['tag']} is missing")
             continue
         if commit != entry["tag_commit"]:
-            problems.append(f"{name}: tag {spec['tag']} moved {entry['tag_commit'][:8]} -> {commit[:8]}")
+            problems.append(
+                f"{name}: tag {spec['tag']} moved {entry['tag_commit'][:8]} -> {commit[:8]}"
+            )
             continue
         pinned: dict[str, str] = entry["files"]
         late: dict[str, str] = entry.get("files_not_in_tag", {})

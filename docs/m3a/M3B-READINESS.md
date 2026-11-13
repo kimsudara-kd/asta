@@ -29,3 +29,24 @@
 
 ## 4. Explicit non-claims
 No credential exists; no authenticated request was made; no order of any kind (demo or real) was placed; nothing in this repository can currently do so.
+
+
+---
+
+# R1 update (M3A-R1): credential readiness
+
+**Credential readiness: NO-GO.** M3-B is not authorized and not started.
+
+| Blocker | State after R1 |
+|---|---|
+| B-1 independent review (F-03) | **OPEN** - no reviewer designated; package complete and ready for one |
+| B-2 legacy M2 processes outside the boundary (F-01) | **OPEN** - audited (`r1-process-audit.txt`); they stay as they are until a separately authorized, verified migration; credential-free by policy |
+| B-3 boundary not independently enforced (F-02) | **OPEN, mitigated** - kernel netfilter gate built and verified (78/78 + 39/39 across restarts, fail-closed on gate loss); dedicated VM architecture, sizing and deployment plan delivered; VM not provisionable here (Windows Home, no admin, no hypervisor software); needs CEO decision on technology/approval for host changes |
+| B-4 vault backend / key custody (F-05, F-06) | OPEN (unchanged; contract only) |
+| B-5 OKX connectivity and behaviour (R-1, F-04) | OPEN - still BLOCKED by the upstream DNS sinkhole; reconfirmed; not bypassed |
+| B-6 duplicate-order controls (F-12) | OPEN - R1 quantified the repeated-signal behaviour and proposed de-duplication boundaries (analysis only) |
+| B-7 hosted CI, fee/rule assumptions | OPEN |
+
+Closed or improved in R1: evidence protection (F-16 closed), credential hygiene (obsolete dev-login file identified, leak-checked, deletion pending owner), gitleaks exception reviewed (kept, one fingerprint), Binance Spot Testnet public capabilities reconfirmed through the hardened boundary.
+
+Decisions requested from the CEO: (1) designate the independent security reviewer; (2) choose the dedicated boundary technology and authorize the host changes it needs (VM software/rights, virtual switch) or a separate physical firewall; (3) confirm deletion of `data/manual/creds.json`; (4) provide a lawful network path for OKX or accept Binance-testnet-only scope for M3-B.

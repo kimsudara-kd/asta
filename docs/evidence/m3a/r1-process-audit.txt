@@ -1,0 +1,19 @@
+ASTA process audit, 2026-11-13 ~09:10 UTC (read-only: Get-CimInstance Win32_Process, Get-NetTCPConnection)
+
+ProcessId ParentProcessId Name       cmd
+--------- --------------- ----       ---
+     8776            3476 cmd.exe    "cmd.exe" /c "E:\Dev\asta\scripts\run_paper_supervisor.cmd"
+    35188            8776 python.exe ".venv\Scripts\python.exe"  scripts\paper_supervisor.py
+    43108           35188 python.exe  (interpreter of the supervisor; holds the lock file)
+    41952           43108 python.exe E:\Dev\asta\.venv\Scripts\python.exe -m asta.paper_service
+    46748           41952 python.exe  (interpreter of the paper service)
+
+Connections (Established/Listen) by owning process:
+  PID 43108 (supervisor): 1 x 127.0.0.1 (PostgreSQL 5640)
+  PID 46748 (paper_service): 4 x 127.0.0.1 (PostgreSQL), 1 x 13.159.191.183 (Binance public data), 1 x 54.92.91.152 (Binance public data)
+
+Task Scheduler: ASTA-Paper-Supervisor = Running (priority 4)
+
+Docker (ASTA): asta-db 127.0.0.1:5640, asta-db-test 127.0.0.1:5641 (localhost only).
+Result: the paper service reaches the Internet DIRECTLY from the Windows host (outside the protected boundary).
+It holds no credentials and contains no signing/order code (tests/live_lock).

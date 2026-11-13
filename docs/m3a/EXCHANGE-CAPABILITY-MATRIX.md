@@ -464,3 +464,23 @@ Method: `infra/egress/capability_probe.py` run inside the protected container (`
 Observed Binance testnet vs production differences (runtime): order rate limits (50/10 s and 160,000/day vs 100/10 s and 200,000/day), different order-book levels and depth. Documented (not runtime-verified): monthly testnet resets with wiped balances/orders, trading keys issued via the testnet site, user-data stream via WebSocket API.
 
 Retrieval note: `developers.binance.com` and all `okx.com` pages were unreachable from the documentation fetch tool on this PC (connection refused to 127.0.0.1:443 - the same upstream DNS sinkhole). Binance facts come from the official GitHub docs repository; **OKX facts are second-hand search excerpts of the official pages and MUST be re-read live before M3-B.**
+
+
+---
+
+# R1 reconfirmation (M3A-R1 Workstream E, 2026-11-13 ~09:15 UTC)
+
+Re-run of the public, unauthenticated capability probe through the **gated** boundary (kernel gate + proxy, profile `capability_probe`, then restored to `runtime`): `docs/evidence/m3a/r1-capability-probe.json`.
+
+| Capability | Status after reconfirmation |
+|---|---|
+| Binance Spot Testnet `GET /api/v3/ping`, `/time`, `/exchangeInfo`, `/depth`, `/klines` (public) | **RUNTIME VERIFIED** again (HTTP 200 x5); testnet `ORDERS` limits still 50/10 s and 160,000/day (production market-data host: 100/10 s, 200,000/day) |
+| `wss://stream.testnet.binance.vision/ws/...` and `wss://data-stream.binance.vision/ws/...` upgrade | **RUNTIME VERIFIED** (101 Switching Protocols) |
+| Binance authenticated endpoints, user-data stream, `ws-api.testnet.binance.vision` | DOCUMENTED only (official GitHub docs); not runtime verified (no credentials, not allowlisted) |
+| Binance order behaviour, filters beyond `BTCUSDT`, client-id rule for REST | DOCUMENTED / UNVERIFIED (REST `newClientOrderId` pattern not stated; FIX pattern assumed) |
+| OKX public REST/WS (`www.okx.com`, `ws.okx.com`) | **BLOCKED** - the gate's resolver refuses the sinkholed answer (`127.0.0.1`), so the name is never allowed; the proxy returns 403. Not bypassed. |
+| OKX documentation re-read (`https://www.okx.com/docs-v5/en/`) | **BLOCKED** - documentation fetch again failed with `connect ECONNREFUSED 127.0.0.1:443` (same DNS sinkhole). OKX facts remain second-hand search excerpts (DOCUMENTED (excerpt)/UNVERIFIED) and must be re-read live before M3-B |
+| OKX demo header, `50101`, regional hosts, rate limits, instrument constraints | DOCUMENTED (excerpt) / UNVERIFIED - no change |
+
+Fixture-tested capabilities: the existing fixtures and contract tests cover only the **public** market-data parsing of both venues (candles, instruments, time); there is no fixture for any authenticated or order endpoint by design (no signing code exists), so no private capability has FIXTURE VERIFIED status.
+No credentials, signed requests or order endpoints were used. The upstream DNS block was not bypassed.

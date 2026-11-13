@@ -52,3 +52,34 @@ See `docs/m3a/THREAT-MODEL.md` findings F-01..F-15. The most important: legacy M
 
 ## 6. Expected deliverable from the reviewer
 A signed report with: scope and commit reviewed, methodology, findings with severity (Critical/High/Medium/Low/Info), reproduction steps, recommended remediation, a statement on each of questions 1-10, and an explicit **credential-readiness opinion (ready / not ready / ready with conditions)**. Closure of Critical/High findings is then tracked in `THREAT-MODEL.md` (owner and closure condition per finding).
+
+
+---
+
+# R1 update: completeness of the package and reviewer status
+
+**Reviewer designation: NOT RECEIVED. Independent review gate: OPEN.** No qualified independent reviewer has been designated by the CEO and no review has been performed. The implementer's own testing and this package are not an independent review and are not presented as one.
+
+## Package contents (all in the repository at the final R1 commit)
+| Required item | Where |
+|---|---|
+| Network and trust-boundary diagrams | `TRUST-BOUNDARIES-AND-LIFECYCLE.md` section 1, `VM-BOUNDARY-DESIGN.md` section 3 |
+| Threat model, findings, owners, closure conditions | `THREAT-MODEL.md` (F-01..F-18) |
+| Egress policy and negative-test results | `EGRESS-ENFORCEMENT.md` sections 3, 4, 8; `docs/evidence/m3a/negative-tests-run*.json`, `r1-negative-tests-gated-run1.json`, `r1-gate-tests-run1.json`, `r1-boundary-verification.json`, `container-posture.txt` |
+| Authentication and authorization controls | `TRUST-BOUNDARIES-AND-LIFECYCLE.md` section 2 |
+| Mock vault isolation | `CREDENTIAL-ISOLATION.md`, `tests/m3a/test_security.py` |
+| Credential lifecycle design | `TRUST-BOUNDARIES-AND-LIFECYCLE.md` section 4 |
+| Demo/production environment-separation design | `TRUST-BOUNDARIES-AND-LIFECYCLE.md` section 5, `CREDENTIAL-ISOLATION.md` section 3, `EXCHANGE-CAPABILITY-MATRIX.md` |
+| Known vulnerabilities and unresolved findings | `THREAT-MODEL.md` section 3-4 |
+| M0-M2 safety regression evidence | `docs/evidence/M3A-acceptance.md` section 2 (full suite, live-lock, browser, diffs, frozen-evidence verifier) |
+| Remaining attack paths | `TRUST-BOUNDARIES-AND-LIFECYCLE.md` section 6 |
+| Dedicated-VM architecture, sizing, deployment plan | `VM-BOUNDARY-DESIGN.md` |
+| Credential hygiene and gitleaks exception review | `CREDENTIAL-HYGIENE.md` |
+
+## New reproduction commands (R1)
+```bash
+python infra/egress/verify_boundary.py out.json         # baseline/restart/gate-restart/fail-closed/recovery matrix
+docker exec asta-compromised-proxy-sim python /app/gate_tests.py   # unprivileged attacker inside the proxy namespace
+python scripts/verify_frozen_evidence.py                # frozen M0-M2 evidence integrity
+```
+Additional reviewer questions: (11) is the gate-sidecar pattern (proxy in the gate's namespace, NET_ADMIN confined to the gate) acceptable as an interim boundary or must the VM exist first? (12) is the resolved-address allowlist (public IPv4 only, 60 s refresh, 10 min expiry) adequate against address rotation, and is the dnsmasq-from-hosts-file design sound? (13) should the legacy M2 host processes be moved behind the same boundary or kept strictly credential-free by policy and test?

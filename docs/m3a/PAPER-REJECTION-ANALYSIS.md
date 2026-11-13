@@ -34,3 +34,44 @@ Scope: read-only analysis of the live M2 observation sessions. **Nothing was cha
 
 ## 5. Relevance to M3
 Order intent volume matters for demo trading: an exchange demo would receive (or must locally suppress) the duplicate-signal stream. M3-B must define idempotent client order IDs and duplicate suppression **before** any authenticated connector exists; the paper evidence shows the existing strategies would otherwise generate repeated identical intents (this is also a duplicate-order threat in `THREAT-MODEL.md`, T-14).
+
+
+---
+
+# R1 addendum: repeated-signal diagnostics (M3A-R1 Workstream F, read-only)
+
+Data snapshot 2026-11-13 ~09:10 UTC, `observe-5m` (`489d0990-...`), tables `strategy_signals`, `paper_orders`. Nothing was modified; the sessions, strategy parameters, risk limits and configurations are untouched.
+
+| Measure | Value |
+|---|---|
+| Rejected BUY signals | 264 (189 `RISK_ASSET_EXPOSURE_CAP`, 75 `INSUFFICIENT_CASH`); the cap count stopped growing at 189 (OKX disabled since 03:00 UTC), the cash count keeps growing (Binance `sma_cross` retrying) |
+| Distinct signal numbers (`signal_id`) | 118 - **`signal_id` is a per-account sequence, not a global identifier** (the same number appears in several accounts), so it cannot be used for de-duplication |
+| Distinct intents (account, symbol, side, order type, tag) | **12** |
+| Repeats on the very next 5-minute bar | 253 of 264 (96 %); first-in-episode 11 |
+| Repeats with the identical rejection reason as the previous bar | 252; reason flips: 1 (cap -> cash) |
+| Strategy / tag mix | `sma_cross` entry 213 + exit 4; `regime_grid` b:0/b:1/b:2 levels 20/20/21 |
+
+## Identical strategy-state evaluations
+`SmaCross.on_bar` has no state besides its two moving averages and a counter that only increments on emission: as long as `fast > slow`, position = 0, no open order and no global halt, **every bar produces the same intent**. The rejection feeds nothing back (no position, no open order, `halted_new_buys` false), so consecutive evaluations are functionally identical, differing only in the client id counter (`x:<SYMBOL>:<n>`) - the identifier changes while the decision does not. `regime_grid` re-arms the same level on each bar while its level price is touched and exposure headroom is missing.
+
+## Rejection patterns
+* Asset cap: one shared per-asset cap (100 USDT, 10 % of 1,000) versus 90 USDT entries per account and 6 accounts per asset; after a single 90 USDT fill in an asset almost no headroom remains for any other account.
+* Cash: each account owns 166.67 USDT; after one 90 USDT entry the second 90 USDT entry fails (`INSUFFICIENT_CASH`).
+* Time pattern: bursts last until the trend flips or exposure frees (OKX `sma_cross` ETH-USDT 74 consecutive bars; Binance `sma_cross` SOL-USDT 40).
+
+## Potential de-duplication boundaries (analysis only)
+| Boundary | Effect on this session's 264 rejected signals (estimate from the data) | Risk |
+|---|---|---|
+| D1. Same intent key (account, symbol, side, type, tag) rejected on the previous bar, with unchanged reason and unchanged exposure/cash snapshot -> suppress | 252 of 264 suppressed (about 95 %); the 12 first emissions and the 1 reason flip pass | needs a reliable "state changed" signal (fill, cancel, exposure/cash delta) to re-arm |
+| D2. Per-intent cool-down of N bars (1 h = 12 bars) | about 24 emissions remain (240 of 264 suppressed) | may delay a legitimate entry after headroom frees |
+| D3. Cool-down 4 h | about 10 emissions remain | larger delay |
+| D4. Pre-submission headroom check (strategy sees per-asset headroom and cash, skips or resizes) | removes the rejection class itself (cap and cash) | changes the strategy interface; separate approval |
+| D5. Idempotent order identity: deterministic client order id = hash(account, symbol, side, tag, decision bar), unique per decision | makes any accidental duplicate harmless at an exchange; does not reduce repeated decisions | prerequisite for M3-B regardless |
+
+## Proposals for a later, separately approved milestone (not implemented)
+1. Strategy layer: remember a rejected intent and re-emit only when its blocking condition changes (D1) or a cool-down expires (D2).
+2. Expose per-asset headroom and available cash in `StrategyContext` (D4) and size entries to the cap.
+3. Replace the per-account `signal_id` by a global, deterministic decision id and a deterministic client order id (D5).
+4. Reporting: show distinct rejected intents next to raw counts.
+5. Portfolio layer: decide whether six accounts should share one per-asset cap; allocate headroom explicitly.
+All require their own work package, new paper sessions and a fresh evaluation (the M2 sessions and holdout data must not be tuned).

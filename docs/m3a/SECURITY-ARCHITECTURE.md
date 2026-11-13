@@ -79,3 +79,6 @@ Layers (each independently effective): (1) infrastructure: internal network + pr
 | 15 | Incomplete independent review explicitly a blocker to credential readiness | **Recorded as BLOCKER** | INDEPENDENT-REVIEW-PACKAGE.md, M3B-READINESS.md |
 | 16 | Security tests reproducible | MET | commands in acceptance doc; JSON evidence under `docs/evidence/m3a/` |
 | 17 | No other project disrupted | MET (as observable) | Docker before/after diff shows only ASTA additions; no host/firewall/DNS change |
+
+
+> **M3A-R1 note:** this document is the original M3-A architecture. Hardening, the dedicated-VM plan, trust-boundary diagrams, credential hygiene and updated findings are in `VM-BOUNDARY-DESIGN.md`, `TRUST-BOUNDARIES-AND-LIFECYCLE.md`, `CREDENTIAL-HYGIENE.md`, `THREAT-MODEL.md` (F-16..F-18) and `docs/evidence/M3A-acceptance.md`. Gate 1 and gate 15 verdicts are unchanged by R1: legacy host processes remain outside the boundary; the independent review is still outstanding.
