@@ -67,3 +67,67 @@ Rollback: delete the VMs and switch; snapshots before each change; nothing on th
 
 ## 7. Restart and failure behaviour verified now (in-Docker gate)
 `docs/evidence/m3a/r1-boundary-verification.json` (`python infra/egress/verify_boundary.py`): baseline, after proxy restart, after gate restart (dependents recreated), and after recovery all pass 78/78 negative checks and 39/39 compromised-proxy checks; with the **gate stopped**, the protected runtime has zero connectivity (alias unresolvable, no route) - fail closed; recovery restores service. **Docker Desktop/VM restart and Windows reboot were not performed**: that would interrupt every other project and the M2 database container; recorded UNVERIFIED (F-14).
+
+
+---
+
+# R2: finalized Linux security-host deployment plan (M3A-R2 Workstream B)
+
+Status: **design and configuration artifacts only, nothing deployed, nothing on this PC changed** (no Windows firewall, hypervisor, security setting or shared Docker configuration was touched; M2 operations unchanged). F-02 remains OPEN until the dedicated host exists and is independently verified. All artifacts are in `infra/security-host/` and checked by `tests/m3a/test_security_host_config.py` (12 tests, including `nft -c` syntax validation of both rule sets in a scratch container that loads nothing).
+
+## R2-1. Topology and boundaries
+
+```
+                       +--------------------- Linux security host (dedicated machine or hypervisor) --------------------+
+ Windows PC (M2,       |                                                                                              |
+ untouched)            |   asta-rt  (runtime VM)            asta-prot (private L2 switch,        asta-fw (firewall VM)    |
+ no path in/out of  X  |   10.77.0.10/24                    10.77.0.0/24, NO uplink,             10.77.0.1 (prot0)        |    Internet
+ the boundary          |   connector + vault (unix sock)    no host adapter)                     up0 = ONLY uplink  ----- |----> allowlisted public
+                       |   no route, no DNS, no IPv6  --------------prot0-------------------->  nft default-DROP, proxy    |      names/ports only
+                       +----------------------------------------------------------------------------------------------+
+```
+Boundary 1 (hypervisor/virtual switch): `asta-prot` has no uplink and no host-side adapter, so the runtime VM cannot reach the Windows host, the LAN or the Internet by construction. Boundary 2 (guest nftables on `asta-rt`): output is default-DROP, only `10.77.0.1:3128`; IPv6 only loopback. Boundary 3 (`asta-fw`): input only `10.77.0.10 -> 3128`; forward DROP (it never routes); output only TCP 443/9443 to the resolved allowlist set plus root-only DNS/NTP to one pinned upstream. Boundary 4 (systemd): proxy and connector units add `IPAddressDeny=any` with explicit allows. Each layer is independently sufficient for the egress rule it states; a mistake in one is caught by the next.
+
+Hard rules of the host: no shared folders/clipboard/USB, no nested virtualization, no SSH password login, no package manager access to the Internet except through the proxy during a change-controlled maintenance window (the allowlist would need the Ubuntu mirror hosts added by a reviewed change and removed afterwards), snapshots before every change, disks encrypted.
+
+## R2-2. Independently enforced egress rules (summary; exact text in the files)
+| File | Purpose |
+|---|---|
+| `firewall-vm/nftables.conf` | `inet asta_fw`: input/forward/output policy DROP; `iifname prot0 ip saddr 10.77.0.10 tcp dport 3128`; output `ip daddr @allowed_dst tcp dport {443, 9443}` on `up0`; DNS/NTP only with `meta skuid 0` to the pinned upstream; counters + rate-limited LOG on every drop |
+| `firewall-vm/asta-allowlist-refresh.{sh,service,timer}` | every 60 s resolve allowlisted names (as root), admit only public unicast IPv4, update the nft set and write `/etc/asta-egress/hosts` atomically |
+| `firewall-vm/asta-egress-proxy.service` | `infra/egress/proxy.py` as a `DynamicUser`, no capabilities, `BindReadOnlyPaths` hosts file + empty `resolv.conf` (the proxy has **no DNS egress**, so no tunnelling path), full sandboxing |
+| `firewall-vm/netplan-50-asta.yaml` | `prot0` static `10.77.0.1/24`, `up0` the single uplink, no IPv6/RA, DHCP DNS ignored |
+| `runtime-vm/nftables.conf` | `inet asta_rt`: input only from the admin jump on 22 (optional; console preferred), output only to `10.77.0.1:3128` |
+| `runtime-vm/netplan-50-asta.yaml` | `prot0` static `10.77.0.10/24`, **no gateway, no nameservers, no IPv6** |
+
+Routing: the runtime VM has no default route; its only on-link network is `10.77.0.0/24`. The firewall VM has `net.ipv4.ip_forward=0` and `net.ipv6.conf.all.disable_ipv6=1`; its default route is on `up0` for the proxy's own traffic only. Router-side (optional, separate approval): a LAN ACL allowing the firewall VM's MAC/IP only 443/9443 outbound and the pinned DNS/NTP.
+
+## R2-3. Secrets-vault placement and privilege boundaries
+* The vault runs on **asta-rt** as its own service user `asta-vault`, in a systemd unit with `PrivateNetwork=yes` and `RestrictAddressFamilies=AF_UNIX`: it has **no network at all**. Its only interface is the unix socket `/run/asta-vault/vault.sock`, mode 0660, group `asta-connector`; the vault authenticates the peer with `SO_PEERCRED` and applies the per-identity grants (signed two-reviewer configuration) before leasing.
+* Three separate users: `asta-vault` (store + key), `asta-connector` (may connect to the socket and to the proxy), and `asta-app` (strategies, AI modules, UI, research: no socket permission, no route). A compromised strategy/AI process cannot read the socket or the vault state directory (`0700`, owned by `asta-vault`).
+* Key custody for the encrypted store: the key-encryption key is a systemd encrypted credential (`LoadCredentialEncrypted`, bound to the VM's TPM/host key where available) or an offline-entered unlock at boot; **never in the repository, an environment file or the proxy VM**. Backups never contain the unlock secret (R2-4). The real backend choice (file store + KEK as above, or an OS keystore/HSM) is for the independent review; the contract (`asta.security.vault`) is backend-independent.
+* The vault server module (`asta.security.vault_server`) and the connector (`asta.connectors.demo`) referenced in the unit files **do not exist yet** - they are M3-B work and explicitly not authorized; the units are design artifacts.
+* Privilege boundary summary: no process on `asta-rt` runs as root except SSH/systemd; connector and vault have empty capability sets, `NoNewPrivileges`, syscall filters, no core dumps; the firewall VM's proxy has no capabilities and no DNS.
+
+## R2-4. Backup, restore and operational monitoring
+| Item | Plan |
+|---|---|
+| What is backed up | configuration in Git (the source of truth: nft files, units, allowlist, netplan); the encrypted vault store file(s); audit-log database dumps; VM disk snapshots (before changes) |
+| What is never backed up | the vault unlock secret/KEK; any plaintext credential; the proxy hosts file (regenerated) |
+| Encryption and custody | backups are encrypted (age/gpg) to an offline key held by two named custodians; stored off the host (offline media); integrity hash recorded in the audit chain |
+| Schedule | configuration: every change; vault store: after every store/rotate/revoke; audit DB: daily; snapshot: before every change |
+| Restore drill | quarterly on a scratch VM: restore config + vault store, unlock with the offline secret, verify with `negative_tests.py`/`gate_tests.py` adapted, verify the audit chain (`verify_chain`) and that a revoked credential stays revoked; record time-to-restore |
+| Monitoring | proxy decision JSON log and nft drop counters shipped to the audit chain (finding F-07); alerts on: any DENY burst (>20/5 min), any `resolves-to-non-public`, nft policy change, allowlist set empty, refresh job failed > 3 intervals, unit failure, clock drift > 2 s, vault lease outside the expected connector/purpose, any `lease.denied`, disk > 80 % |
+| Integrity | hash of `nftables.conf`, units and `allowlist.json` checked hourly against Git; drift alerts |
+| Time | chrony pinned to the single upstream (output rule above) |
+
+## R2-5. Migrating the existing M2 paper sessions later (not authorized now; M2 unchanged)
+The M2 sessions and supervisor keep running on the Windows host exactly as they are. A later, separately authorized migration should (a) never carry credentials (the paper service has none), (b) run the paper service behind the same proxy only if a reviewer wants all egress uniform, and (c) keep the observation database where it is unless there is a reason to move it. If moved:
+1. **Preconditions:** security host verified and reviewed (F-01/F-02/F-03 closed or accepted); written CEO approval; a backup of the database and `data/paper`; a rollback window defined.
+2. **Rehearsal on a copy:** dump `asta` (pg_dump), restore into a scratch database on the new host, start the paper service in **observation-only/paused** mode against the copy, and prove: session ids and config hashes identical, every stored checkpoint digest verifies by replay (`scripts/paper_integrity.py`), reconciliation 0 discrepancies, daily reports reproduce (`verify_report`), frozen-evidence verifier green.
+3. **Cutover:** stop the Windows supervisor task (recording the gap as unmonitored time), take a final dump, restore, run the same verification, start the service on the new host through the proxy, confirm both feeds fresh and steps continuing from the stored cursors with gap detection/backfill covering the cutover interval; sessions are **never recreated or reset** (a recreated session is a new evaluation window and must be disclosed as such).
+4. **Rollback:** restart the Windows task against the untouched original database (kept read-only until the new host passes a defined soak period); any divergence is a no-go and is disclosed.
+5. **Evidence:** before/after integrity JSON, hashes of the dumps, incident records, time of the unmonitored gap.
+
+## R2-6. Remaining prerequisites to deploy (decisions, not code)
+CEO choice of dedicated host technology and approval for the host changes it needs; hardware or VM software and administrator rights; the router/ISP DNS decision (the upstream currently sinkholes OKX, so OKX stays unavailable regardless); reviewer-set key ceremony; the independent reviewer. Until then F-02 and F-03 stay OPEN and credential readiness stays NO-GO.

@@ -25,3 +25,22 @@ File `.gitleaksignore`, **two** fingerprint entries (the second added in R1: a S
 * **Current code:** the literal was removed in the next commit (built at runtime) so the current tree contains no such shape.
 * **Why not remove it:** the only alternative is rewriting history. The affected commit sits below the commits the CEO references (baseline `445c578`, tags built on earlier history are unaffected but all later hashes would change), and rewriting accepted history conflicts with evidence preservation. A one-fingerprint, commented exception is the narrowest correct control.
 * **Verdict:** justified and appropriately narrow; no rule or path allowlist was added; keep, and re-review if the file ever grows (the hygiene test does not cover `.gitleaksignore` growth - covered by the frozen-evidence/`git diff` review at each acceptance).
+
+
+---
+
+# R2 update (M3A-R2 Workstream A)
+
+## Deletion of `data/manual/creds.json` - DONE
+1. **Reconfirmed obsolete (2026-11-13):** file hash prefix unchanged (`9412ad3eb6fa6d76`); `users` table of the observation database `asta`: 0 rows; `asta_test`: 0 rows; no `*e2e*` database exists; the only references to the path in the repository are documentation. No workflow, script or test reads it.
+2. **Deleted** with `Remove-Item -LiteralPath ... -Force` after the explicit authorization in directive M3A-R2 (the sandbox allowed it this time; the earlier refusal was before authorization). **Absence verified without reading content:** `Test-Path` -> `False`, `ls data/manual` shows only `api.log`, `import`, `store`. The file's values were never printed at any point.
+3. **Reintroduction is prevented by tests:** `tests/m3a/test_credential_hygiene.py` - the path is a tombstone (the test fails if it reappears), any other credential-like file outside source/docs fails, and the gitleaks suppression list must be exactly the two reviewed fingerprints with no rule/path/regex growth in `.gitleaks.toml`. The e2e runner still creates and deletes its own throw-away secrets file and database per run (tested statically).
+4. Pre-deletion leak check (`docs/evidence/m3a/r1-credential-leakcheck-before.json`): 0 occurrences of its values in the work tree or git history.
+
+## Review of the two gitleaks fingerprint exclusions (evidence `docs/evidence/m3a/r2-gitleaks-without-exceptions.json`)
+A scan of a clone with `.gitleaksignore` removed reports **exactly two findings** - the two entries; nothing else is suppressed.
+| # | Fingerprint | Demonstrably synthetic? |
+|---|---|---|
+| 1 | `23cc0228...:tests/m3a/test_security.py:generic-api-key:248` | **Yes.** The matched text is `"password=" + 12 literal filler characters` inside an assertion of the scrubber unit test; the same line asserts that the filler is *removed* by the scrubber. It is a test fixture whose purpose is to be redacted; it was never a credential at any system. The literal was removed from the current tree in the next commit (built at runtime) |
+| 2 | `968252f4...:tests/m3a/test_credential_hygiene.py:generic-api-key:19` | **Yes.** The matched text is a SHA-256 hex digest (a file-integrity pin) next to the file name `creds.json`; a hash cannot be used as the credential it fingerprints (second-preimage infeasible), and the values it covered were random seeder output for accounts that no longer exist. The current test keeps only a 16-character prefix in a comment |
+Neither suppression was widened, no rule/path allowlist was added, and a new finding cannot be hidden by them: the fingerprints are bound to a commit, file, rule and line. Verdict: keep both (removing them would require rewriting commits below accepted baseline hashes); re-review at every acceptance.

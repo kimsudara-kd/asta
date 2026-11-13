@@ -50,3 +50,41 @@ No credential exists; no authenticated request was made; no order of any kind (d
 Closed or improved in R1: evidence protection (F-16 closed), credential hygiene (obsolete dev-login file identified, leak-checked, deletion pending owner), gitleaks exception reviewed (kept, one fingerprint), Binance Spot Testnet public capabilities reconfirmed through the hardened boundary.
 
 Decisions requested from the CEO: (1) designate the independent security reviewer; (2) choose the dedicated boundary technology and authorize the host changes it needs (VM software/rights, virtual switch) or a separate physical firewall; (3) confirm deletion of `data/manual/creds.json`; (4) provide a lawful network path for OKX or accept Binance-testnet-only scope for M3-B.
+
+
+---
+
+# R2 update (M3A-R2): proposed Binance-only M3-B scope
+
+**Recommendation: credential readiness remains NO-GO.** A Binance-only M3-B scope is now *proposed* and may be considered only after every security gate below closes; nothing about it is authorized, no credential exists, and demo credential creation, authenticated requests and trading stay disabled.
+
+## R2-A. Why Binance-only is feasible as a first scope
+| Aspect | Evidence | Status |
+|---|---|---|
+| Separate environment hosts | Official docs: REST `https://testnet.binance.vision/api`, streams `wss://stream.testnet.binance.vision`, WebSocket API `wss://ws-api.testnet.binance.vision` (GitHub docs repository; `testnet.binance.vision` page re-read 2026-11-13) - production uses different names, so **host allowlisting is an effective separation control** (unlike OKX) | DOCUMENTED + public endpoints RUNTIME VERIFIED |
+| Public endpoints reachable through the hardened boundary | `ping`, `time`, `exchangeInfo`, `depth`, `klines` HTTP 200 and WebSocket upgrade 101 via the gated proxy (`r1-capability-probe.json`) | RUNTIME VERIFIED |
+| Key creation | official page: "log in with your Github account and generate an API key"; RSA/Ed25519 keys are registered by public key; **"By default, an API key cannot TRADE"** - trading must be enabled in key management | DOCUMENTED (re-read 2026-11-13) |
+| Virtual funds | funds are "virtual" and cannot be moved in or out of the testnet | DOCUMENTED (re-read) |
+| Resets | "periodically reset to a blank state", "approximately once per month", **no prior notice** - balances, orders and possibly keys are lost | DOCUMENTED (re-read) |
+| Limits and filters | official page says IP limits, order rate limits and exchange/symbol filters are "generally the same" as production; **runtime observed difference**: testnet ORDERS limits 50 per 10 s and 160,000 per day vs 100 per 10 s and 200,000 per day on the production data host - so read limits and filters from the testnet `exchangeInfo` at runtime, never assume | DOCUMENTED + RUNTIME VERIFIED difference |
+| Order books | testnet and production best bid/ask and depth differ at the same instant (probe: 68706.81/68706.82 vs 68701.00/68701.01); docs do not claim equivalence | RUNTIME VERIFIED |
+| Authenticated behaviour (order endpoints, weights, error codes, client-id rule, user-data stream) | DOCUMENTED in the matrix (official GitHub docs); REST `newClientOrderId` pattern not stated (FIX pattern assumed); user-data stream is a WebSocket API subscription (REST listenKey existence on testnet UNVERIFIED) | DOCUMENTED / UNVERIFIED; verification needs a demo key (M3-B) |
+| Fixtures | only public market-data fixtures exist; **no authenticated fixture** by design | - |
+
+## R2-B. Limitations and unverified items that a Binance-only scope still carries
+Monthly unannounced resets; testnet liquidity not representative (fills must not be read as strategy evidence); key trading permission default-off; Ed25519/HMAC signing and clock-skew handling unimplemented (the live-lock tests forbid signing vocabulary until an authorized milestone changes them with review); REST/WS rate-limit headers not yet exercised authenticated; GitHub-account dependency for key issuance (a human step outside ASTA); allowlist for the authenticated hosts (`ws-api.testnet.binance.vision` etc.) not yet in any profile.
+
+## R2-C. OKX stays unavailable and supported-in-design
+OKX remains **BLOCKED** (upstream DNS sinkhole, R-1), not bypassed, and documentation could not be re-read. Binance-only is a **sequencing choice, not a removal of OKX**: `DEMO_BINDINGS` keeps the OKX binding, the vault keeps `OKX_DEMO`, the capability matrix and the OKX-specific controls (header guard, `50101` fatal alarm, shared-host controls) stay in the design, and OKX can be added later by a separate authorization once (1) a lawful network path exists, (2) the OKX documentation is re-read live, and (3) the shared-host demo/production separation is runtime-verified with real demo responses. No OKX code or test was removed.
+
+## R2-D. Gates that must close before a Binance-only M3-B may be considered (all required)
+1. F-03 independent review completed with credential-readiness opinion "ready" or "ready with conditions", all Critical/High closed or formally accepted.
+2. F-02 dedicated security host deployed and independently verified (`VM-BOUNDARY-DESIGN.md` R2), including the restart matrix.
+3. F-01 resolved by policy and test: the connector exists only inside the protected runtime; legacy processes remain credential-free.
+4. F-05/F-06: vault backend and key custody reviewed; reviewer key ceremony done; signed-configuration scheme extended with expiry and replay protection.
+5. F-12: idempotent client order ids and signal de-duplication designed, with tests, before any order path.
+6. F-07: proxy/vault logs shipped to the audit chain with alerting.
+7. A fresh CEO authorization (M3-B directive with its own gates). No demo key is to be created before that.
+
+## R2-E. Proposed M3-B scope if all gates close (for the CEO to approve or amend)
+Binance Spot Testnet only; one connector instance bound to `EXCHANGE_DEMO`/Binance; READ + SPOT_TRADE demo key, no withdrawal/transfer; hard per-order notional cap and a daily order-count cap far below the demo balance; kill switch and `RISK_HALT` integration; deterministic client order ids; reconciliation after every timeout; reset-aware bookkeeping; paper-vs-demo comparison reporting only (no performance claims); exact-once order submission verified against duplicate signals; OKX excluded until separately authorized.

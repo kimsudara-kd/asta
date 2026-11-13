@@ -66,3 +66,15 @@ Severity scale: **Critical** (credentials or live trading exposed now), **High**
 | F-18 | Medium | The in-Docker gate container holds `NET_ADMIN` (scoped to its namespace) on a kernel shared by all projects | Engineering + reviewer | superseded by the dedicated VM boundary | Open (part of F-02) |
 
 Status after R1: **Critical 0; High 3 open (F-01, F-02 mitigated-not-closed, F-03).** Credential readiness: **NO-GO**.
+
+
+## 5. R2 status changes
+| ID | Change |
+|---|---|
+| F-08 | **Closed in R2**: obsolete file deleted, absence verified, tombstone test added (`CREDENTIAL-HYGIENE.md` R2) |
+| F-17 | Reviewed again: two single-fingerprint exceptions, both demonstrably synthetic, suppression list pinned by test |
+| F-02 | Linux security-host plan and config artifacts finalized and `nft -c`-validated (`VM-BOUNDARY-DESIGN.md` R2, `infra/security-host/`); still OPEN until deployed and independently verified |
+| F-05/F-06 | Vault placement and privilege boundaries designed (separate users, `PrivateNetwork=yes` vault, unix socket, key custody); backend selection and key ceremony still open |
+| F-07 | Monitoring/backup/restore plan written (`VM-BOUNDARY-DESIGN.md` R2-4); implementation still open |
+
+Remaining High after R2: **F-01, F-02, F-03** (unchanged count). Critical: 0. Credential readiness: **NO-GO**.
