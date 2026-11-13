@@ -15,9 +15,8 @@ SKIP = {"node_modules", ".venv", ".git", ".next"}
 NAME = re.compile(r"(cred|secret|password|passwd|token|apikey|api_key|private)", re.IGNORECASE)
 EXT = {".json", ".txt", ".env", ".yaml", ".yml", ".ini", ".cfg", ".key", ".pem"}
 
-KNOWN_OBSOLETE = {
-    "data/manual/creds.json": "9412ad3eb6fa6d76943368f96b35213c5ec37943421ba3a78219df4bfe21bac5",
-}
+# SHA-256 prefix (16 hex chars = 64 bits) of the obsolete file; a prefix is enough to detect change
+KNOWN_OBSOLETE = {"data/manual/creds.json": "9412ad3eb6fa6d76"}
 
 
 def credential_like_files() -> list[Path]:
@@ -43,7 +42,7 @@ def test_only_the_documented_obsolete_file_may_exist_and_it_must_be_unchanged():
         want = KNOWN_OBSOLETE.get(rel)
         if want is None:
             problems.append(f"unexpected credential-like file: {rel}")
-        elif hashlib.sha256(p.read_bytes()).hexdigest() != want:
+        elif not hashlib.sha256(p.read_bytes()).hexdigest().startswith(want):
             problems.append(f"documented obsolete file changed: {rel}")
     assert not problems, problems
 

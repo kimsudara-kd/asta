@@ -1,3 +1,5 @@
 # Narrow, reviewed false positive (synthetic scrubber test string in commit 23cc022, since rewritten to be built at runtime).
 # Fingerprint = commit:file:rule:line. Not a rule/path allowlist.
 23cc0228cdde01dd86469a92ebda1fcf78229c01:tests/m3a/test_security.py:generic-api-key:248
+# Second reviewed false positive: a SHA-256 hash (file-integrity pin) in commit 968252f, next to a file name; not a secret. The test now stores a 16-char prefix.
+968252f427e213bf04c3b87d57ebdfdfc65d0811:tests/m3a/test_credential_hygiene.py:generic-api-key:19

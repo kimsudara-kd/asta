@@ -19,7 +19,7 @@ Values were never displayed: inspection used key names, value lengths and SHA-25
 * The e2e seeding secrets are throw-away and local; browser artifacts (screenshots) were searched with the rest of the tree (0 hits).
 
 ## 3. Review of the narrow gitleaks fingerprint suppression
-File `.gitleaksignore`, one entry: `23cc0228...:tests/m3a/test_security.py:generic-api-key:248`.
+File `.gitleaksignore`, **two** fingerprint entries (the second added in R1: a SHA-256 integrity pin written next to the file name in the hygiene test at commit `968252f` tripped the generic-api-key rule; it is a hash, not a secret, and the current test stores only a 16-character prefix). First entry: `23cc0228...:tests/m3a/test_security.py:generic-api-key:248`.
 * **What it suppresses:** exactly one finding. Verified on a clone with the file removed (`docs/evidence/m3a/r1-gitleaks-without-exception.json`): the full-history scan reports 1 finding, this one; with the file, 0.
 * **What the string is:** a synthetic literal inside a scrubber unit test (`"password=" + 12 filler characters`), not a credential; it never was valid anywhere.
 * **Current code:** the literal was removed in the next commit (built at runtime) so the current tree contains no such shape.
