@@ -2,7 +2,7 @@
 
 **No real exchange credential exists in this repository, was created, requested or used.** Everything below is contract + mock harness with random synthetic secrets (`SYNTH-...`, never valid at any exchange). The real backend, key custody and rotation operations are a later, independently reviewed decision (M3-B or later).
 
-Code: `src/asta/security/` (`redaction.py`, `vault.py`, `binding.py`); tests `tests/m3a/test_security.py` (60 tests). Import boundary: nothing outside `asta.security` imports it (test `test_nothing_outside_the_security_package_imports_it`), and it imports only `asta.core`/`asta.audit` and no network library.
+Code: `src/asta/security/` (`redaction.py`, `vault.py`, `binding.py`); tests `tests/m3a/test_security.py` (40 tests). Import boundary: nothing outside `asta.security` imports it (test `test_nothing_outside_the_security_package_imports_it`), and it imports only `asta.core`/`asta.audit` and no network library.
 
 ## 1. Vault contract
 | Requirement | Implementation / evidence |
