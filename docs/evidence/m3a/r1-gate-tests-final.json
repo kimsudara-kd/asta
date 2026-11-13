@@ -1,0 +1,279 @@
+{
+ "total": 39,
+ "failed": 0,
+ "results": [
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 1.1.1.1:443",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 8.8.8.8:443",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 93.184.216.34:443",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 93.184.216.34:80",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 1.1.1.1:22",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 1.1.1.1:25",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G01",
+   "desc": "direct public IP: tcp 104.18.32.47:9443",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G02",
+   "desc": "UDP DNS to 8.8.8.8",
+   "expected": "no answer",
+   "observed": "no-answer:PermissionError",
+   "pass": true
+  },
+  {
+   "test": "G02",
+   "desc": "UDP DNS to 1.1.1.1",
+   "expected": "no answer",
+   "observed": "no-answer:PermissionError",
+   "pass": true
+  },
+  {
+   "test": "G02",
+   "desc": "UDP DNS to 9.9.9.9",
+   "expected": "no answer",
+   "observed": "no-answer:PermissionError",
+   "pass": true
+  },
+  {
+   "test": "G03",
+   "desc": "local resolver, non-allowlisted name",
+   "expected": "refused/no answer",
+   "observed": "answer:rcode=5:bytes=29",
+   "pass": true
+  },
+  {
+   "test": "G03",
+   "desc": "local resolver, tunnelling-style name",
+   "expected": "refused/no answer",
+   "observed": "answer:rcode=5:bytes=51",
+   "pass": true
+  },
+  {
+   "test": "G03",
+   "desc": "system resolver, non-allowlisted name",
+   "expected": "no resolution",
+   "observed": "gaierror",
+   "pass": true
+  },
+  {
+   "test": "G04",
+   "desc": "allowlisted name resolves via the gate",
+   "expected": "resolves",
+   "observed": "16.76.22.254",
+   "pass": true
+  },
+  {
+   "test": "G04",
+   "desc": "allowed IP:443 reachable",
+   "expected": "CONNECTED",
+   "observed": "CONNECTED",
+   "pass": true
+  },
+  {
+   "test": "G04",
+   "desc": "allowed IP but other port: tcp 16.76.22.254:80",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G04",
+   "desc": "allowed IP but ssh port: tcp 16.76.22.254:22",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G04",
+   "desc": "TLS GET /api/v3/time to the allowed host",
+   "expected": "HTTP 200",
+   "observed": "HTTP/1.1 200 OK",
+   "pass": true
+  },
+  {
+   "test": "G05",
+   "desc": "external IPv6: tcp 2606:4700:4700::1111:443",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "G05",
+   "desc": "IPv6 loopback-ish host service: tcp fd00::1:443",
+   "expected": "no connection",
+   "observed": "blocked:OSError",
+   "pass": true
+  },
+  {
+   "test": "G05",
+   "desc": "no global IPv6 address in the namespace",
+   "expected": "none",
+   "observed": "[]",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 169.254.169.254:80",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 169.254.169.254:443",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 100.100.100.200:80",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 172.31.251.1:22",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 172.31.251.1:2375",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 172.31.250.1:22",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 192.168.1.1:80",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp 10.0.0.1:443",
+   "expected": "no connection",
+   "observed": "blocked:TimeoutError",
+   "pass": true
+  },
+  {
+   "test": "G06",
+   "desc": "host/LAN/metadata: tcp host.docker.internal:5640",
+   "expected": "no connection",
+   "observed": "blocked:gaierror",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "no effective capabilities",
+   "expected": "CapEff == 0",
+   "observed": "0000000000000000",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "raw socket",
+   "expected": "refused",
+   "observed": "PermissionError",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "write net sysctl",
+   "expected": "refused",
+   "observed": "OSError",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "netfilter netlink socket",
+   "expected": "unusable for changes",
+   "observed": "opened (read-only without NET_ADMIN)",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "iptables not present in the proxy image",
+   "expected": "absent",
+   "observed": "False",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "ip6tables not present in the proxy image",
+   "expected": "absent",
+   "observed": "False",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "ipset not present in the proxy image",
+   "expected": "absent",
+   "observed": "False",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "nft not present in the proxy image",
+   "expected": "absent",
+   "observed": "False",
+   "pass": true
+  },
+  {
+   "test": "G07",
+   "desc": "ip not present in the proxy image",
+   "expected": "absent",
+   "observed": "False",
+   "pass": true
+  }
+ ]
+}

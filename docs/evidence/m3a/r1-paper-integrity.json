@@ -1,0 +1,22 @@
+{
+ "observe-1h": {
+  "id": "afec3e2b-c5dc-4306-a98d-82da6ea38346",
+  "config_hash": "dd59484ff7d1da598c9a946ecf5662955372d0eda40cd2ea5ecd9266febefb84",
+  "state": "RUNNING",
+  "last_step_ts": "2026-11-13T12:00:00+00:00",
+  "replay_steps_verified": 321,
+  "reconcile_discrepancies": 0,
+  "fills": 0,
+  "fills_digest": "e3b0c44298fc1c14"
+ },
+ "observe-5m": {
+  "id": "489d0990-6cf9-4120-9ad7-c6d370374dc2",
+  "config_hash": "f06aaf1a8f6b4595349ee6b591390480ddddee94de0689aec824e58ce42eae72",
+  "state": "RUNNING",
+  "last_step_ts": "2026-11-13T13:00:00+00:00",
+  "replay_steps_verified": 549,
+  "reconcile_discrepancies": 0,
+  "fills": 9,
+  "fills_digest": "4c1c532630797968"
+ }
+}
