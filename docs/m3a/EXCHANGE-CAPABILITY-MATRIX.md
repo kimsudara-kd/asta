@@ -484,3 +484,16 @@ Re-run of the public, unauthenticated capability probe through the **gated** bou
 
 Fixture-tested capabilities: the existing fixtures and contract tests cover only the **public** market-data parsing of both venues (candles, instruments, time); there is no fixture for any authenticated or order endpoint by design (no signing code exists), so no private capability has FIXTURE VERIFIED status.
 No credentials, signed requests or order endpoints were used. The upstream DNS block was not bypassed.
+
+
+---
+
+# R2 observation: the upstream OKX DNS block lifted (2026-11-13)
+
+During the R2 full regression the OKX live probe test, skipped in every earlier run because `www.okx.com` resolved to `127.0.0.1`, **passed**. Investigation (read-only):
+* From this PC `www.okx.com` now resolves to a public address (`104.18.43.174`), `ws.okx.com` to `172.64.144.82`, `developers.binance.com` to a public address. Nothing in ASTA changed the resolver, firewall or DNS configuration; the upstream change happened by itself.
+* Through the hardened boundary (runtime profile, `docs/evidence/m3a/r2-capability-probe-runtime-profile.json`): `GET /api/v5/public/time` -> HTTP 200 (`{"code":"0",...}`), `GET /api/v5/public/instruments?instType=SPOT&instId=BTC-USDT` -> HTTP 200, `wss://ws.okx.com/ws/v5/public` upgrade -> 101. Unauthenticated public calls only. **OKX public REST/WS: RUNTIME VERIFIED at this moment (one probe, not continuous).**
+* The M2 paper service re-verified OKX by itself and re-enabled it (the R4 `_reverify_loop`): incident `VENUE_DISABLED` resolved 2026-11-13 09:30:27 UTC (disabled since 05:49:09; the outage began 03:00:16), and `FEED_DISCONNECTED` (reopened 09:35:51) resolved 13:00:12 UTC; both feeds are `CONNECTED/LIVE` at 13:47 UTC. Sessions untouched (same IDs/hashes, 0 reconciliation discrepancies). The recorded outage intervals are preserved as incident history; no data was fabricated.
+* Boundary re-tests after the change: 78/78 and 39/39 (`r2-negative-tests.json`, `r2-gate-tests.json`).
+
+What this does and does not change: the **public** OKX capability rows can be marked RUNTIME VERIFIED (single observation). It does **not** make OKX continuous connectivity verified (residual R-1 remains: one observation after a 6.5-hour block), does **not** verify any OKX authenticated or demo behaviour (host/header separation, `50101`, regional hosts, rate limits), and the OKX documentation itself was not re-read live in this step. For M3-B planning OKX stays **excluded** from the first proposed scope exactly as directed ("preserve OKX as unavailable"), and its design support is retained.

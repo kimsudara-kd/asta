@@ -1,6 +1,6 @@
 # M3-A acceptance evidence (ASTA-M3A-IMPLEMENTATION-01)
 
-> **Superseded in status by the M3A-R1 section at the end of this file (R1: BUILT — NOT ACCEPTED, credential readiness NO-GO).**
+> **Superseded in status by the M3A-R2 section at the end of this file (R2: BUILT — NOT ACCEPTED, credential readiness NO-GO).**
 
 **Final status: `ACCEPTANCE CANDIDATE` for M3-A engineering scope, with credential readiness explicitly NOT granted.** Credential/authenticated-demo readiness is **BLOCKED** by three open High findings (independent security review outstanding, legacy M2 host processes outside the boundary, proxy egress not independently firewalled). M3-A is **not accepted** (needs CEO review), **no M3-A acceptance tag was created**, **M3-B was not started**, nothing was pushed (no remote exists).
 
@@ -102,3 +102,44 @@ Read-only addendum in `docs/m3a/PAPER-REJECTION-ANALYSIS.md`: 264 rejected BUY s
 
 ## R1-8. Outstanding findings and recommendation
 Open High: **F-01** (legacy host processes outside the boundary), **F-02** (no dedicated VM; mitigated by the kernel gate, not closed), **F-03** (no independent review). No Critical. Open Medium/Low: F-04..F-07, F-09..F-14, F-18 (see `THREAT-MODEL.md`); F-16 closed, F-17 accepted, F-08 pending owner deletion. **M3-B readiness: NO-GO** (`docs/m3a/M3B-READINESS.md`). Decisions needed from the CEO: designate the independent reviewer; choose the dedicated boundary technology and authorize the host changes; confirm deletion of `creds.json`; provide a lawful OKX path or accept Binance-testnet-only scope.
+
+
+---
+
+# M3A-R2 — Security closure preparation (evidence update)
+
+**R2 final status: `BUILT — NOT ACCEPTED`. Credential readiness: NO-GO.** No credential, signed request, authenticated call or order of any kind; no M3-B work; ExecutionGateway default DENY untouched; no push; no M3-A acceptance tag; no change to the Windows host (firewall, hypervisor, security settings) or to shared Docker configuration; no change to the M2 supervisor, paper-session configurations or sessions. Baseline `74b22a7`; R2 commits are local (`git log --oneline 74b22a7..HEAD`).
+
+## R2-1. Credential-hygiene status (Workstream A) - DONE
+`data/manual/creds.json` was reconfirmed obsolete (0 users in the observation and test databases, no e2e database, no code references), **securely deleted** (`Remove-Item -Force`, authorized by the directive; the sandbox allowed it), absence verified without reading content (`Test-Path` False, `ls data/manual`), and it can never come back unnoticed: `tests/m3a/test_credential_hygiene.py` keeps the path as a tombstone, rejects any other credential-like file, and pins the gitleaks suppression list to exactly the two reviewed fingerprints with no growth of `.gitleaks.toml`. Both fingerprints were reviewed and are demonstrably synthetic (a scrubber test string that the same assertion proves is redacted; a SHA-256 integrity pin); an exception-free clone scan reports exactly those two (`r2-gitleaks-without-exceptions.json`). Full text: `docs/m3a/CREDENTIAL-HYGIENE.md` R2. Finding F-08 **closed**.
+
+## R2-2. Isolated deployment design (Workstream B) - delivered, not deployed
+`docs/m3a/VM-BOUNDARY-DESIGN.md` R2-1..R2-6 and `infra/security-host/`: topology and four independent boundaries (private virtual switch without uplink, runtime-VM nftables, firewall-VM nftables, systemd `IPAddressDeny`), the exact firewall and routing configuration (`firewall-vm/nftables.conf`, `runtime-vm/nftables.conf`, two netplan files; the proxy has **no DNS egress**, it resolves from a hosts file written by a root refresh job), the secrets-vault placement and privilege boundaries (`PrivateNetwork=yes` vault with a unix socket, three separate users, key custody design), backup/restore/monitoring plan, and the later safe migration procedure for the M2 sessions (rehearsal on a copy, replay/checksum verification, cutover with disclosed gap, rollback). Verified statically and with `nft -c` check-only runs of both rule sets in a scratch container (12 tests, `tests/m3a/test_security_host_config.py`); the vault server and connector modules named in the unit files do not exist (M3-B, not authorized). Windows host, hypervisor and shared Docker untouched; M2 operations unchanged.
+
+## R2-3. Binance-only feasibility (Workstream C)
+`docs/m3a/M3B-READINESS.md` R2: a Binance-Spot-Testnet-only first scope is **proposed**, conditional on closing every gate (independent review, dedicated host, F-01 policy, vault/key custody, de-duplication, log shipping, fresh CEO authorization). Official capabilities and limits were re-read on 2026-11-13 (REST host, key creation via GitHub login, trading disabled by default, virtual funds, resets roughly monthly without notice, limits "generally the same" - while the runtime probe shows lower ORDERS limits and different order books). Demo-credential creation, authenticated requests and trading stay disabled. OKX is excluded from the first scope but its design support (binding, vault identity, controls, matrix) is retained.
+
+**New observation:** the upstream OKX DNS block lifted by itself during R2 (`docs/m3a/EXCHANGE-CAPABILITY-MATRIX.md`, R2 observation): OKX public REST/WS now answer through the hardened boundary (HTTP 200 / 101, `r2-capability-probe-runtime-profile.json`) and the M2 service re-enabled its OKX feed automatically. This is one observation, not continuous-connectivity or authenticated-behaviour verification; OKX stays out of the proposed first scope.
+
+## R2-4. Independent review readiness (Workstream D)
+Package complete and extended (`INDEPENDENT-REVIEW-PACKAGE.md` R2): architecture, boundaries, compromised-proxy tests, credential isolation, threat model, open findings with mitigation plans, evidence manifests (`FROZEN-EVIDENCE.json`; `REVIEW-MANIFEST.json` via `scripts/review_manifest.py`), M0-M2 regression evidence, feasibility matrix, deployment and rollback plans, configuration artifacts. **Reviewer not designated, review not started - gate OPEN.** The sign-off block is empty on purpose; the developer did not and cannot sign.
+
+## R2-5. Remaining High findings
+**F-01** (legacy host processes outside the boundary; credential-free by policy/test; migration plan written), **F-02** (dedicated independently enforced boundary not deployed; in-Docker gate verified, Linux security-host design validated, deployment awaits CEO decision), **F-03** (independent review not performed). Critical: 0. Closed this round: F-08. Medium/Low open list in `THREAT-MODEL.md` section 5.
+
+## R2-6. Full regression (final tree)
+| Check | Result |
+|---|---|
+| Full Python, `ASTA_RUN_NETWORK_TESTS=1` (`r2-pytest-full.log`) | **563 passed, 0 skipped, 0 failed** (549 + 14 new: security-host config 12, hygiene +1, +1). **The OKX live probe passed for the first time because the upstream DNS block lifted**; in every earlier run it was skipped |
+| Browser (`r2-e2e-full-run.log`) | **39/39**; no tracked file modified by the run |
+| Ruff check + format | clean |
+| mypy strict (container) | no issues, 153 files |
+| Pyright | `src` 0 errors |
+| pip-audit / pnpm audit | no known vulnerabilities / no known vulnerabilities |
+| Secret scan / full-history gitleaks | 0 findings / no leaks (two reviewed single-fingerprint exceptions) |
+| Infrastructure negative tests | protected-runtime 78/78 and compromised-proxy 39/39 (`r2-negative-tests.json`, `r2-gate-tests.json`) after the change in OKX reachability |
+| M0-M2 safety | live-lock/contract tests inside the full suite; `git diff fe8194c -- src/asta/risk src/asta/core` empty; frozen-evidence verifier "intact" |
+| Paper sessions | both RUNNING, same IDs and config hashes, replay verified (321 / 557 checkpoints), 0 reconciliation discrepancies (`r2-paper-integrity.json`); supervisor untouched |
+
+## R2-7. Recommendation
+**NO-GO** for credential introduction and for M3-B. The security work that can be done without CEO decisions and host changes is done; what remains is decisions and external actions: designate the independent reviewer; choose the dedicated security-host technology and authorize its provisioning; (later) approve any migration of the legacy processes; then, if the gates close, authorize a Binance-only M3-B with its own acceptance gates. Nothing in this repository can currently place an order.

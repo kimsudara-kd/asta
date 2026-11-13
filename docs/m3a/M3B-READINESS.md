@@ -88,3 +88,5 @@ OKX remains **BLOCKED** (upstream DNS sinkhole, R-1), not bypassed, and document
 
 ## R2-E. Proposed M3-B scope if all gates close (for the CEO to approve or amend)
 Binance Spot Testnet only; one connector instance bound to `EXCHANGE_DEMO`/Binance; READ + SPOT_TRADE demo key, no withdrawal/transfer; hard per-order notional cap and a daily order-count cap far below the demo balance; kill switch and `RISK_HALT` integration; deterministic client order ids; reconciliation after every timeout; reset-aware bookkeeping; paper-vs-demo comparison reporting only (no performance claims); exact-once order submission verified against duplicate signals; OKX excluded until separately authorized.
+
+> **R2 note on OKX:** the upstream DNS block lifted on 2026-11-13; OKX public endpoints answered through the boundary (see the R2 observation in `EXCHANGE-CAPABILITY-MATRIX.md`). OKX remains excluded from the proposed first M3-B scope and its authenticated/demo behaviour is still UNVERIFIED.

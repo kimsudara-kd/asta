@@ -55,8 +55,11 @@ def files() -> list[Path]:
 
 def head() -> str:
     r = subprocess.run(  # noqa: S603
-        ["git", "-C", str(ROOT), "rev-parse", "HEAD"], capture_output=True, text=True, check=True
-    )  # noqa: S607
+        ["git", "-C", str(ROOT), "rev-parse", "HEAD"],  # noqa: S607
+        capture_output=True,
+        text=True,
+        check=True,
+    )
     return r.stdout.strip()
 
 
