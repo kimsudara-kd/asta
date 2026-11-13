@@ -131,3 +131,42 @@ The M2 sessions and supervisor keep running on the Windows host exactly as they 
 
 ## R2-6. Remaining prerequisites to deploy (decisions, not code)
 CEO choice of dedicated host technology and approval for the host changes it needs; hardware or VM software and administrator rights; the router/ISP DNS decision (the upstream currently sinkholes OKX, so OKX stays unavailable regardless); reviewer-set key ceremony; the independent reviewer. Until then F-02 and F-03 stay OPEN and credential readiness stays NO-GO.
+
+
+---
+
+# R3: reproducible provisioning, testable isolation controls, reboot/recovery, migration rehearsal (M3A-R3)
+
+Nothing in this section was deployed: no dedicated infrastructure exists (`HOST-INVENTORY-AND-FEASIBILITY.md`) and installing a hypervisor on the Windows PC, repartitioning, changing shared policies, purchasing hardware and migrating live M2 processes are not authorized. The artifacts are validated statically and by dry runs.
+
+## R3-1. Reproducible provisioning artifacts (`infra/security-host/provision/`, `acceptance/`)
+| Artifact | Role | Validation done now |
+|---|---|---|
+| `build_seed.py` | builds cloud-init NoCloud seeds (`user-data`, `meta-data`, `network-config`) for `asta-fw` and `asta-rt` from the version-controlled configuration; writes `INPUT-SHA256SUMS`; no key or credential embedded (operator SSH **public** key placeholder; vault unlock secret never in a seed) | two builds are byte-identical; seed file contents equal the reviewed config; vault/connector units not enabled; `nft -c` is part of first boot (test) |
+| `hyperv-create.ps1` | private switch `asta-prot` (no uplink), uplink switch not shared with the management OS, Gen2 Secure Boot VMs, integration channels off, spoofing/router/DHCP guards, clean snapshots | **dry run by default**; parses without errors (PowerShell parser); marked DO NOT RUN on the development PC |
+| `virtualbox-create.sh`, `libvirt-create.sh` | the same layout for VirtualBox (`intnet`, no host adapter) and libvirt/KVM (isolated network, no forward mode) | dry run by default; `bash -n` clean (Git Bash only: see incident note in `M3A-acceptance.md`) |
+| `deploy.sh` | applies a role on the VM with `nft -c` **before** loading, timestamped backup of every replaced file | dry run prints the plan and the check-before-load order (tested) |
+| `rollback.sh` | restores the last backup; if none, installs a default-DROP ruleset instead of an empty one; refuses without a recorded backup; hypervisor snapshot is the second path | refusal path tested |
+| `acceptance/vm_acceptance.py` | on the VM, phases `pre` and `post` (post requires a changed `boot_id`, identical firewall ruleset hash, identical routes, same services): policies DROP, `ip_forward=0`, IPv6 off, no default route on the runtime VM, direct-IP/metadata/LAN/IPv6/DNS blocked, only the proxy port reachable, the 78-check suite via `ASTA_PROXY`; on the firewall VM an unprivileged process must have no direct-IP and no DNS egress | imports and parsers tested; **executes only on Linux VMs** (not run: no VM) |
+| `acceptance/vault_validation.py` | synthetic-secret validation (23 checks): lifecycle, denials, exposure scan of logs/crash text/stdout/stderr/vault files/access log, revoke destroys material; POSIX checks (file modes 0600, dir 0700, core dumps off, environment/cmdline) | **PASS 23/23 on Linux** (unprivileged scratch container, `r3-vault-validation-linux.json`); on Windows 19 PASS + 4 SKIPPED (POSIX-only, never counted as passed) |
+
+## R3-2. Testable network-isolation acceptance controls (to be executed on the dedicated host)
+| # | Control | How verified | Where |
+|---|---|---|---|
+| C1 | runtime VM has no route out and no resolver | `ip route`, `resolv.conf`, direct connects fail | `vm_acceptance.py runtime` |
+| C2 | direct-IP, IPv6, DNS, metadata, LAN, production-endpoint denial | 78-check suite from the runtime VM through `ASTA_PROXY` | runtime VM |
+| C3 | proxy-bypass attempts (SOCKS, alternative ports, tunnel to proxy, userinfo/case variants) | same suite (N06) | runtime VM |
+| C4 | firewall VM never forwards; only proxy port is open to the runtime VM | `nft list ruleset`, `ss`, port scan from runtime VM | both |
+| C5 | compromised-proxy simulation: unprivileged process on the firewall VM has no direct-IP/DNS egress | `setpriv` checks in `vm_acceptance.py firewall` | firewall VM |
+| C6 | hypervisor-side: the private switch has no uplink and no host adapter; MAC/IP spoofing and router/DHCP guards on; packet capture on the uplink shows only allowlisted flows | hypervisor commands + `tcpdump` on the uplink (manual, recorded) | host |
+| C7 | **reboot persistence**: guest reboot, hypervisor-host reboot, snapshot revert, power loss | `vm_acceptance.py ... post --pre` after each | both |
+| C8 | fail-closed: firewall VM stopped -> runtime VM has zero connectivity; firewall VM restarted -> restored without manual steps | manual + `vm_acceptance.py` | both |
+| C9 | allowlist drift: running ruleset and `allowlist.json` hashes equal Git | hash compare (monitoring plan R2-4) | both |
+| C10 | synthetic-secret vault validation on the runtime VM (file modes, `PrivateNetwork`, socket group, core dumps) | `vault_validation.py` | runtime VM |
+Evidence template: each run writes JSON (PASS/FAIL/SKIPPED, state, hashes); the independent reviewer re-runs the same commands. **No control above C1..C10 has been executed on dedicated infrastructure** (none exists); C2/C3 equivalents were executed in the Docker boundary (R1/R2, 78/78) and the compromised-proxy simulation (39/39).
+
+## R3-3. F-01: credential-bearing processes only in the isolated runtime
+Policy (tested statically by `tests/m3a/test_legacy_isolation.py`, 5 tests): every future process that can hold a credential - the vault, the connector, anything that leases - exists **only** on `asta-rt`; the legacy Windows processes (`paper_service`, supervisor, API/UI, research) never import `asta.security`, never mention the vault/demo/testnet environment, their launcher sets exactly four dev-only variables, `load_settings()` refuses exchange-credential environment variables, and they have no network route to `asta-rt` (the private switch has no host adapter) nor filesystem access to the vault (separate machine). Runtime verification of "no route from legacy hosts to the credential store" requires the dedicated host (C1, C6): **F-01 stays OPEN**.
+
+## R3-4. Migration rehearsal for the M2 sessions (executed read-only on a copy)
+`scripts/m2_migration_rehearsal.py` (evidence `r3-m2-migration-rehearsal.json`): `pg_dump` of the live `asta` database -> restore into a scratch database on the TEST container -> proof on the copy -> drop and delete dump. Result at 14:27 UTC: **passed** - both session ids and config hashes identical; **887 checkpoints** in the copy, 0 missing in the source, 0 different digests (prefix equality with the still-running source); replay verified every checkpoint (322 and 565 steps), 0 reconciliation discrepancies, latest report revision of each completed day reproducible (superseded revision 0 and the invalid 2026-11-11 reports are not reproducible by design); dump SHA-256 `dc2d3cdc...d4298`, scratch database dropped, dump deleted. Nothing live was stopped, written or moved; the paper sessions and supervisor were not touched. The full migration procedure is `VM-BOUNDARY-DESIGN.md` R2-5; what is not rehearsed yet: starting the service against the copy on the new host, the cutover gap, rollback timing.

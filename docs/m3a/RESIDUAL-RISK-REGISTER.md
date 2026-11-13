@@ -1,0 +1,27 @@
+# Residual-risk register (M3A-R3, status 2026-11-13)
+
+Severity: Critical (credentials/live trading exposed now), High (blocks credential readiness), Medium, Low, Info. "Owner" is who must act; "Closure" is the evidence that closes it. No finding is Critical. **Mandatory gates F-01, F-02, F-03 are High and OPEN.**
+
+| ID | Sev | Risk | Current mitigation | Owner | Closure condition | Status |
+|---|---|---|---|---|---|---|
+| F-01 | High | Credential-bearing processes might run outside an isolated runtime; legacy Windows processes have egress and no boundary | legacy processes credential-free by tested policy (`test_legacy_isolation.py`, settings refusal, import boundaries); credential design places vault and connector only on `asta-rt`; nothing credential-bearing exists | CEO + Engineering | dedicated runtime deployed; C1/C6 executed (no route from legacy hosts); reviewer accepts | **OPEN** |
+| F-02 | High | No independently enforced boundary on dedicated infrastructure | in-Docker kernel gate verified (78/78, 39/39, restarts, fail-closed); dedicated-host design, rule sets (`nft -c`), seeds, hypervisor scripts, deploy/rollback, acceptance suite ready | CEO (hardware/authorization) | C1..C10 executed on dedicated host incl. real reboot matrix; reviewer verifies | **OPEN** (no dedicated infrastructure; Option A recommended) |
+| F-03 | High | No independent security review | package, index, engagement kit, manifests | CEO (designate reviewer) | signed report; Critical/High closed or accepted | **OPEN** |
+| F-04 | Med | OKX demo/production share a host; header-based separation unverified | OKX excluded from first scope; controls designed; public OKX endpoints now observed reachable (single probe) | Eng | live docs re-read + runtime verification with a real demo key in an authorized M3-B | Open |
+| F-05 | Med | Vault is an in-process contract; real backend/custody undefined | placement design (separate users, `PrivateNetwork` vault, unix socket, KEK as encrypted credential), 23-check synthetic validation | Eng + reviewer | backend chosen and reviewed; validation run on the runtime VM | Open |
+| F-06 | Med | Reviewer key set and ceremony for signed privilege configs undefined; no expiry/replay protection | 2-of-N Ed25519 verification implemented and tested | CEO/Eng | named reviewers, key ceremony, expiry/replay fields | Open |
+| F-07 | Med | Proxy/vault logs not shipped to the audit chain; no alerting; no drift detector | monitoring plan (R2-4) | Eng | implemented and tested | Open |
+| F-09 | Med | Malicious *public* DNS answer for an allowed name accepted | non-public answers refused; client TLS validation | Eng + reviewer | pinning decision | Open |
+| F-12 | Med | Duplicate/runaway orders once an order path exists (strategies re-emit rejected intents ~96 %) | quantified; de-dup boundaries D1..D5 proposed (not implemented) | Eng | idempotent client order ids + de-dup designed and tested before any order | Open |
+| F-18 | Med | Docker gate container holds `NET_ADMIN` on the shared Docker Desktop kernel | confined to its namespace, hardened | Eng | superseded by dedicated host | Open (part of F-02) |
+| F-10 | Low | `websockets` redirect behaviour unverified | proxy policy still refuses unauthorized targets | Eng | test/pin behaviour | Open |
+| F-11 | Low | `httpx` `trust_env` honours proxy variables in legacy processes | none credential-bearing | Eng | connector built with `trust_env=False` | Open |
+| F-13 | Low | Base images pulled by tag, not digest | pinned minor tags | Eng | digest pinning | Open |
+| F-14 | Low | Docker Desktop/VM restart and Windows reboot not exercised; dedicated-host reboot matrix not run | service/container/gate restarts and fail-closed verified; `vm_acceptance.py` post-reboot phase ready | Eng | reboot matrix on dedicated host | Open |
+| F-15 | Info | 29 pyright findings in tests/scripts (type-only) | classified | Eng | optional cleanup | Open |
+| R-1 | Med | OKX continuous public connectivity unverified (block lifted once, observed again) | recorded incidents; re-verification loop | - | sustained observation | Open |
+| R-2 | Med | Hosted CI never executed | local full regression | CEO | CI run | Open |
+| R-11 | Med | Fee and trading-rule assumptions unverified | testnet `exchangeInfo` can be read at runtime | Eng | verified in an authorized M3-B | Open |
+| OP-1 | Low | M2 observation depends on the laptop staying awake/online; coverage 62-84 % | supervisor, incidents recorded | - | n/a (waived gate) | Open |
+| OP-2 | Info | Incident: a test invoked `bash` from PATH, which on this PC is the WSL launcher, and the shared `Ubuntu-24.04` distribution was found running afterwards | tests now locate Git Bash explicitly and refuse the WSL launcher; the distribution was not stopped (other work may use it) | Eng | owner stops it if unneeded | Disclosed |
+| Closed | - | F-08 (obsolete dev-login file deleted), F-16 (evidence integrity), F-17 (gitleaks exceptions reviewed) | see R1/R2 | - | - | Closed |
