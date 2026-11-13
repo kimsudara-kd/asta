@@ -1,0 +1,25 @@
+[Unit]
+Description=ASTA egress allowlist refresh (resolves allowlisted names into the nft set)
+After=nftables.service network-online.target
+Requires=nftables.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/asta-allowlist-refresh.sh
+# needs CAP_NET_ADMIN to update the nft set, nothing else
+User=root
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_NETLINK
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native

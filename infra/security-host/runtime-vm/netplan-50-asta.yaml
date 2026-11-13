@@ -1,0 +1,13 @@
+# /etc/netplan/50-asta.yaml on the runtime VM (design artifact). One NIC on the private switch,
+# NO gateway, NO nameservers, no IPv6: the VM has no route to anything except 10.77.0.0/24.
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    prot0:
+      addresses: [10.77.0.10/24]
+      dhcp4: false
+      dhcp6: false
+      accept-ra: false
+      link-local: []
+      # deliberately no `routes:` default entry and no `nameservers:`

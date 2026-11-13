@@ -1,0 +1,41 @@
+[Unit]
+Description=ASTA credential vault (separate identity; reachable only over a unix socket)
+Requires=asta-vault.socket
+After=asta-vault.socket
+
+[Service]
+Type=simple
+ExecStart=/opt/asta/venv/bin/python -m asta.security.vault_server
+User=asta-vault
+Group=asta-vault
+# NO network at all: the vault can neither be reached over IP nor leak over IP
+PrivateNetwork=yes
+RestrictAddressFamilies=AF_UNIX
+# only this service can read its encrypted store and its key (key custody: see docs/m3a/VM-BOUNDARY-DESIGN.md)
+StateDirectory=asta-vault
+StateDirectoryMode=0700
+LoadCredentialEncrypted=vault-kek:/etc/asta-vault/vault-kek.cred
+CapabilityBoundingSet=
+AmbientCapabilities=
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+ProcSubset=pid
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+UMask=0077
+# no core dumps of secrets
+LimitCORE=0
+Restart=on-failure

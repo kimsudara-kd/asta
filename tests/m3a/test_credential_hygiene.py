@@ -1,12 +1,11 @@
-"""M3A-R1 C: development credential hygiene.
+"""M3A-R1/R2 C: development credential hygiene.
 
-No plaintext credential-like file may exist in the work tree except the single, documented, OBSOLETE
-file below (its users were seeded into a disposable e2e database that no longer exists; removal is
-pending the owner's confirmation - see docs/m3a/CREDENTIAL-HYGIENE.md). It is pinned by SHA-256 so
-it cannot silently change, and any NEW file of this kind fails the test.
+``data/manual/creds.json`` (obsolete seeded app-user logins from a 2026-11-12 manual run, SHA-256
+prefix 9412ad3eb6fa6d76) was securely removed in M3A-R2. This test is its tombstone: that path, and
+any other credential-like file outside source/docs, must not exist, and the gitleaks suppression
+list must stay exactly as reviewed (two single-fingerprint entries, no rule/path allowlist growth).
 """
 
-import hashlib
 import re
 from pathlib import Path
 
@@ -15,8 +14,7 @@ SKIP = {"node_modules", ".venv", ".git", ".next"}
 NAME = re.compile(r"(cred|secret|password|passwd|token|apikey|api_key|private)", re.IGNORECASE)
 EXT = {".json", ".txt", ".env", ".yaml", ".yml", ".ini", ".cfg", ".key", ".pem"}
 
-# SHA-256 prefix (16 hex chars = 64 bits) of the obsolete file; a prefix is enough to detect change
-KNOWN_OBSOLETE = {"data/manual/creds.json": "9412ad3eb6fa6d76"}
+REMOVED_TOMBSTONES = ("data/manual/creds.json",)  # sha256 prefix 9412ad3eb6fa6d76 when it existed
 
 
 def credential_like_files() -> list[Path]:
@@ -32,19 +30,34 @@ def credential_like_files() -> list[Path]:
     return out
 
 
-def test_only_the_documented_obsolete_file_may_exist_and_it_must_be_unchanged():
+def test_no_credential_like_file_exists_and_the_removed_one_stays_removed():
+    for rel in REMOVED_TOMBSTONES:
+        assert not (ROOT / rel).exists(), f"removed obsolete credential file reappeared: {rel}"
     problems = []
     for p in credential_like_files():
         rel = p.relative_to(ROOT).as_posix()
         # source/documentation files that merely have such a word in their name are not credentials
         if rel.startswith(("src/", "tests/", "docs/", "scripts/", "infra/", "apps/web/src/")):
             continue
-        want = KNOWN_OBSOLETE.get(rel)
-        if want is None:
-            problems.append(f"unexpected credential-like file: {rel}")
-        elif not hashlib.sha256(p.read_bytes()).hexdigest().startswith(want):
-            problems.append(f"documented obsolete file changed: {rel}")
+        problems.append(f"unexpected credential-like file: {rel}")
     assert not problems, problems
+
+
+def test_gitleaks_suppression_is_exactly_the_two_reviewed_fingerprints():
+    entries = [
+        ln.strip()
+        for ln in (ROOT / ".gitleaksignore").read_text(encoding="utf-8").splitlines()
+        if ln.strip() and not ln.startswith("#")
+    ]
+    assert sorted(entries) == sorted(
+        [
+            "23cc0228cdde01dd86469a92ebda1fcf78229c01:tests/m3a/test_security.py:generic-api-key:248",
+            "968252f427e213bf04c3b87d57ebdfdfc65d0811:tests/m3a/test_credential_hygiene.py:generic-api-key:19",
+        ]
+    )
+    toml = (ROOT / ".gitleaks.toml").read_text(encoding="utf-8")
+    assert toml.count("[allowlist]") == 1 and "rules" not in toml.split("[allowlist]")[1]
+    assert "regexes" not in toml and "commits" not in toml and "stopwords" not in toml
 
 
 def test_the_e2e_runner_creates_disposable_credentials_and_deletes_them():

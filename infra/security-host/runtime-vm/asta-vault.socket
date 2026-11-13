@@ -1,0 +1,14 @@
+[Unit]
+Description=ASTA credential vault socket
+
+[Socket]
+ListenStream=/run/asta-vault/vault.sock
+SocketUser=asta-vault
+# only the connector's group may connect; strategies, AI modules and the UI run as other users
+SocketGroup=asta-connector
+SocketMode=0660
+DirectoryMode=0750
+# the vault authenticates the peer by SO_PEERCRED (uid/gid) and checks the grant per identity
+
+[Install]
+WantedBy=sockets.target

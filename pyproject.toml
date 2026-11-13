@@ -64,6 +64,7 @@ ignore = ["S101"]
 "scripts/*.py" = ["E501"]
 "scripts/paper_supervisor.py" = ["E501", "S603", "S607"]
 "tests/m3a/test_egress.py" = ["S603", "S607"]  # docker CLI calls into the protected container
+"tests/m3a/test_security_host_config.py" = ["S603", "S607"]  # docker run of `nft -c` (check only)
 "infra/egress/*.py" = ["E501", "ASYNC240"]  # standalone infra scripts (stdlib only)
 "migrations/versions/*.py" = ["E501"]
 "src/asta/db/research_*.py" = ["E501"]
