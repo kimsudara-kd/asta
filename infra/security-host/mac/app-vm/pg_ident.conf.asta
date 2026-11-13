@@ -1,0 +1,2 @@
+# map the OS service user to the database role (no password exists)
+asta   asta-app   asta

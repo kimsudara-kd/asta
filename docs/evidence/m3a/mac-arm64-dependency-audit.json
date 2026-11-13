@@ -1,0 +1,643 @@
+{
+ "packages": 79,
+ "pure_python": 67,
+ "native_with_arm64_wheel": 12,
+ "needs_build_on_linux_aarch64": [
+  "pgserver"
+ ],
+ "needs_build_on_macos_arm64": [],
+ "rows": [
+  {
+   "package": "alembic",
+   "version": "1.20.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "annotated-doc",
+   "version": "0.0.6",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "annotated-types",
+   "version": "0.8.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "anyio",
+   "version": "4.16.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "argon2-cffi",
+   "version": "25.1.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "argon2-cffi-bindings",
+   "version": "26.1.0",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "asn1crypto",
+   "version": "1.5.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "ast-serialize",
+   "version": "0.13.1",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "attrs",
+   "version": "26.1.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "boolean-py",
+   "version": "5.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "cachecontrol",
+   "version": "0.14.4",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "certifi",
+   "version": "2026.10.23",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "cffi",
+   "version": "2.1.1",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "charset-normalizer",
+   "version": "3.5.2",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "click",
+   "version": "8.5.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "colorama",
+   "version": "0.4.6",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "cryptography",
+   "version": "50.0.2",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "cyclonedx-python-lib",
+   "version": "11.12.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "defusedxml",
+   "version": "0.7.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "fastapi",
+   "version": "0.162.5",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "fasteners",
+   "version": "0.20",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "filelock",
+   "version": "4.2.10",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "greenlet",
+   "version": "3.5.6",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "h11",
+   "version": "0.16.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "httpcore",
+   "version": "1.0.9",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "httpx",
+   "version": "0.28.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "hypothesis",
+   "version": "6.139.3",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "idna",
+   "version": "3.20",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "iniconfig",
+   "version": "2.3.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "librt",
+   "version": "0.16.0",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "license-expression",
+   "version": "30.4.4",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "mako",
+   "version": "1.4.3",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "markdown-it-py",
+   "version": "4.3.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "markupsafe",
+   "version": "3.0.4",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "mdurl",
+   "version": "0.1.2",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "msgpack",
+   "version": "1.2.4",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "mypy",
+   "version": "2.4.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "mypy-extensions",
+   "version": "1.2.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "opentelemetry-api",
+   "version": "1.45.2",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "packageurl-python",
+   "version": "0.17.6",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "packaging",
+   "version": "26.3",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pathspec",
+   "version": "1.1.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pg8000",
+   "version": "1.31.6",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pgserver",
+   "version": "0.1.4",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": false,
+   "macos_arm64_no_build": true,
+   "sdist_available": false
+  },
+  {
+   "package": "pip",
+   "version": "26.3",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pip-api",
+   "version": "0.0.35",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pip-audit",
+   "version": "2.10.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pip-requirements-parser",
+   "version": "32.0.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "platformdirs",
+   "version": "4.14.5",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pluggy",
+   "version": "1.7.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "psutil",
+   "version": "7.2.2",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "py-serializable",
+   "version": "2.2.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pycparser",
+   "version": "3.12",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pydantic",
+   "version": "2.14.3",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pydantic-core",
+   "version": "2.50.4",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pydantic-settings",
+   "version": "2.16.2",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pygments",
+   "version": "2.21.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pyotp",
+   "version": "2.10.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pyparsing",
+   "version": "3.3.3",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pytest",
+   "version": "9.2.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "pytest-asyncio",
+   "version": "1.4.1.post1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "python-dateutil",
+   "version": "4.0.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "python-dotenv",
+   "version": "1.2.4",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "requests",
+   "version": "2.34.2",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "respx",
+   "version": "0.23.1",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "rich",
+   "version": "15.0.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "ruff",
+   "version": "0.17.4",
+   "kind": "native wheel",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "scramp",
+   "version": "1.5.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "sortedcontainers",
+   "version": "2.4.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "sqlalchemy",
+   "version": "2.0.57",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "starlette",
+   "version": "1.10.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "tomli",
+   "version": "2.5.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "tomli-w",
+   "version": "1.2.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "typing-extensions",
+   "version": "4.16.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "typing-inspection",
+   "version": "0.4.5",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "tzdata",
+   "version": "2026.6",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "urllib3",
+   "version": "2.8.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "uvicorn",
+   "version": "0.54.0",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  },
+  {
+   "package": "websockets",
+   "version": "17.4",
+   "kind": "pure-python",
+   "linux_aarch64_no_build": true,
+   "macos_arm64_no_build": true,
+   "sdist_available": true
+  }
+ ]
+}

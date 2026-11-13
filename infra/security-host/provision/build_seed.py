@@ -194,9 +194,183 @@ def emit(outdir: Path) -> dict[str, str]:
     return sums
 
 
+MAC = SH / "mac"
+NL = "\n"
+
+
+def _tail(name: str) -> list[dict[str, str]]:
+    return [
+        {
+            "path": "/etc/asta-egress/empty-resolv.conf",
+            "permissions": "0644",
+            "content": "# intentionally empty" + NL,
+        },
+        {
+            "path": "/etc/asta-egress/hosts",
+            "permissions": "0644",
+            "content": "127.0.0.1 localhost" + NL,
+        },
+    ]
+
+
+def _runcmd(extra: list[list[str]] | None = None) -> list[list[str]]:
+    base = [
+        ["sysctl", "--system"],
+        ["nft", "-c", "-f", "/etc/nftables.conf"],
+        ["systemctl", "enable", "--now", "nftables.service"],
+    ]
+    return base + (extra or []) + [["netplan", "apply"]]
+
+
+def mac_fw() -> dict[str, object]:
+    c = common("asta-fw")
+    fw = MAC / "firewall-vm"
+    c["write_files"] += [  # type: ignore[operator]
+        f(fw / "nftables.conf", "/etc/nftables.conf"),
+        f(fw / "netplan-50-asta.yaml", "/etc/netplan/50-asta.yaml", "0600"),
+        f(fw / "asta-allowlist-refresh.sh", "/usr/local/sbin/asta-allowlist-refresh.sh", "0750"),
+        f(
+            fw / "asta-allowlist-refresh.service",
+            "/etc/systemd/system/asta-allowlist-refresh.service",
+        ),
+        f(fw / "asta-allowlist-refresh.timer", "/etc/systemd/system/asta-allowlist-refresh.timer"),
+        f(fw / "asta-egress-proxy.service", "/etc/systemd/system/asta-egress-proxy.service"),
+        f(EG / "proxy.py", "/opt/asta-egress/proxy.py"),
+        f(EG / "allowlist.json", "/etc/asta-egress/allowlist.json"),
+        *_tail("fw"),
+    ]
+    c["runcmd"] = _runcmd(
+        [
+            ["systemctl", "daemon-reload"],
+            [
+                "systemctl",
+                "enable",
+                "--now",
+                "asta-allowlist-refresh.timer",
+                "asta-egress-proxy.service",
+            ],
+        ]
+    )
+    c["packages"] = ["nftables", "jq", "python3", "chrony"]
+    return c
+
+
+def mac_app() -> dict[str, object]:
+    c = common("asta-app")
+    app = MAC / "app-vm"
+    c["groups"] = ["asta-app"]
+    c["users"] += [  # type: ignore[operator]
+        {
+            "name": "asta-app",
+            "system": True,
+            "shell": "/usr/sbin/nologin",
+            "lock_passwd": True,
+            "primary_group": "asta-app",
+            "homedir": "/var/lib/asta",
+        }
+    ]
+    sec = "/opt/asta/src/infra/security-host/mac/app-vm/"
+    c["write_files"] += [  # type: ignore[operator]
+        f(app / "nftables.conf", "/etc/nftables.conf"),
+        f(app / "netplan-50-asta.yaml", "/etc/netplan/50-asta.yaml", "0600"),
+        f(app / "asta-paper-service.service", "/etc/systemd/system/asta-paper-service.service"),
+        f(
+            app / "asta-paper-supervisor.service",
+            "/etc/systemd/system/asta-paper-supervisor.service",
+        ),
+        f(app / "asta-db-backup.service", "/etc/systemd/system/asta-db-backup.service"),
+        f(app / "asta-db-backup.timer", "/etc/systemd/system/asta-db-backup.timer"),
+        f(
+            app / "postgresql-hardening.conf",
+            "/etc/postgresql/16/main/conf.d/asta-hardening.conf",
+            "0644",
+            "postgres:postgres",
+        ),
+        f(
+            app / "pg_hba.conf.asta",
+            "/etc/postgresql/16/main/pg_hba.conf.asta",
+            "0640",
+            "postgres:postgres",
+        ),
+        f(
+            app / "pg_ident.conf.asta",
+            "/etc/postgresql/16/main/pg_ident.conf.asta",
+            "0640",
+            "postgres:postgres",
+        ),
+        f(app / "db_backup.sh", sec + "db_backup.sh", "0755"),
+        f(app / "db_restore_verify.sh", sec + "db_restore_verify.sh", "0755"),
+    ]
+    # /etc/asta/asta.env (application secret key) is generated ON the VM at provisioning, never carried in a seed;
+    # the ASTA runtime (wheels + source) arrives on a separate read-only payload disk.
+    c["runcmd"] = _runcmd()
+    c["packages"] = ["nftables", "postgresql-16", "python3.12", "python3.12-venv", "age", "chrony"]
+    return c
+
+
+def mac_cred() -> dict[str, object]:
+    c = common("asta-cred")
+    cr = MAC / "cred-vm"
+    c["groups"] = ["asta-connector", "asta-vault"]
+    c["users"] += [  # type: ignore[operator]
+        {
+            "name": "asta-vault",
+            "system": True,
+            "shell": "/usr/sbin/nologin",
+            "lock_passwd": True,
+            "primary_group": "asta-vault",
+        },
+        {
+            "name": "asta-connector",
+            "system": True,
+            "shell": "/usr/sbin/nologin",
+            "lock_passwd": True,
+            "primary_group": "asta-connector",
+        },
+    ]
+    c["write_files"] += [  # type: ignore[operator]
+        f(cr / "nftables.conf", "/etc/nftables.conf"),
+        f(cr / "netplan-50-asta.yaml", "/etc/netplan/50-asta.yaml", "0600"),
+        f(SH / "runtime-vm" / "asta-vault.service", "/etc/systemd/system/asta-vault.service"),
+        f(SH / "runtime-vm" / "asta-vault.socket", "/etc/systemd/system/asta-vault.socket"),
+        f(
+            SH / "runtime-vm" / "asta-connector.service",
+            "/etc/systemd/system/asta-connector.service",
+        ),
+    ]
+    c["runcmd"] = _runcmd()  # vault/connector units are NOT enabled: the M3-B modules do not exist
+    c["packages"] = ["nftables", "python3.12", "python3.12-venv", "chrony"]
+    return c
+
+
+def emit_mac(outdir: Path) -> dict[str, str]:
+    sums: dict[str, str] = {}
+    for name, cfg, host in (
+        ("fw", mac_fw(), "asta-fw"),
+        ("app", mac_app(), "asta-app"),
+        ("cred", mac_cred(), "asta-cred"),
+    ):
+        d = outdir / name
+        d.mkdir(parents=True, exist_ok=True)
+        user = "#cloud-config" + NL + json.dumps(cfg, indent=1, sort_keys=True) + NL
+        (d / "user-data").write_text(user, encoding="utf-8", newline=NL)
+        (d / "meta-data").write_text(
+            f"instance-id: asta-mac-{name}-1{NL}local-hostname: {host}{NL}",
+            encoding="utf-8",
+            newline=NL,
+        )
+        (d / "network-config").write_text(
+            f"version: 2{NL}ethernets: {{}}{NL}", encoding="utf-8", newline=NL
+        )
+        for fn in ("user-data", "meta-data", "network-config"):
+            sums[f"{name}/{fn}"] = hashlib.sha256((d / fn).read_bytes()).hexdigest()
+    return sums
+
+
 def main() -> int:
-    outdir = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "data" / "seed-out"
-    print(json.dumps(emit(outdir), indent=1))
+    args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    outdir = Path(args[0]) if args else ROOT / "data" / "seed-out"
+    print(json.dumps(emit_mac(outdir) if "--target=mac" in sys.argv else emit(outdir), indent=1))
     return 0
 
 

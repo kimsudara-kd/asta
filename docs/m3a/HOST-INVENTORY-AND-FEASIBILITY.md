@@ -1,3 +1,5 @@
+> **Superseded in part (ASTA-M3A-MAC-01):** the CEO decided to use the existing Mac mini M4 as the dedicated host; the x86 "Option A" procurement proposal below is replaced by `MAC-MINI-DEPLOYMENT-DESIGN.md`. The Windows inventory in section 1 remains valid for the development PC.
+
 # Actual host inventory and dedicated-host feasibility (M3A-R3, read-only inspection 2026-11-13)
 
 Inspection used `Get-CimInstance`/`Get-NetAdapter`/`Get-PSDrive` and tool lookups only; nothing was installed, enabled, partitioned or changed. Raw facts below; the conclusion is in section 4.

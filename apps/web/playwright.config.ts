@@ -11,7 +11,11 @@ export default defineConfig({
   reporter: [["list"], ["json", { outputFile: "test-results/e2e-report.json" }]],
   use: {
     baseURL: "http://127.0.0.1:3640",
-    channel: "chrome", // system Chrome: no browser download
+    // system Chrome by default (Windows/macOS, no download). On Linux ARM64 there is no Google Chrome build:
+    // set E2E_BROWSER_CHANNEL=chromium to use the Playwright-installed Chromium instead.
+    ...(process.env.E2E_BROWSER_CHANNEL === "chromium"
+      ? {}
+      : { channel: process.env.E2E_BROWSER_CHANNEL ?? "chrome" }),
     headless: true,
     screenshot: "off",
     trace: "off",

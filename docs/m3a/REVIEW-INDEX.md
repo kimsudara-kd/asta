@@ -8,7 +8,7 @@ Organises the review package (see `INDEPENDENT-REVIEW-PACKAGE.md`; file hashes i
 | 1 | `docs/evidence/M3A-acceptance.md` (R3, R2, R1 sections first), `M3B-READINESS.md` | what is claimed, what is open, what is asked |
 | 2 | `SECURITY-ARCHITECTURE.md`, `TRUST-BOUNDARIES-AND-LIFECYCLE.md` | architecture, zones, auth, credential lifecycle, remaining attack paths |
 | 3 | `THREAT-MODEL.md` (threats T-01..T-19, findings F-01..F-18, status tables) | threats and the claimed controls |
-| 4 | `EGRESS-ENFORCEMENT.md`, `VM-BOUNDARY-DESIGN.md` (R3, R2 sections), `HOST-INVENTORY-AND-FEASIBILITY.md` | boundary design, what is deployed (Docker) versus designed (dedicated host) |
+| 4 | `MAC-MINI-DEPLOYMENT-DESIGN.md` (the CEO-chosen Apple Silicon host), `EGRESS-ENFORCEMENT.md`, `VM-BOUNDARY-DESIGN.md` (R3, R2 sections), `HOST-INVENTORY-AND-FEASIBILITY.md` | boundary design, what is deployed (Docker) versus designed (dedicated host) |
 | 5 | `infra/egress/` (proxy, gate, tests) and `infra/security-host/` (rules, units, provisioning, acceptance) | the artifacts themselves |
 | 6 | `CREDENTIAL-ISOLATION.md`, `CREDENTIAL-HYGIENE.md`, `src/asta/security/`, `tests/m3a/test_security.py` | vault contract, environment binding, signed configuration, hygiene |
 | 7 | `EXCHANGE-CAPABILITY-MATRIX.md`, `PAPER-REJECTION-ANALYSIS.md` | exchange feasibility and the duplicate-order risk |

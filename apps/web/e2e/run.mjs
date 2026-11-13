@@ -9,7 +9,12 @@ import path from "node:path";
 
 const web = path.resolve(import.meta.dirname, "..");
 const repo = path.resolve(web, "../..");
-const py = path.join(repo, ".venv", "Scripts", "python.exe");
+// portable: Windows venv layout by default, POSIX (Linux/macOS, incl. ARM64) otherwise; E2E_PYTHON overrides
+const py =
+  process.env.E2E_PYTHON ??
+  (process.platform === "win32"
+    ? path.join(repo, ".venv", "Scripts", "python.exe")
+    : path.join(repo, ".venv", "bin", "python"));
 const secrets = path.join(import.meta.dirname, ".secrets.json");
 const pgBase = process.env.ASTA_E2E_PG ?? "postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5641";
 const dbUrl = `${pgBase}/asta_e2e`;
@@ -56,7 +61,9 @@ function start(name, cmd, args, opts) {
   return child;
 }
 function stop(child) {
-  if (child && child.exitCode === null) spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+  if (!child || child.exitCode !== null) return;
+  if (process.platform === "win32") spawnSync("taskkill", ["/PID", String(child.pid), "/T", "/F"], { stdio: "ignore" });
+  else child.kill("SIGTERM");
 }
 async function waitFor(url, ms = 90_000) {
   const end = Date.now() + ms;

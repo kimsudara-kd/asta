@@ -1,0 +1,14 @@
+# /etc/netplan/50-asta.yaml on asta-cred (design artifact). NO gateway, NO nameservers on the private links.
+# MAC addresses are fixed by qemu-vms.sh so interface names are stable across reboots.
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    fw0:
+      match: { macaddress: "52:54:00:77:02:02" }
+      set-name: fw0
+      addresses: [10.77.2.2/30]
+      dhcp4: false
+      dhcp6: false
+      accept-ra: false
+      link-local: []

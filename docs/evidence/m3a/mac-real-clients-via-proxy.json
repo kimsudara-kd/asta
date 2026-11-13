@@ -1,0 +1,6 @@
+{
+ "HTTPS_PROXY": "http://asta-egress-proxy:3128",
+ "rest_time_via_proxy": "OK",
+ "ws_first_message_via_proxy": "OK",
+ "control_without_proxy": "blocked (ConnectError)"
+}

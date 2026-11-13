@@ -97,3 +97,10 @@ Binance Spot Testnet only; one connector instance bound to `EXCHANGE_DEMO`/Binan
 # R3 update (M3A-R3): credential readiness
 
 **Credential readiness: NO-GO. M3-B: NOT AUTHORIZED, not started.** F-01, F-02 and F-03 are unchanged and OPEN: no dedicated infrastructure exists (single Windows 11 Home laptop, no admin rights, no hypervisor; hypervisor installation and hardware purchase are not authorized), and no independent reviewer has been designated (see `HOST-INVENTORY-AND-FEASIBILITY.md`, `REVIEWER-ENGAGEMENT.md`, `RESIDUAL-RISK-REGISTER.md`). Ready on the day infrastructure exists: reproducible seeds, hypervisor scripts, deploy/rollback, acceptance suite (controls C1..C10 with a real reboot matrix), synthetic-secret vault validation, and the database part of the M2 migration rehearsal (passed). Binance-only scope (R2) remains the proposed first M3-B scope once every gate closes; OKX stays out of the first scope.
+
+
+---
+
+# MAC-01 update: host decision
+
+The dedicated host is the existing Apple Mac mini M4 (16 GB / 256 GB) with Linux ARM64 VMs (`MAC-MINI-DEPLOYMENT-DESIGN.md`); the x86 procurement option is withdrawn. Gates are unchanged: F-01, F-02, F-03 OPEN; **credential readiness NO-GO; M3-B not authorized**. A Binance-only first scope stays proposed (R2) and OKX stays out of it. Prepared: Phase A inventory script (not yet run on the Mac), ARM64 compatibility audit (36 aarch64 runtime wheels fetched, only dev-only `pgserver` lacks one), three-VM design with QEMU+HVF unix-socket links, rule sets, units, launchd daemons, backup/restore, POSIX supervisor, real REST/WS clients verified through the proxy. Not done: any change on the Mac, ARM64 execution of the test suite, cross-architecture replay, reboot matrix.
