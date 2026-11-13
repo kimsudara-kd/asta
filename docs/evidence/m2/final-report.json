@@ -1,0 +1,300 @@
+{
+ "observe-1h": {
+  "id": "afec3e2b-c5dc-4306-a98d-82da6ea38346",
+  "state": "RUNNING",
+  "started_at": "2026-11-12T16:23:20.916397+00:00",
+  "last_step_ts": "2026-11-13T06:00:00+00:00",
+  "totals": {
+   "equity": "1000.000000000000000000",
+   "cash": "1000.000000000000000000",
+   "inventory_value": "0",
+   "realized_pnl": "0",
+   "unrealized_pnl": "0"
+  },
+  "accounts": {
+   "BINANCE:regime_grid": {
+    "cash_total": "166.666666680000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666680000000000"
+   },
+   "BINANCE:sma_cross": {
+    "cash_total": "166.666666660000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666660000000000"
+   },
+   "BINANCE:trend_pullback": {
+    "cash_total": "166.666666660000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666660000000000"
+   },
+   "OKX:regime_grid": {
+    "cash_total": "166.666666680000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666680000000000"
+   },
+   "OKX:sma_cross": {
+    "cash_total": "166.666666660000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666660000000000"
+   },
+   "OKX:trend_pullback": {
+    "cash_total": "166.666666660000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666660000000000"
+   }
+  },
+  "equity": "1000.000000000000000000",
+  "net_pnl": "0.000000000000000000",
+  "max_drawdown_fraction": "0",
+  "strategies": [
+   {
+    "strategy": "regime_grid",
+    "starting_cash": "333.33333336",
+    "equity": "333.33333336",
+    "net_pnl": "0.00000000",
+    "fills": 0,
+    "fees": "0",
+    "estimated_slippage": "0",
+    "realized_pnl": "0",
+    "deployment_candidate": false
+   },
+   {
+    "strategy": "sma_cross",
+    "starting_cash": "333.33333332",
+    "equity": "333.33333332",
+    "net_pnl": "0.00000000",
+    "fills": 0,
+    "fees": "0",
+    "estimated_slippage": "0",
+    "realized_pnl": "0",
+    "deployment_candidate": false
+   },
+   {
+    "strategy": "trend_pullback",
+    "starting_cash": "333.33333332",
+    "equity": "333.33333332",
+    "net_pnl": "0.00000000",
+    "fills": 0,
+    "fees": "0",
+    "estimated_slippage": "0",
+    "realized_pnl": "0",
+    "deployment_candidate": false
+   }
+  ],
+  "data_coverage": {
+   "BINANCE": {
+    "steps": 15,
+    "complete_and_fresh": 13
+   },
+   "OKX": {
+    "steps": 15,
+    "complete_and_fresh": 8
+   }
+  },
+  "orders_by_status": {},
+  "fills": {
+   "count": 0,
+   "notional": "0",
+   "estimated_slippage": "0",
+   "realized_pnl": "0"
+  },
+  "negative_balance_rows": 0,
+  "risk_events": {},
+  "checkpoints_stored": 315,
+  "replay_report": "ReplayReport(steps=315, last_step_seq=314, last_digest='fa2b244e24d4d54f4591e809e91b12424dc30a7340a66dfe93ee8c306848df4a', problems=[])",
+  "replay_verified": true,
+  "reconcile_discrepancies": 0,
+  "daily_reports": [
+   {
+    "date": "2026-11-11",
+    "revision": 0,
+    "reproducible": false
+   },
+   {
+    "date": "2026-11-12",
+    "revision": 0,
+    "reproducible": false
+   },
+   {
+    "date": "2026-11-12",
+    "revision": 1,
+    "reproducible": true
+   }
+  ]
+ },
+ "observe-5m": {
+  "id": "489d0990-6cf9-4120-9ad7-c6d370374dc2",
+  "state": "RUNNING",
+  "started_at": "2026-11-12T16:24:16.954683+00:00",
+  "last_step_ts": "2026-11-13T07:20:00+00:00",
+  "totals": {
+   "equity": "998.9859991714000000000000000",
+   "cash": "908.946562170000000000",
+   "inventory_value": "90.03943700140000000000000000",
+   "realized_pnl": "-0.885791830000000000",
+   "unrealized_pnl": "-0.1282089986000000000000000000"
+  },
+  "accounts": {
+   "BINANCE:regime_grid": {
+    "cash_total": "166.666666680000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666680000000000"
+   },
+   "BINANCE:sma_cross": {
+    "cash_total": "76.292941770000000000",
+    "assets": [
+     [
+      "ETH",
+      "0.000055200000000000"
+     ],
+     [
+      "SOL",
+      "1.115783000000000000"
+     ]
+    ],
+    "realized_pnl": "-0.206100100000000000",
+    "unrealized_pnl": "-0.12820895000000000000000000",
+    "equity": "166.3323576100000000000000000"
+   },
+   "BINANCE:trend_pullback": {
+    "cash_total": "166.666666660000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666660000000000"
+   },
+   "OKX:regime_grid": {
+    "cash_total": "166.666666680000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666680000000000"
+   },
+   "OKX:sma_cross": {
+    "cash_total": "165.986953720000000000",
+    "assets": [
+     [
+      "SOL",
+      "0.000000260000000000"
+     ]
+    ],
+    "realized_pnl": "-0.679691730000000000",
+    "unrealized_pnl": "-0.00000004860000000000000000000000",
+    "equity": "165.9869748814000000000000000"
+   },
+   "OKX:trend_pullback": {
+    "cash_total": "166.666666660000000000",
+    "assets": [],
+    "realized_pnl": "0",
+    "unrealized_pnl": "0",
+    "equity": "166.666666660000000000"
+   }
+  },
+  "equity": "998.985999171400000000",
+  "net_pnl": "-1.014000828600000000",
+  "max_drawdown_fraction": "0.001974952562364856874658780505",
+  "strategies": [
+   {
+    "strategy": "regime_grid",
+    "starting_cash": "333.33333336",
+    "equity": "333.33333336",
+    "net_pnl": "0.00000000",
+    "fills": 0,
+    "fees": "0",
+    "estimated_slippage": "0",
+    "realized_pnl": "0",
+    "deployment_candidate": false
+   },
+   {
+    "strategy": "sma_cross",
+    "starting_cash": "333.33333332",
+    "equity": "332.3193324914000000000000000",
+    "net_pnl": "-1.0140008286000000000000000",
+    "fills": 9,
+    "fees": "0.8093993636000000000000000000",
+    "estimated_slippage": "0.473119780000000000",
+    "realized_pnl": "-0.885791830000000000",
+    "deployment_candidate": false
+   },
+   {
+    "strategy": "trend_pullback",
+    "starting_cash": "333.33333332",
+    "equity": "333.33333332",
+    "net_pnl": "0.00000000",
+    "fills": 0,
+    "fees": "0",
+    "estimated_slippage": "0",
+    "realized_pnl": "0",
+    "deployment_candidate": false
+   }
+  ],
+  "data_coverage": {
+   "BINANCE": {
+    "steps": 181,
+    "complete_and_fresh": 159
+   },
+   "OKX": {
+    "steps": 181,
+    "complete_and_fresh": 113
+   }
+  },
+  "orders_by_status": {
+   "CANCELLED": 5,
+   "REJECTED": 230,
+   "FILLED": 9
+  },
+  "fills": {
+   "count": 9,
+   "notional": "809.398052400000000000",
+   "estimated_slippage": "0.473119780000000000",
+   "realized_pnl": "-0.885791830000000000"
+  },
+  "negative_balance_rows": 0,
+  "risk_events": {
+   "ORDER_REJECTED": 230
+  },
+  "checkpoints_stored": 481,
+  "replay_report": "ReplayReport(steps=481, last_step_seq=480, last_digest='8b107d7e200acf223af2ebcc090b468b54ed6bb7fda8f456678fc31c7083ad88', problems=[])",
+  "replay_verified": true,
+  "reconcile_discrepancies": 0,
+  "daily_reports": [
+   {
+    "date": "2026-11-11",
+    "revision": 0,
+    "reproducible": false
+   },
+   {
+    "date": "2026-11-12",
+    "revision": 0,
+    "reproducible": false
+   },
+   {
+    "date": "2026-11-12",
+    "revision": 1,
+    "reproducible": true
+   }
+  ]
+ },
+ "_global": {
+  "exchange_connections_rows": 0,
+  "unresolved_critical_incidents": 0,
+  "dead_letter_jobs": 0
+ },
+ "_outbound_http_methods_in_service_log": {
+  "GET": 7715
+ }
+}

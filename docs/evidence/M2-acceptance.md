@@ -453,3 +453,74 @@ Window since 20:11:22Z: elapsed 11.17 h of 72; supervisor coverage **83.8 %** (u
 Observation incomplete (61 h remaining); OKX continuous connectivity unverified (R-1); supervisor outage risk from PC sleep/log-off; the unexplained single `0xC000013A` relaunch; pyright findings outside `src`; R-2 hosted CI, R-3 infrastructure egress, R-11 assumed fees, M2-1…M2-5.
 
 **Recommendation: BUILT — NOT ACCEPTED** until the gate is evaluated at or after 2026-11-15T20:11:22Z.
+
+---
+
+# ASTA-DECISION-005 — M2 final verification under the revised acceptance policy
+
+**Status: ACCEPTANCE CANDIDATE** (engineering acceptance under the CEO timing-gate waiver; **not** an acceptance of the original 72-hour observation, which was **not achieved**). No M2 tag, no push, no M3, no credential, no authenticated/demo/real order. Recorded in `docs/decisions/ceo-approval-register.md`. Historical evidence and the failed/immature gate outputs are unchanged.
+
+## D5-1. Revised acceptance criteria (prospective)
+
+Mandatory: no unexplained reconciliation discrepancy; no duplicate financial posting; no negative virtual balance from an accounting defect; no unauthorised risk increase; no unresolved critical incident; no unverified/fabricated report; regression and security checks pass; M0/M1 safeguards intact; no exchange credentials or authenticated order path. **Waived (not achieved):** >= 72 h observation, >= 95 % supervisor coverage. Retained as reported measurements, not gates.
+
+## D5-2. Actual observation measurements (reported, not waived away)
+
+| Window | Elapsed | Supervisor coverage | Service availability | Unmonitored |
+|---|---|---|---|---|
+| From approved start 2026-11-12T20:11:22Z | **11.29 h** (of the original 72 h) | **83.9 %** | 83.5 % | 6,528 s |
+| From session start (16:23 UTC) | 15.09 h / 15.07 h | 62.8 % / 62.9 % | 62.5 % | about 20,200 s (includes the 3.8 h before a supervisor existed and a 66-min PC suspension) |
+
+`gate_pass: false` in both windows (`d005-gate-*.json`), for duration and coverage only. Every other gate criterion is satisfied (below). Sessions continue to run for research; not reset.
+
+**Venues (separate).** *Binance*: CONNECTED and fresh; outage intervals only at planned restarts and kill tests (seconds each); the 66-min PC suspension was gap-detected and fully backfilled (9 gaps, 0 open). Step data coverage 159/181 complete-and-fresh (five-minute session). *OKX*: reachable earlier; **blocked continuously since 2026-11-13 03:00:16 UTC** (DNS sinkhole, R-1), feed DISABLED with a stored reason and a `VENUE_DISABLED` incident; 113/181 steps complete-and-fresh; no OKX fill after 21:05 UTC on 2026-11-12 and no OKX order accepted after the outage (every later OKX order is a risk rejection); OKX cash/inventory untouched. The network restriction was not bypassed.
+
+## D5-3. Sessions, balances, orders, fills, fees, P&L (`docs/evidence/m2/final-report.json`, tool `scripts/paper_final_report.py`, read-only)
+
+| | observe-1h `afec3e2b-c5dc-4306-a98d-82da6ea38346` | observe-5m `489d0990-6cf9-4120-9ad7-c6d370374dc2` |
+|---|---|---|
+| Config hash | `dd59484ff7d1da598c9a946ecf5662955372d0eda40cd2ea5ecd9266febefb84` | `f06aaf1a8f6b4595349ee6b591390480ddddee94de0689aec824e58ce42eae72` |
+| State / last step | RUNNING / 2026-11-13 06:00 | RUNNING / 2026-11-13 07:20 |
+| Equity (start 1,000 virtual USDT) | 1,000.000000 | **998.985999** |
+| Net P&L | 0.00 | **-1.014001** (realized -0.885792, unrealized -0.128209) |
+| Cash / inventory value | 1,000.00 / 0 | 908.946562 / 90.039437 (ETH 0.0000552 and SOL 1.115783 on Binance; dust SOL on OKX) |
+| Orders | none | 244: 9 FILLED, 5 CANCELLED, 230 REJECTED (189 `RISK_ASSET_EXPOSURE_CAP`, 41 `INSUFFICIENT_CASH`) |
+| Fills / notional | 0 / 0 | 9 / 809.398 |
+| Fees (assumed schedule) / estimated slippage | 0 / 0 | **0.809399** / **0.473120** |
+| Max drawdown | 0 % | **0.197 %** |
+| Risk events | 0 | 230 `ORDER_REJECTED` (all risk or cash refusals); no halt, no trip |
+| Negative balance rows | 0 | 0 |
+
+All figures are simulated, assumed-fee, estimated-fill values on virtual funds and are not evidence of an edge. All P&L comes from `sma_cross`; the other strategies were idle (no fabricated records).
+
+## D5-4. Verification
+
+* **Ledger and checkpoints:** a full `rebuild_runtime` of both sessions verified **every stored checkpoint digest** (315 and 481 checkpoints, `problems=[]`); ledger reconciliation **0 discrepancies**; 0 duplicate postings; restored risk state not halted.
+* **Risk enforcement:** tests for caps, daily/drawdown latch, halt persistence and suspended-venue isolation pass; live evidence is 189 asset-cap refusals and 41 cash refusals, no accepted risk-increasing order on a disabled venue, no halt.
+* **External orders:** `exchange_connections` has 0 rows; the service log has **7,714 outbound GET requests and no other HTTP method**; no credential or signing code exists (15 live-lock tests, secret scan, gitleaks); `git diff 773b604` over risk/egress/environment and all M0/M1 evidence is empty.
+* **Daily reports:** the latest revision (1) of 2026-11-12 is reproducible for both sessions; revision 0 is the documented defective first attempt superseded by audited revision records; the two 2026-11-11 pre-session reports are invalidated by audited records and excluded. 2026-11-13 closes at 00:00 UTC.
+* **Supervisor/service recovery:** R4A-3 (service killed, recovered in 11 s; supervisor killed, keep-alive relaunch with orphan cleanup; incident records verified). Unresolved critical incidents 0; dead-letter jobs 0.
+* **Migrations:** database at head `0005`; tests build fresh databases from migrations.
+
+## D5-5. Final regression (this commit)
+
+Python (`ASTA_RUN_NETWORK_TESTS=1`): **465 passed, 1 skipped, 0 failed** (the skip is the OKX live probe, blocked by the DNS sinkhole; not a pass). Browser **39/39** (`e2e-full-run-final.log`). Ruff clean. mypy strict **no issues (144 files)**; a real typing defect in my R4 test was found and fixed. pip-audit and pnpm audit clean. Secret scan 0; gitleaks no leaks. Pyright: `src` **0 errors** (gated scope).
+
+## D5-6. Pyright findings outside `src` (33 at review start; none affects runtime behaviour)
+
+* **Fixed (mine):** 4 in the new `scripts/paper_final_report.py`; the two new scripts are clean. 29 remain.
+* **Test fixtures passing int literals where `Decimal` is declared** (`tests/paper/test_service.py`, 9): type-only; noncritical.
+* **Optional narrowing in tests** (`tests/contracts/test_m2_public.py` 2, `tests/integration/test_auth.py` 3, `tests/research/test_strategies.py` 4): a `None` would fail the test at runtime; noncritical.
+* **Private attribute access in tests** (`tests/paper/test_worker.py`, `StepWorker._state`, 6): deliberate white-box access; noncritical.
+* **"possibly unbound" in a test loop** (`tests/paper/test_worker.py`, 3): the loop always assigns; noncritical.
+* **Developer tooling** (`scripts/dev_db.py` private import from `pgserver`; `scripts/e2e_seed_paper.py` optional member): noncritical.
+
+None changes strategies, risk, fees or results; they remain **open noncritical typing defects**.
+
+## D5-7. Retained residual risks
+
+Long-duration 24/7 reliability unverified (15 h of operation, 83.9 % coverage in the approved window, one unexplained `0xC000013A` relaunch failure, dependence on the PC staying awake); OKX continuous public connectivity unverified (blocked since 03:00 UTC); R-3 infrastructure egress not enforced (mandatory before any credential); R-11 fee and trading-rule assumptions unverified; R-2 hosted CI not executed; 29 noncritical pyright findings in tests/scripts; M2-1 to M2-5 earlier items.
+
+## D5-8. Recommendation
+
+**ACCEPTANCE CANDIDATE** under ASTA-DECISION-005 with the residuals above. The acceptance tag requires separate CEO authorization and has not been created.

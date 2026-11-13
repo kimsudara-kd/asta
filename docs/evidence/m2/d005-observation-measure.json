@@ -1,0 +1,2300 @@
+{
+ "measured_at": "2026-11-13T07:28:32.248234+00:00",
+ "since": "2026-11-12T16:21:00+00:00",
+ "sessions": [
+  {
+   "id": "afec3e2b-c5dc-4306-a98d-82da6ea38346",
+   "name": "observe-1h",
+   "state": "RUNNING",
+   "timeframe": "1h",
+   "started_at": "2026-11-12 16:23:20.916397+00:00",
+   "elapsed_hours": 15.086,
+   "live_steps": 15,
+   "expected_steps_approx": 15,
+   "muted_late_or_paused_steps": 1,
+   "steps_with_blocked_markets": 7,
+   "fills": 0,
+   "reconciliation_discrepancies": 0,
+   "last_reconcile_ok": true,
+   "equity": "1000.000000000000000000",
+   "partial_day_report": {
+    "report_version": "paper-report-1",
+    "labels": [
+     "PAPER TRADING \u2014 VIRTUAL FUNDS ONLY",
+     "SIMULATED",
+     "ESTIMATED FILLS",
+     "NOT LIVE TRADING"
+    ],
+    "session_id": "afec3e2b-c5dc-4306-a98d-82da6ea38346",
+    "config_hash": "dd59484ff7d1da598c9a946ecf5662955372d0eda40cd2ea5ecd9266febefb84",
+    "window": {
+     "start": "2026-11-13T00:00:00+00:00",
+     "end": "2026-11-13T07:28:32.248234+00:00",
+     "timezone": "UTC",
+     "partial": true
+    },
+    "kind": "OBSERVED_PAPER_SIMULATION",
+    "financial": {
+     "opening_equity": "1000.000000000000000000",
+     "closing_equity": "1000.000000000000000000",
+     "net_pnl": "0.000000000000000000",
+     "realized_pnl": "0",
+     "unrealized_pnl_movement": "0.000000000000000000",
+     "fees": "0",
+     "estimated_slippage": "0",
+     "return_pct": "0",
+     "max_drawdown_window": "0",
+     "max_drawdown_since_start": "0",
+     "cash": "1000.000000000000000000",
+     "exposure": "0.000000000000000000",
+     "inventory_by_account": {
+      "BINANCE:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "BINANCE:sma_cross": {
+       "USDT": "166.666666660000000000"
+      },
+      "BINANCE:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      },
+      "OKX:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "OKX:sma_cross": {
+       "USDT": "166.666666660000000000"
+      },
+      "OKX:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      }
+     },
+     "venue_contribution": {
+      "BINANCE": "0.00000000",
+      "OKX": "0.00000000"
+     },
+     "account_equity": {
+      "BINANCE:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:sma_cross": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "OKX:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "OKX:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "OKX:sma_cross": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      }
+     }
+    },
+    "trading": {
+     "signals_generated": 0,
+     "signals_rejected": 0,
+     "orders_created": 0,
+     "orders_filled": 0,
+     "partial_fills": 0,
+     "orders_cancelled": 0,
+     "fills": 0,
+     "closed_sells": 0,
+     "win_rate": "N/A",
+     "average_gain": "N/A",
+     "average_loss": "N/A",
+     "strategy_pnl": {
+      "regime_grid": "0.00000000",
+      "sma_cross": "0.00000000",
+      "trend_pullback": "0.00000000"
+     },
+     "benchmarks": {
+      "BENCH:all_cash": {
+       "open": "1000",
+       "close": "1000",
+       "pnl": "0"
+      },
+      "BENCH:hold_constrained": {
+       "open": "999.1128074900000000000000000",
+       "close": "989.9118853223000000000000000",
+       "pnl": "-9.2009221677000000000000000"
+      },
+      "BENCH:hold_unconstrained": {
+       "open": "997.3370969260000000000000000",
+       "close": "973.0256935651000000000000000",
+       "pnl": "-24.3114033609000000000000000"
+      }
+     },
+     "strategies_are_deployment_candidates": false
+    },
+    "operations": {
+     "steps_processed": 7,
+     "steps_expected": 7,
+     "uptime_fraction": "1",
+     "feed_availability": {
+      "BINANCE": "0.8571428571428571428571428571",
+      "OKX": "0.1428571428571428571428571429"
+     },
+     "data_gaps": [
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:33:00+00:00",
+       "end": "2026-11-13T05:40:00+00:00",
+       "missing": 8,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:33:00+00:00",
+       "end": "2026-11-13T05:40:00+00:00",
+       "missing": 8,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T01:53:00+00:00",
+       "end": "2026-11-13T02:59:00+00:00",
+       "missing": 67,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T01:53:00+00:00",
+       "end": "2026-11-13T02:59:00+00:00",
+       "missing": 67,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:47:00+00:00",
+       "end": "2026-11-13T05:48:00+00:00",
+       "missing": 2,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T01:53:00+00:00",
+       "end": "2026-11-13T02:59:00+00:00",
+       "missing": 67,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T03:16:00+00:00",
+       "end": "2026-11-13T03:16:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:47:00+00:00",
+       "end": "2026-11-13T05:48:00+00:00",
+       "missing": 2,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T03:16:00+00:00",
+       "end": "2026-11-13T03:16:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T03:16:00+00:00",
+       "end": "2026-11-13T03:16:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:47:00+00:00",
+       "end": "2026-11-13T05:48:00+00:00",
+       "missing": 2,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:06:00+00:00",
+       "end": "2026-11-13T05:28:00+00:00",
+       "missing": 23,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:06:00+00:00",
+       "end": "2026-11-13T05:28:00+00:00",
+       "missing": 23,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:06:00+00:00",
+       "end": "2026-11-13T05:28:00+00:00",
+       "missing": 23,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:33:00+00:00",
+       "end": "2026-11-13T05:40:00+00:00",
+       "missing": 8,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:55:00+00:00",
+       "end": "2026-11-13T05:58:00+00:00",
+       "missing": 4,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:55:00+00:00",
+       "end": "2026-11-13T05:58:00+00:00",
+       "missing": 4,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:55:00+00:00",
+       "end": "2026-11-13T05:58:00+00:00",
+       "missing": 4,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T06:39:00+00:00",
+       "end": "2026-11-13T06:39:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T06:39:00+00:00",
+       "end": "2026-11-13T06:39:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T06:39:00+00:00",
+       "end": "2026-11-13T06:39:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      }
+     ],
+     "worker_restarts_recoveries": 5,
+     "reconciliation_failures": 0,
+     "risk_incidents": [],
+     "unresolved_alerts": [
+      {
+       "kind": "DATA_GAP",
+       "severity": "WARNING",
+       "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+      },
+      {
+       "kind": "DATA_GAP",
+       "severity": "WARNING",
+       "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+      },
+      {
+       "kind": "DATA_GAP",
+       "severity": "WARNING",
+       "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+      },
+      {
+       "kind": "FEED_DISCONNECTED",
+       "severity": "WARNING",
+       "detail": "OKX: no public market data for 30s"
+      },
+      {
+       "kind": "VENUE_DISABLED",
+       "severity": "WARNING",
+       "detail": "OKX feed suspended (verification failed, entries isolated): ConnectError: All connection attempts failed"
+      }
+     ]
+    },
+    "research_conclusion": {
+     "profitable_period": false,
+     "risk_compliant_period": true,
+     "market_data": "STORED_PUBLIC_OBSERVATIONS",
+     "observation_sources": {
+      "LIVE": 1365,
+      "BACKFILL": 318
+     },
+     "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
+     "statement": "Simulated net P&L 0.00000000 USDT on 1000.00000000 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
+     "ai_commentary": null
+    }
+   }
+  },
+  {
+   "id": "489d0990-6cf9-4120-9ad7-c6d370374dc2",
+   "name": "observe-5m",
+   "state": "RUNNING",
+   "timeframe": "5m",
+   "started_at": "2026-11-12 16:24:16.954683+00:00",
+   "elapsed_hours": 15.071,
+   "live_steps": 181,
+   "expected_steps_approx": 180,
+   "muted_late_or_paused_steps": 14,
+   "steps_with_blocked_markets": 70,
+   "fills": 9,
+   "reconciliation_discrepancies": 0,
+   "last_reconcile_ok": true,
+   "equity": "998.985999171400000000",
+   "partial_day_report": {
+    "report_version": "paper-report-1",
+    "labels": [
+     "PAPER TRADING \u2014 VIRTUAL FUNDS ONLY",
+     "SIMULATED",
+     "ESTIMATED FILLS",
+     "NOT LIVE TRADING"
+    ],
+    "session_id": "489d0990-6cf9-4120-9ad7-c6d370374dc2",
+    "config_hash": "f06aaf1a8f6b4595349ee6b591390480ddddee94de0689aec824e58ce42eae72",
+    "window": {
+     "start": "2026-11-13T00:00:00+00:00",
+     "end": "2026-11-13T07:28:32.248234+00:00",
+     "timezone": "UTC",
+     "partial": true
+    },
+    "kind": "OBSERVED_PAPER_SIMULATION",
+    "financial": {
+     "opening_equity": "999.445967845200000000",
+     "closing_equity": "998.985999171400000000",
+     "net_pnl": "-0.459968673800000000",
+     "realized_pnl": "-0.454251680000000000",
+     "unrealized_pnl_movement": "-0.005716993800000000",
+     "fees": "0.1795515800000000000000000000",
+     "estimated_slippage": "0.099590000000000000",
+     "return_pct": "-0.0004602236525018855460601466777",
+     "max_drawdown_window": "0.0006608556877828648444480862518",
+     "max_drawdown_since_start": "0.001974952562364856874658780505",
+     "cash": "908.946562170000000000",
+     "exposure": "90.039437001400000000",
+     "inventory_by_account": {
+      "BINANCE:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "BINANCE:sma_cross": {
+       "ETH": "0.000055200000000000",
+       "SOL": "1.115783000000000000",
+       "USDT": "76.292941770000000000"
+      },
+      "BINANCE:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      },
+      "OKX:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "OKX:sma_cross": {
+       "SOL": "0.000000260000000000",
+       "USDT": "165.986953720000000000"
+      },
+      "OKX:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      }
+     },
+     "venue_contribution": {
+      "BINANCE": "-0.4599685880000000000000000",
+      "OKX": "-0.0000000858000000000000000"
+     },
+     "account_equity": {
+      "BINANCE:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:sma_cross": {
+       "open": "166.7923261980000000000000000",
+       "close": "166.3323576100000000000000000",
+       "pnl": "-0.4599685880000000000000000"
+      },
+      "OKX:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "OKX:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "OKX:sma_cross": {
+       "open": "165.9869749672000000000000000",
+       "close": "165.9869748814000000000000000",
+       "pnl": "-0.0000000858000000000000000"
+      }
+     }
+    },
+    "trading": {
+     "signals_generated": 26,
+     "signals_rejected": 19,
+     "orders_created": 27,
+     "orders_filled": 2,
+     "partial_fills": 0,
+     "orders_cancelled": 5,
+     "fills": 2,
+     "closed_sells": 1,
+     "win_rate": "0",
+     "average_gain": "N/A",
+     "average_loss": "-0.454251680000000000",
+     "strategy_pnl": {
+      "regime_grid": "0.00000000",
+      "sma_cross": "-0.4599686738000000000000000",
+      "trend_pullback": "0.00000000"
+     },
+     "benchmarks": {
+      "BENCH:all_cash": {
+       "open": "1000",
+       "close": "1000",
+       "pnl": "0"
+      },
+      "BENCH:hold_constrained": {
+       "open": "999.0535607360000000000000000",
+       "close": "990.7068651866000000000000000",
+       "pnl": "-8.3466955494000000000000000"
+      },
+      "BENCH:hold_unconstrained": {
+       "open": "997.5932011260000000000000000",
+       "close": "974.3807649978000000000000000",
+       "pnl": "-23.2124361282000000000000000"
+      }
+     },
+     "strategies_are_deployment_candidates": false
+    },
+    "operations": {
+     "steps_processed": 89,
+     "steps_expected": 89,
+     "uptime_fraction": "1",
+     "feed_availability": {
+      "BINANCE": "0.7865168539325842696629213483",
+      "OKX": "0.2471910112359550561797752809"
+     },
+     "data_gaps": [
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:33:00+00:00",
+       "end": "2026-11-13T05:40:00+00:00",
+       "missing": 8,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:33:00+00:00",
+       "end": "2026-11-13T05:40:00+00:00",
+       "missing": 8,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T01:53:00+00:00",
+       "end": "2026-11-13T02:59:00+00:00",
+       "missing": 67,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T01:53:00+00:00",
+       "end": "2026-11-13T02:59:00+00:00",
+       "missing": 67,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:47:00+00:00",
+       "end": "2026-11-13T05:48:00+00:00",
+       "missing": 2,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T01:53:00+00:00",
+       "end": "2026-11-13T02:59:00+00:00",
+       "missing": 67,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T03:16:00+00:00",
+       "end": "2026-11-13T03:16:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:47:00+00:00",
+       "end": "2026-11-13T05:48:00+00:00",
+       "missing": 2,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T03:16:00+00:00",
+       "end": "2026-11-13T03:16:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T03:16:00+00:00",
+       "end": "2026-11-13T03:16:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:47:00+00:00",
+       "end": "2026-11-13T05:48:00+00:00",
+       "missing": 2,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:06:00+00:00",
+       "end": "2026-11-13T05:28:00+00:00",
+       "missing": 23,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:06:00+00:00",
+       "end": "2026-11-13T05:28:00+00:00",
+       "missing": 23,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:06:00+00:00",
+       "end": "2026-11-13T05:28:00+00:00",
+       "missing": 23,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:33:00+00:00",
+       "end": "2026-11-13T05:40:00+00:00",
+       "missing": 8,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T05:55:00+00:00",
+       "end": "2026-11-13T05:58:00+00:00",
+       "missing": 4,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T05:55:00+00:00",
+       "end": "2026-11-13T05:58:00+00:00",
+       "missing": 4,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T05:55:00+00:00",
+       "end": "2026-11-13T05:58:00+00:00",
+       "missing": 4,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "BTC-USDT",
+       "start": "2026-11-13T06:39:00+00:00",
+       "end": "2026-11-13T06:39:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "ETH-USDT",
+       "start": "2026-11-13T06:39:00+00:00",
+       "end": "2026-11-13T06:39:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      },
+      {
+       "venue": "BINANCE",
+       "symbol": "SOL-USDT",
+       "start": "2026-11-13T06:39:00+00:00",
+       "end": "2026-11-13T06:39:00+00:00",
+       "missing": 1,
+       "status": "BACKFILLED"
+      }
+     ],
+     "worker_restarts_recoveries": 13,
+     "reconciliation_failures": 0,
+     "risk_incidents": [],
+     "unresolved_alerts": [
+      {
+       "kind": "RECOVERY",
+       "severity": "INFO",
+       "detail": "runtime restored by verified replay of 303 steps (digest f8cfa7436779)"
+      },
+      {
+       "kind": "DATA_GAP",
+       "severity": "WARNING",
+       "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+      },
+      {
+       "kind": "DATA_GAP",
+       "severity": "WARNING",
+       "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+      },
+      {
+       "kind": "DATA_GAP",
+       "severity": "WARNING",
+       "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+      },
+      {
+       "kind": "FEED_DISCONNECTED",
+       "severity": "WARNING",
+       "detail": "OKX: no public market data for 30s"
+      },
+      {
+       "kind": "VENUE_DISABLED",
+       "severity": "WARNING",
+       "detail": "OKX feed suspended (verification failed, entries isolated): ConnectError: All connection attempts failed"
+      }
+     ]
+    },
+    "research_conclusion": {
+     "profitable_period": false,
+     "risk_compliant_period": true,
+     "market_data": "STORED_PUBLIC_OBSERVATIONS",
+     "observation_sources": {
+      "LIVE": 1365,
+      "BACKFILL": 318
+     },
+     "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
+     "statement": "Simulated net P&L -0.45996867 USDT on 999.44596785 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
+     "ai_commentary": null
+    }
+   }
+  }
+ ],
+ "feeds": {
+  "BINANCE:BTC-USDT": {
+   "candles": 906,
+   "span_minutes": 906,
+   "present_fraction": 1.0,
+   "from_backfill": 115,
+   "realtime_candles_within_180s": 791,
+   "realtime_fraction": 0.87307,
+   "first": "2026-11-12 16:22:00+00:00",
+   "last": "2026-11-13 07:27:00+00:00"
+  },
+  "BINANCE:ETH-USDT": {
+   "candles": 906,
+   "span_minutes": 906,
+   "present_fraction": 1.0,
+   "from_backfill": 115,
+   "realtime_candles_within_180s": 791,
+   "realtime_fraction": 0.87307,
+   "first": "2026-11-12 16:22:00+00:00",
+   "last": "2026-11-13 07:27:00+00:00"
+  },
+  "BINANCE:SOL-USDT": {
+   "candles": 906,
+   "span_minutes": 906,
+   "present_fraction": 1.0,
+   "from_backfill": 115,
+   "realtime_candles_within_180s": 791,
+   "realtime_fraction": 0.87307,
+   "first": "2026-11-12 16:22:00+00:00",
+   "last": "2026-11-13 07:27:00+00:00"
+  },
+  "OKX:BTC-USDT": {
+   "candles": 572,
+   "span_minutes": 572,
+   "present_fraction": 1.0,
+   "from_backfill": 5,
+   "realtime_candles_within_180s": 565,
+   "realtime_fraction": 0.98776,
+   "first": "2026-11-12 16:21:00+00:00",
+   "last": "2026-11-13 01:52:00+00:00"
+  },
+  "OKX:ETH-USDT": {
+   "candles": 572,
+   "span_minutes": 572,
+   "present_fraction": 1.0,
+   "from_backfill": 5,
+   "realtime_candles_within_180s": 565,
+   "realtime_fraction": 0.98776,
+   "first": "2026-11-12 16:21:00+00:00",
+   "last": "2026-11-13 01:52:00+00:00"
+  },
+  "OKX:SOL-USDT": {
+   "candles": 572,
+   "span_minutes": 572,
+   "present_fraction": 1.0,
+   "from_backfill": 5,
+   "realtime_candles_within_180s": 565,
+   "realtime_fraction": 0.98776,
+   "first": "2026-11-12 16:21:00+00:00",
+   "last": "2026-11-13 01:52:00+00:00"
+  }
+ },
+ "gaps": [
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 9,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "OKX",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "OKX",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "OKX",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 9,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 9,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 01:53:00+00:00",
+   "missing": 67,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 01:53:00+00:00",
+   "missing": 67,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 01:53:00+00:00",
+   "missing": 67,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 03:16:00+00:00",
+   "missing": 1,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 03:16:00+00:00",
+   "missing": 1,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 03:16:00+00:00",
+   "missing": 1,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 05:06:00+00:00",
+   "missing": 23,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 05:06:00+00:00",
+   "missing": 23,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 05:06:00+00:00",
+   "missing": 23,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 05:33:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 05:33:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 05:33:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 05:47:00+00:00",
+   "missing": 2,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 05:47:00+00:00",
+   "missing": 2,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 05:47:00+00:00",
+   "missing": 2,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 05:55:00+00:00",
+   "missing": 4,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 05:55:00+00:00",
+   "missing": 4,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 05:55:00+00:00",
+   "missing": 4,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-13 06:39:00+00:00",
+   "missing": 1,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-13 06:39:00+00:00",
+   "missing": 1,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-13 06:39:00+00:00",
+   "missing": 1,
+   "status": "BACKFILLED"
+  }
+ ],
+ "incidents": [
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T06:47:35.415127+00:00",
+   "resolved": "2026-11-13T06:47:36.753392+00:00",
+   "detail": "runtime restored by verified replay of 472 steps (digest 228dc4f1e1a9)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T06:44:50.976416+00:00",
+   "resolved": "2026-11-13T06:44:51.007798+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [9268, 46792] left by a previous supervisor"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T06:42:34.704269+00:00",
+   "resolved": "2026-11-13T06:42:35.244270+00:00",
+   "detail": "runtime restored by verified replay of 471 steps (digest 06cb26272d9d)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T06:41:21.449307+00:00",
+   "resolved": "2026-11-13T06:41:21.460957+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T06:41:10.279468+00:00",
+   "resolved": "2026-11-13T06:41:21.482067+00:00",
+   "detail": "paper service exited unexpectedly (code 1); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T05:59:25.100767+00:00",
+   "resolved": "2026-11-13T05:59:25.958410+00:00",
+   "detail": "runtime restored by verified replay of 462 steps (digest fefb0057997f)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:55:21.049322+00:00",
+   "resolved": "2026-11-13T05:55:21.072364+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [12800, 46036] left by a previous supervisor"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T05:49:13.998322+00:00",
+   "resolved": "2026-11-13T05:49:14.936490+00:00",
+   "detail": "runtime restored by verified replay of 460 steps (digest 3795596ddcfd)"
+  },
+  {
+   "kind": "VENUE_DISABLED",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:49:09.123983+00:00",
+   "resolved": null,
+   "detail": "OKX feed suspended (verification failed, entries isolated): ConnectError: All connection attempts failed"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:48:16.777259+00:00",
+   "resolved": "2026-11-13T05:51:14.540293+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:41:28.678525+00:00",
+   "resolved": "2026-11-13T05:49:15.754094+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T05:30:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:41:28.678525+00:00",
+   "resolved": "2026-11-13T05:49:15.762320+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T05:30:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:41:28.678525+00:00",
+   "resolved": "2026-11-13T05:42:33.143089+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T05:30:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T05:41:28.678525+00:00",
+   "resolved": "2026-11-13T05:41:33.418142+00:00",
+   "detail": "runtime restored by verified replay of 458 steps (digest 9270c728ade0)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:40:31.545609+00:00",
+   "resolved": "2026-11-13T05:51:14.536276+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:32:58.735249+00:00",
+   "resolved": "2026-11-13T05:51:14.532768+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T05:29:16.983935+00:00",
+   "resolved": "2026-11-13T05:29:20.068155+00:00",
+   "detail": "runtime restored by verified replay of 454 steps (digest a91a2dad1f36)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:28:36.159545+00:00",
+   "resolved": "2026-11-13T05:51:14.528758+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:27:23.860437+00:00",
+   "resolved": "2026-11-13T05:51:14.525250+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:26:11.548138+00:00",
+   "resolved": "2026-11-13T05:51:14.481038+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:24:59.881749+00:00",
+   "resolved": "2026-11-13T05:51:14.473022+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:23:45.222710+00:00",
+   "resolved": "2026-11-13T05:51:14.521242+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:22:31.794501+00:00",
+   "resolved": "2026-11-13T05:51:14.517234+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:21:18.642008+00:00",
+   "resolved": "2026-11-13T05:51:14.512661+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:20:08.330416+00:00",
+   "resolved": "2026-11-13T05:51:14.508521+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:52.687519+00:00",
+   "resolved": "2026-11-13T05:51:14.505962+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:47.824470+00:00",
+   "resolved": "2026-11-13T05:32:38.461953+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T05:05:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:47.824470+00:00",
+   "resolved": "2026-11-13T05:32:38.469616+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T05:05:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T05:18:47.824470+00:00",
+   "resolved": "2026-11-13T05:18:52.919934+00:00",
+   "detail": "runtime restored by verified replay of 453 steps (digest 4e145fa32b18)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:47.824470+00:00",
+   "resolved": "2026-11-13T05:32:38.596394+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T05:05:00+00:00"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:08.197650+00:00",
+   "resolved": "2026-11-13T05:51:14.501854+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:17:37.825483+00:00",
+   "resolved": "2026-11-13T05:51:14.497746+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T03:17:32.922106+00:00",
+   "resolved": "2026-11-13T03:17:33.241024+00:00",
+   "detail": "runtime restored by verified replay of 430 steps (digest e7b86e8d4542)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:17:17.311247+00:00",
+   "resolved": "2026-11-13T05:51:14.492534+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:17:03.157534+00:00",
+   "resolved": "2026-11-13T05:51:14.487960+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:17:01.032876+00:00",
+   "resolved": "2026-11-13T05:51:14.483561+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T03:12:31.756036+00:00",
+   "resolved": "2026-11-13T03:12:32.090676+00:00",
+   "detail": "runtime restored by verified replay of 429 steps (digest 5597b0f4c809)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:08:48.933799+00:00",
+   "resolved": "2026-11-13T03:08:48.959078+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [44328, 36372] left by a previous supervisor"
+  },
+  {
+   "kind": "FEED_DISCONNECTED",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:38.208927+00:00",
+   "resolved": null,
+   "detail": "OKX: no public market data for 30s"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:34.347462+00:00",
+   "resolved": "2026-11-13T03:02:34.662383+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:34.347462+00:00",
+   "resolved": null,
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:34.347462+00:00",
+   "resolved": null,
+   "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:34.347462+00:00",
+   "resolved": null,
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:34.347462+00:00",
+   "resolved": "2026-11-13T03:02:34.673222+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:34.347462+00:00",
+   "resolved": "2026-11-13T03:02:34.677470+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:50:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:15:19.532367+00:00",
+   "resolved": "2026-11-13T01:15:19.732323+00:00",
+   "detail": "runtime restored by verified replay of 406 steps (digest 8c2fe6972904)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:13:00.918506+00:00",
+   "resolved": "2026-11-13T01:13:00.916433+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T01:12:49.825978+00:00",
+   "resolved": "2026-11-13T01:13:00.937281+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:50:20.808750+00:00",
+   "resolved": "2026-11-13T00:50:20.986981+00:00",
+   "detail": "runtime restored by verified replay of 401 steps (digest 0ff4bef3cce3)"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:45:18.975726+00:00",
+   "resolved": "2026-11-13T00:45:19.157524+00:00",
+   "detail": "runtime restored by verified replay of 400 steps (digest 20ba1a1235e4)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:44:32.343591+00:00",
+   "resolved": "2026-11-13T00:44:32.358660+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:44:21.269530+00:00",
+   "resolved": "2026-11-13T00:44:32.370596+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:43:30.130343+00:00",
+   "resolved": "2026-11-13T00:43:30.144788+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [37708, 30168] left by a previous supervisor"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:40:19.550452+00:00",
+   "resolved": "2026-11-13T00:40:19.876112+00:00",
+   "detail": "runtime restored by verified replay of 399 steps (digest 7b0a9924f56d)"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:20:18.052352+00:00",
+   "resolved": "2026-11-12T20:20:18.198351+00:00",
+   "detail": "runtime restored by verified replay of 347 steps (digest 9eb1ce4a2e9b)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:16:00.938373+00:00",
+   "resolved": "2026-11-12T20:16:00.944844+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:15:49.861032+00:00",
+   "resolved": "2026-11-12T20:16:00.953305+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:15:21.216010+00:00",
+   "resolved": "2026-11-12T20:15:21.360361+00:00",
+   "detail": "runtime restored by verified replay of 346 steps (digest f7ffebb5016c)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:12:53.556679+00:00",
+   "resolved": "2026-11-12T20:12:53.564855+00:00",
+   "detail": "service healthy again after 1 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:12:52.470501+00:00",
+   "resolved": "2026-11-12T20:12:53.578839+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T17:05:04.534321+00:00",
+   "resolved": "2026-11-12T17:05:04.713089+00:00",
+   "detail": "runtime restored by verified replay of 308 steps (digest 37c20b3466e2)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:50:06.447108+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.566222+00:00",
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.560604+00:00",
+   "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.553583+00:00",
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.546151+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.539140+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": null,
+   "detail": "runtime restored by verified replay of 303 steps (digest f8cfa7436779)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:26:34.283317+00:00",
+   "resolved": "2026-11-12T16:30:05.390875+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:26:34.283317+00:00",
+   "resolved": "2026-11-12T16:30:05.381824+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:26:34.283317+00:00",
+   "resolved": "2026-11-12T16:30:05.381824+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T07:02:30.523871+00:00",
+   "resolved": "2026-11-13T07:02:30.733566+00:00",
+   "detail": "runtime restored by verified replay of 314 steps (digest 952fad1e5d03)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T06:44:50.976416+00:00",
+   "resolved": "2026-11-13T06:44:51.007798+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [9268, 46792] left by a previous supervisor"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T06:41:21.449307+00:00",
+   "resolved": "2026-11-13T06:41:21.460957+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T06:41:10.279468+00:00",
+   "resolved": "2026-11-13T06:41:21.482067+00:00",
+   "detail": "paper service exited unexpectedly (code 1); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T06:02:33.164707+00:00",
+   "resolved": "2026-11-13T06:02:33.523107+00:00",
+   "detail": "runtime restored by verified replay of 313 steps (digest 79e8152c0416)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:55:21.049322+00:00",
+   "resolved": "2026-11-13T05:55:21.072364+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [12800, 46036] left by a previous supervisor"
+  },
+  {
+   "kind": "VENUE_DISABLED",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:49:09.123983+00:00",
+   "resolved": null,
+   "detail": "OKX feed suspended (verification failed, entries isolated): ConnectError: All connection attempts failed"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:48:16.777259+00:00",
+   "resolved": "2026-11-13T05:51:14.540293+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:40:31.545609+00:00",
+   "resolved": "2026-11-13T05:51:14.536276+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:32:58.735249+00:00",
+   "resolved": "2026-11-13T05:51:14.532768+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:28:36.159545+00:00",
+   "resolved": "2026-11-13T05:51:14.528758+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:27:23.860437+00:00",
+   "resolved": "2026-11-13T05:51:14.525250+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:26:11.548138+00:00",
+   "resolved": "2026-11-13T05:51:14.481038+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:24:59.881749+00:00",
+   "resolved": "2026-11-13T05:51:14.473022+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:23:45.222710+00:00",
+   "resolved": "2026-11-13T05:51:14.521242+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:22:31.794501+00:00",
+   "resolved": "2026-11-13T05:51:14.517234+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:21:18.642008+00:00",
+   "resolved": "2026-11-13T05:51:14.512661+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:20:08.330416+00:00",
+   "resolved": "2026-11-13T05:51:14.508521+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:52.687519+00:00",
+   "resolved": "2026-11-13T05:51:14.505962+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:18:08.197650+00:00",
+   "resolved": "2026-11-13T05:51:14.501854+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T05:17:37.825483+00:00",
+   "resolved": "2026-11-13T05:51:14.497746+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T04:02:31.782967+00:00",
+   "resolved": "2026-11-13T04:02:32.418797+00:00",
+   "detail": "runtime restored by verified replay of 311 steps (digest f17dd066becd)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:17:17.311247+00:00",
+   "resolved": "2026-11-13T05:51:14.492534+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:17:03.157534+00:00",
+   "resolved": "2026-11-13T05:51:14.487960+00:00",
+   "detail": "worker heartbeat stale; supervisor terminating the service for a safe restart"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:17:01.032876+00:00",
+   "resolved": "2026-11-13T05:51:14.483561+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:08:48.933799+00:00",
+   "resolved": "2026-11-13T03:08:48.959078+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [44328, 36372] left by a previous supervisor"
+  },
+  {
+   "kind": "FEED_DISCONNECTED",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:38.208927+00:00",
+   "resolved": null,
+   "detail": "OKX: no public market data for 30s"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": null,
+   "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": "2026-11-13T03:02:34.343762+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": "2026-11-13T03:02:34.350194+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": "2026-11-13T03:02:34.373874+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": null,
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": "2026-11-13T03:01:34.183313+00:00",
+   "detail": "runtime restored by verified replay of 309 steps (digest e63fb4453354)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-13T03:01:33.923952+00:00",
+   "resolved": null,
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-13T01:00:00+00:00"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:13:00.918506+00:00",
+   "resolved": "2026-11-13T01:13:00.916433+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T01:12:49.825978+00:00",
+   "resolved": "2026-11-13T01:13:00.937281+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:00:17.861329+00:00",
+   "resolved": "2026-11-13T01:00:17.989880+00:00",
+   "detail": "runtime restored by verified replay of 308 steps (digest 8b24218aeb35)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:44:32.343591+00:00",
+   "resolved": "2026-11-13T00:44:32.358660+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:44:21.269530+00:00",
+   "resolved": "2026-11-13T00:44:32.370596+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:43:30.130343+00:00",
+   "resolved": "2026-11-13T00:43:30.144788+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [37708, 30168] left by a previous supervisor"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T21:00:21.774220+00:00",
+   "resolved": "2026-11-12T21:00:21.881336+00:00",
+   "detail": "runtime restored by verified replay of 304 steps (digest 2a6f88718bd8)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:16:00.938373+00:00",
+   "resolved": "2026-11-12T20:16:00.944844+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:15:49.861032+00:00",
+   "resolved": "2026-11-12T20:16:00.953305+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:12:53.556679+00:00",
+   "resolved": "2026-11-12T20:12:53.564855+00:00",
+   "detail": "service healthy again after 1 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:12:52.470501+00:00",
+   "resolved": "2026-11-12T20:12:53.578839+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T18:00:19.097621+00:00",
+   "resolved": "2026-11-12T18:00:19.250918+00:00",
+   "detail": "runtime restored by verified replay of 301 steps (digest f67c06915e74)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.319785+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T17:02:32.880966+00:00",
+   "detail": "runtime restored by verified replay of 300 steps (digest 6798fb36f634)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.346573+00:00",
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.340377+00:00",
+   "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.334052+00:00",
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.328671+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.323523+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  }
+ ],
+ "availability": {
+  "window_seconds": 54452.248234,
+  "samples": 3411,
+  "available_seconds": 33923.75277,
+  "unavailable_seconds": 172.526022,
+  "unmonitored_seconds": 20350.394623000004,
+  "service_availability": 0.6230000389371986,
+  "monitored_fraction": 0.6262708100582481,
+  "feed_outage_intervals": {
+   "OKX": [
+    {
+     "start": "2026-11-12T20:14:39.779619+00:00",
+     "end": "2026-11-12T20:14:49.790939+00:00",
+     "seconds": 10.01132
+    },
+    {
+     "start": "2026-11-12T20:15:50.917586+00:00",
+     "end": "2026-11-12T20:16:00.927629+00:00",
+     "seconds": 10.010043
+    },
+    {
+     "start": "2026-11-13T00:38:22.389261+00:00",
+     "end": "2026-11-13T00:38:32.401492+00:00",
+     "seconds": 10.012231
+    },
+    {
+     "start": "2026-11-13T00:43:31.211487+00:00",
+     "end": "2026-11-13T00:43:41.223475+00:00",
+     "seconds": 10.011988
+    },
+    {
+     "start": "2026-11-13T00:44:22.315783+00:00",
+     "end": "2026-11-13T00:44:32.325916+00:00",
+     "seconds": 10.010133
+    },
+    {
+     "start": "2026-11-13T00:46:48.083385+00:00",
+     "end": "2026-11-13T00:46:58.096899+00:00",
+     "seconds": 10.013514
+    },
+    {
+     "start": "2026-11-13T01:12:50.897573+00:00",
+     "end": "2026-11-13T01:13:00.907520+00:00",
+     "seconds": 10.009947
+    },
+    {
+     "start": "2026-11-13T01:14:47.996671+00:00",
+     "end": "2026-11-13T01:14:58.011726+00:00",
+     "seconds": 10.015055
+    },
+    {
+     "start": "2026-11-13T03:00:16.521001+00:00",
+     "end": null,
+     "seconds": null
+    }
+   ],
+   "BINANCE": [
+    {
+     "start": "2026-11-12T20:14:39.779619+00:00",
+     "end": "2026-11-12T20:14:49.790939+00:00",
+     "seconds": 10.01132
+    },
+    {
+     "start": "2026-11-12T20:15:50.917586+00:00",
+     "end": "2026-11-12T20:16:00.927629+00:00",
+     "seconds": 10.010043
+    },
+    {
+     "start": "2026-11-13T00:38:22.389261+00:00",
+     "end": "2026-11-13T00:38:32.401492+00:00",
+     "seconds": 10.012231
+    },
+    {
+     "start": "2026-11-13T00:43:31.211487+00:00",
+     "end": "2026-11-13T00:43:41.223475+00:00",
+     "seconds": 10.011988
+    },
+    {
+     "start": "2026-11-13T00:44:22.315783+00:00",
+     "end": "2026-11-13T00:44:32.325916+00:00",
+     "seconds": 10.010133
+    },
+    {
+     "start": "2026-11-13T00:46:48.083385+00:00",
+     "end": "2026-11-13T00:46:58.096899+00:00",
+     "seconds": 10.013514
+    },
+    {
+     "start": "2026-11-13T01:12:50.897573+00:00",
+     "end": "2026-11-13T01:13:00.907520+00:00",
+     "seconds": 10.009947
+    },
+    {
+     "start": "2026-11-13T01:14:47.996671+00:00",
+     "end": "2026-11-13T01:14:58.011726+00:00",
+     "seconds": 10.015055
+    },
+    {
+     "start": "2026-11-13T03:08:50.064722+00:00",
+     "end": "2026-11-13T03:09:00.084020+00:00",
+     "seconds": 10.019298
+    },
+    {
+     "start": "2026-11-13T03:17:03.131954+00:00",
+     "end": "2026-11-13T03:17:35.408850+00:00",
+     "seconds": 32.276896
+    },
+    {
+     "start": "2026-11-13T05:07:52.237672+00:00",
+     "end": "2026-11-13T05:18:52.664313+00:00",
+     "seconds": 660.426641
+    },
+    {
+     "start": "2026-11-13T05:20:08.296601+00:00",
+     "end": "2026-11-13T05:29:47.203520+00:00",
+     "seconds": 578.906919
+    },
+    {
+     "start": "2026-11-13T05:39:19.118448+00:00",
+     "end": "2026-11-13T05:41:45.387993+00:00",
+     "seconds": 146.269545
+    },
+    {
+     "start": "2026-11-13T05:48:16.404215+00:00",
+     "end": "2026-11-13T05:49:32.670218+00:00",
+     "seconds": 76.266003
+    },
+    {
+     "start": "2026-11-13T05:55:22.248084+00:00",
+     "end": "2026-11-13T05:55:32.271201+00:00",
+     "seconds": 10.023117
+    },
+    {
+     "start": "2026-11-13T05:59:17.707538+00:00",
+     "end": "2026-11-13T05:59:27.732371+00:00",
+     "seconds": 10.024833
+    },
+    {
+     "start": "2026-11-13T06:40:50.234043+00:00",
+     "end": "2026-11-13T06:41:00.258808+00:00",
+     "seconds": 10.024765
+    },
+    {
+     "start": "2026-11-13T06:41:11.411019+00:00",
+     "end": "2026-11-13T06:41:21.430624+00:00",
+     "seconds": 10.019605
+    },
+    {
+     "start": "2026-11-13T06:44:52.172325+00:00",
+     "end": "2026-11-13T06:45:02.215602+00:00",
+     "seconds": 10.043277
+    }
+   ]
+  },
+  "feed_fresh_fraction": {
+   "BINANCE": 0.9778757143674874,
+   "OKX": 0.5930735348381939
+  },
+  "downtime_episodes": [
+   {
+    "start": "2026-11-12T20:14:39.779619+00:00",
+    "end": "2026-11-12T20:14:49.790939+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.01132
+   },
+   {
+    "start": "2026-11-12T20:15:50.917586+00:00",
+    "end": "2026-11-12T20:16:00.927629+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.010043
+   },
+   {
+    "start": "2026-11-13T00:38:22.389261+00:00",
+    "end": "2026-11-13T00:38:32.401492+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.012231
+   },
+   {
+    "start": "2026-11-13T00:43:31.211487+00:00",
+    "end": "2026-11-13T00:43:41.223475+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.011988
+   },
+   {
+    "start": "2026-11-13T00:44:22.315783+00:00",
+    "end": "2026-11-13T00:44:32.325916+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.010133
+   },
+   {
+    "start": "2026-11-13T00:46:48.083385+00:00",
+    "end": "2026-11-13T00:46:58.096899+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.013514
+   },
+   {
+    "start": "2026-11-13T01:12:50.897573+00:00",
+    "end": "2026-11-13T01:13:00.907520+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.009947
+   },
+   {
+    "start": "2026-11-13T01:14:47.996671+00:00",
+    "end": "2026-11-13T01:14:58.011726+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.015055
+   },
+   {
+    "start": "2026-11-13T03:00:16.521001+00:00",
+    "end": "2026-11-13T03:01:42.908627+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 86.387626
+   },
+   {
+    "start": "2026-11-13T03:08:50.064722+00:00",
+    "end": "2026-11-13T03:09:00.084020+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.019298
+   },
+   {
+    "start": "2026-11-13T03:17:03.131954+00:00",
+    "end": "2026-11-13T03:17:35.408850+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 32.276896
+   },
+   {
+    "start": "2026-11-13T05:17:34.067461+00:00",
+    "end": "2026-11-13T05:29:47.203520+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 733.136059
+   },
+   {
+    "start": "2026-11-13T05:39:19.118448+00:00",
+    "end": "2026-11-13T05:41:45.387993+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 146.269545
+   },
+   {
+    "start": "2026-11-13T05:48:16.404215+00:00",
+    "end": "2026-11-13T05:49:32.670218+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 76.266003
+   },
+   {
+    "start": "2026-11-13T05:55:22.248084+00:00",
+    "end": "2026-11-13T05:55:32.271201+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.023117
+   },
+   {
+    "start": "2026-11-13T05:59:17.707538+00:00",
+    "end": "2026-11-13T05:59:27.732371+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.024833
+   },
+   {
+    "start": "2026-11-13T06:40:50.234043+00:00",
+    "end": "2026-11-13T06:41:00.258808+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.024765
+   },
+   {
+    "start": "2026-11-13T06:41:11.411019+00:00",
+    "end": "2026-11-13T06:41:21.430624+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.019605
+   },
+   {
+    "start": "2026-11-13T06:44:52.172325+00:00",
+    "end": "2026-11-13T06:45:02.215602+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.043277
+   }
+  ]
+ },
+ "queue": {
+  "counts": {
+   "DONE": 914
+  },
+  "backlog": 0,
+  "dead": 0,
+  "oldest_runnable_age_s": null
+ },
+ "workers_seen": [
+  {
+   "id": "worker-6212",
+   "started": "2026-11-12 16:21:14.832534+00:00",
+   "last_heartbeat": "2026-11-12 16:21:55.156103+00:00"
+  },
+  {
+   "id": "worker-4432",
+   "started": "2026-11-12 16:22:12.795191+00:00",
+   "last_heartbeat": "2026-11-12 16:36:11.839255+00:00"
+  },
+  {
+   "id": "worker-37820",
+   "started": "2026-11-12 16:45:29.342057+00:00",
+   "last_heartbeat": "2026-11-12 17:01:29.175597+00:00"
+  },
+  {
+   "id": "worker-41164",
+   "started": "2026-11-12 17:01:37.220935+00:00",
+   "last_heartbeat": "2026-11-12 17:03:33.542490+00:00"
+  },
+  {
+   "id": "worker-35724",
+   "started": "2026-11-12 17:03:43.868313+00:00",
+   "last_heartbeat": "2026-11-12 20:11:12.289622+00:00"
+  },
+  {
+   "id": "worker-45852",
+   "started": "2026-11-12 20:11:23.656535+00:00",
+   "last_heartbeat": "2026-11-12 20:12:49.371405+00:00"
+  },
+  {
+   "id": "worker-45716",
+   "started": "2026-11-12 20:12:54.724747+00:00",
+   "last_heartbeat": "2026-11-12 20:14:30.500476+00:00"
+  },
+  {
+   "id": "worker-29080",
+   "started": "2026-11-12 20:14:40.750139+00:00",
+   "last_heartbeat": "2026-11-12 20:15:41.602124+00:00"
+  },
+  {
+   "id": "worker-37020",
+   "started": "2026-11-12 20:15:51.945524+00:00",
+   "last_heartbeat": "2026-11-13 00:38:14.977165+00:00"
+  },
+  {
+   "id": "worker-30168",
+   "started": "2026-11-13 00:38:23.544582+00:00",
+   "last_heartbeat": "2026-11-13 00:43:26.737360+00:00"
+  },
+  {
+   "id": "worker-39532",
+   "started": "2026-11-13 00:43:32.309403+00:00",
+   "last_heartbeat": "2026-11-13 00:44:12.629962+00:00"
+  },
+  {
+   "id": "worker-34480",
+   "started": "2026-11-13 00:44:23.451869+00:00",
+   "last_heartbeat": "2026-11-13 00:46:39.875862+00:00"
+  },
+  {
+   "id": "worker-35908",
+   "started": "2026-11-13 00:46:49.098921+00:00",
+   "last_heartbeat": "2026-11-13 01:12:42.294030+00:00"
+  },
+  {
+   "id": "worker-43580",
+   "started": "2026-11-13 01:12:52.019009+00:00",
+   "last_heartbeat": "2026-11-13 01:14:22.741935+00:00"
+  },
+  {
+   "id": "worker-36372",
+   "started": "2026-11-13 01:14:49.202370+00:00",
+   "last_heartbeat": "2026-11-13 03:08:45.075727+00:00"
+  },
+  {
+   "id": "worker-36848",
+   "started": "2026-11-13 03:08:53.749919+00:00",
+   "last_heartbeat": "2026-11-13 03:16:50.834881+00:00"
+  },
+  {
+   "id": "worker-48848",
+   "started": "2026-11-13 03:17:31.881807+00:00",
+   "last_heartbeat": "2026-11-13 05:15:52.099824+00:00"
+  },
+  {
+   "id": "worker-36588",
+   "started": "2026-11-13 05:18:53.385366+00:00",
+   "last_heartbeat": "2026-11-13 05:18:53.385366+00:00"
+  },
+  {
+   "id": "worker-40628",
+   "started": "2026-11-13 05:29:20.724546+00:00",
+   "last_heartbeat": "2026-11-13 05:32:55.923302+00:00"
+  },
+  {
+   "id": "worker-33800",
+   "started": "2026-11-13 05:41:35.184570+00:00",
+   "last_heartbeat": "2026-11-13 05:47:09.966955+00:00"
+  },
+  {
+   "id": "worker-46036",
+   "started": "2026-11-13 05:49:11.195179+00:00",
+   "last_heartbeat": "2026-11-13 05:55:18.110200+00:00"
+  },
+  {
+   "id": "worker-46156",
+   "started": "2026-11-13 05:55:26.404819+00:00",
+   "last_heartbeat": "2026-11-13 05:55:56.961459+00:00"
+  },
+  {
+   "id": "worker-23676",
+   "started": "2026-11-13 05:59:23.973556+00:00",
+   "last_heartbeat": "2026-11-13 06:39:57.562530+00:00"
+  },
+  {
+   "id": "worker-42052",
+   "started": "2026-11-13 06:40:54.890858+00:00",
+   "last_heartbeat": "2026-11-13 06:41:05.063198+00:00"
+  },
+  {
+   "id": "worker-46792",
+   "started": "2026-11-13 06:41:18.437728+00:00",
+   "last_heartbeat": "2026-11-13 06:44:47.314938+00:00"
+  },
+  {
+   "id": "worker-46748",
+   "started": "2026-11-13 06:44:57.444574+00:00",
+   "last_heartbeat": "2026-11-13 07:28:27.892649+00:00"
+  }
+ ],
+ "feed_status": [
+  {
+   "venue": "BINANCE",
+   "state": "CONNECTED",
+   "source": "LIVE",
+   "reason": "",
+   "reconnects": 0,
+   "since": "2026-11-12T16:21:14.188856+00:00",
+   "last_event_at": "2026-11-13T07:28:28.459305+00:00",
+   "last_event_age_s": 4.325518,
+   "clock_offset_ms": -1170,
+   "connection_id": "svc-461cdf1c59"
+  },
+  {
+   "venue": "OKX",
+   "state": "DISABLED",
+   "source": "DISABLED",
+   "reason": "ConnectError: All connection attempts failed",
+   "reconnects": 0,
+   "since": "2026-11-12T16:21:14.770743+00:00",
+   "last_event_at": "2026-11-13T03:00:18.092252+00:00",
+   "last_event_age_s": 16094.692571,
+   "clock_offset_ms": -924,
+   "connection_id": "svc-461cdf1c59"
+  }
+ ]
+}
