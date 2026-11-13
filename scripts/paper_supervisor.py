@@ -165,7 +165,7 @@ def kill_orphan_services() -> list[int]:
     """A previous supervisor that died abruptly may have left its service child running. Only
     processes whose command line contains `asta.paper_service` are terminated (ASTA-specific)."""
     ps = (
-        "Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'asta\.paper_service' }"
+        r"Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -match 'asta\.paper_service' }"
         " | ForEach-Object { $_.ProcessId }"
     )
     r = subprocess.run(  # noqa: S603,S607
