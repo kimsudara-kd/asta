@@ -11,10 +11,12 @@ export default function Shell({ children }: { children: ReactNode }) {
   const halted = risk.data?.halt_new_buys ?? false;
 
   async function logout() {
-    if (!me.data) return;
+    // Root cause of the intermittent e2e failure: a click before /v1/auth/me had loaded was a silent
+    // no-op. Fetch the principal on demand so Sign out always works.
+    const principal = me.data ?? (await api<{ csrf_token: string }>("/v1/auth/me"));
     await api("/v1/auth/logout", {
       method: "POST",
-      headers: { "X-CSRF-Token": me.data.csrf_token },
+      headers: { "X-CSRF-Token": principal.csrf_token },
     });
     window.location.href = "/login";
   }

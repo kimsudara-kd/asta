@@ -133,6 +133,17 @@ def test_unverifiable_venue_is_disabled_with_a_reason_and_never_bypassed(factory
             .where(MarketRulesVersion.venue == "OKX")
         ).scalar_one()
     assert n_rules == 0 and okx.streams == 0  # no stream was even attempted for the disabled venue
+    with factory() as db:
+        from asta.db.models import Incident
+
+        inc = db.execute(
+            select(Incident).where(Incident.dedupe_key == "venue-disabled:OKX")
+        ).scalar_one()
+        assert (
+            inc.kind == "VENUE_DISABLED"
+            and "simulated network block" in inc.detail
+            and inc.resolved_at is None
+        )
     assert svc.enabled["OKX"] and not svc.enabled["BINANCE"]
 
 

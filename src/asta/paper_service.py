@@ -110,6 +110,7 @@ class PaperService:
                 raise RuntimeError("public instrument rules incomplete or not trading")
             await self._db(self._store_rules, venue, rules, t)
             self.enabled[venue] = ""
+            await self._db(ops.resolve_incident, f"venue-disabled:{venue}", "service")
             await self._db(
                 set_feed_state,
                 venue,
@@ -121,6 +122,17 @@ class PaperService:
         except Exception as exc:  # noqa: BLE001 - recorded as the disable reason
             reason = f"{type(exc).__name__}: {exc}"[:300]
             self.enabled[venue] = reason
+            await self._db(
+                lambda db: ops.open_incident(
+                    db,
+                    "VENUE_DISABLED",
+                    ops.SEV_WARN,
+                    f"{venue} feed suspended (verification failed, entries isolated): {reason}",
+                    f"venue-disabled:{venue}",
+                    None,
+                    venue,
+                )
+            )
             await self._db(
                 set_feed_state, venue, "DISABLED", "DISABLED", reason, self.connection_id
             )

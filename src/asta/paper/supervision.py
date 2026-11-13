@@ -75,6 +75,8 @@ def summarize(
     feed_seen: dict[str, float] = {}
     episodes: list[dict[str, Any]] = []
     cur: dict[str, Any] | None = None
+    feed_out: dict[str, dict[str, Any]] = {}
+    feed_intervals: dict[str, list[dict[str, Any]]] = {}
     prev_end = since
     max_gap = 3 * interval_s
     for i, s in enumerate(win):
@@ -108,6 +110,13 @@ def summarize(
             feed_seen[v] = feed_seen.get(v, 0.0) + dur
             if ok:
                 feed_fresh[v] = feed_fresh.get(v, 0.0) + dur
+                if v in feed_out:  # outage over
+                    o = feed_out.pop(v)
+                    o["end"] = s.ts.isoformat()
+                    o["seconds"] = (s.ts - datetime.fromisoformat(o["start"])).total_seconds()
+                    feed_intervals.setdefault(v, []).append(o)
+            elif v not in feed_out:
+                feed_out[v] = {"start": s.ts.isoformat(), "end": None, "seconds": None}
         prev_end = nxt
     if not win:
         unmon = total
@@ -125,6 +134,10 @@ def summarize(
         "unmonitored_seconds": unmon,
         "service_availability": (avail / total) if total else 0.0,
         "monitored_fraction": 1 - (unmon / total) if total else 0.0,
+        "feed_outage_intervals": {
+            v: feed_intervals.get(v, []) + ([feed_out[v]] if v in feed_out else [])
+            for v in set(feed_seen)
+        },
         "feed_fresh_fraction": {
             v: (feed_fresh.get(v, 0.0) / feed_seen[v]) if feed_seen.get(v) else 0.0
             for v in feed_seen

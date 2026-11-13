@@ -596,3 +596,33 @@ def test_a_risk_halt_persists_across_a_worker_restart_and_is_never_auto_resumed(
             )
         ]
     assert log[-1] == "RISK_HALTED" and "RUNNING" not in log[log.index("RISK_HALTED") + 1 :]
+
+
+def test_a_manual_pause_persists_across_a_worker_restart_and_creates_no_orders(factory):
+    sid = new_session(factory)
+    enqueue_steps(factory, sid, 0, 340)
+    w1 = late_ok_worker(factory)
+    drain_steps(w1, factory, sid, 330)
+    with factory() as db:  # operator pauses (same audited transition the API uses)
+        store.transition(db, sid, SessionState.PAUSED, "operator", "manual pause")
+        db.commit()
+        before = db.execute(
+            text("select count(*) from strategy_signals where session_id=:s"), {"s": str(sid)}
+        ).scalar_one()
+    w2 = late_ok_worker(factory)  # restart
+    drain_steps(w2, factory, sid, 340)
+    with factory() as db:
+        assert store.get_session(db, sid).state == "PAUSED"  # never auto-resumed
+        after = db.execute(
+            text("select count(*) from strategy_signals where session_id=:s"), {"s": str(sid)}
+        ).scalar_one()
+        muted = db.execute(
+            select(func.count())
+            .select_from(PaperStepInput)
+            .where(
+                PaperStepInput.session_id == sid,
+                PaperStepInput.step_seq >= 330,
+                PaperStepInput.strategy_active.is_(False),
+            )
+        ).scalar_one()
+    assert after == before and muted == 10 and cursor(factory, sid) == 339

@@ -68,3 +68,22 @@ def test_expected_candles_and_json_roundtrip():
     assert expected_candles(T0, T0 + timedelta(hours=2)) == 120
     smp = run("A")[0]
     assert Sample.from_json(smp.to_json()) == smp
+
+
+def test_per_venue_outage_intervals_are_reported_separately_from_service_availability():
+    samples = []
+    for i in range(30):
+        samples.append(
+            Sample(
+                T0 + timedelta(seconds=i * 10),
+                True,
+                True,
+                True,
+                {"BINANCE": True, "OKX": not (10 <= i < 20)},
+            )
+        )
+    s = summarize(samples, T0, T0 + timedelta(seconds=290))
+    assert s["service_availability"] > 0.95  # the service itself was fine
+    ivs = s["feed_outage_intervals"]
+    assert ivs["BINANCE"] == [] and len(ivs["OKX"]) == 1 and ivs["OKX"][0]["seconds"] == 100
+    assert s["feed_fresh_fraction"]["OKX"] < s["feed_fresh_fraction"]["BINANCE"]

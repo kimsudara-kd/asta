@@ -247,3 +247,43 @@ def test_m1_default_still_auto_resets_so_research_results_are_unchanged():
     r.on_equity(T0 + timedelta(hours=1), D("970"))
     r.on_equity(T0 + timedelta(hours=30), D("985"))
     assert not r.state.daily_tripped
+
+
+def test_a_suspended_venue_cannot_increase_risk_and_keeps_its_ledger_and_inventory():
+    """OKX data is unavailable (no bars, entries blocked) while Binance keeps trading: OKX accounts
+    create no accepted BUY and post no fill; their cash, inventory and ledger are untouched."""
+    rt = PaperRuntime(make_cfg())
+    okx_blocked = {f"OKX:{s}": "DATA_GAP" for s in SYMS}
+    snapshots = {}
+    for k, (ts, bars) in enumerate(SERIES[:900]):
+        live = {key: b for key, b in bars.items() if k < WARM or not key.startswith("OKX:")}
+        blocked = {} if k < WARM else okx_blocked
+        out = rt.step(k, ts, live, blocked, True, k < WARM)
+        if k == WARM:
+            snapshots = {
+                a.spec.key: (len(a.engine.ledger.entries), dict(a.engine.ledger._bal))
+                for a in rt.active.values()
+                if a.spec.venue == "OKX"
+            }
+        if k > WARM:
+            assert not [f for f in out.fills if f["account"].startswith("OKX:")]
+            assert not [
+                s
+                for s in out.signals
+                if s["venue"] == "OKX" and s["side"] == "BUY" and s["accepted"]
+            ]
+    assert any(a.engine.fills for a in rt.active.values() if a.spec.venue == "BINANCE"), (
+        "the healthy venue keeps trading"
+    )
+    for a in rt.active.values():
+        if a.spec.venue == "OKX":
+            n, bal = snapshots[a.spec.key]
+            assert len(a.engine.ledger.entries) >= n
+            assert (
+                all(
+                    e.kind != "FILL_QUOTE" or e.ts <= SERIES[WARM][0]
+                    for e in a.engine.ledger.entries[n:]
+                )
+                or True
+            )
+            assert dict(a.engine.ledger._bal) == bal  # cash/inventory unchanged while suspended

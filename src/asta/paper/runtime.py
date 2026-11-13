@@ -126,7 +126,12 @@ class SubAccount:
 
     # ---- extraction
     def extract(
-        self, rows: StepRows, step_ts: datetime, persist_money: bool, persist_orders: bool
+        self,
+        rows: StepRows,
+        step_ts: datetime,
+        persist_money: bool,
+        persist_orders: bool,
+        persist_balances: bool,
     ) -> None:
         eng, led, venue = self.engine, self.engine.ledger, self.spec.venue
         assert led is not None
@@ -204,7 +209,10 @@ class SubAccount:
                     }
                 )
             assets = {self.cfg.quote_asset} | {s.split("-")[0] for s in eng.cfg.symbols}
-            for a in sorted(assets if (persist_orders or rows.ledger or rows.fills) else ()):
+            # balances (with their marks) are re-emitted on EVERY live step, also when strategies are
+            # muted (paused/late): the equity snapshot is marked each step and reconciliation
+            # compares it with balances x marks
+            for a in sorted(assets if (persist_balances or rows.ledger or rows.fills) else ()):
                 pos = led.positions.get(a)
                 rows.balances.append(
                     {
@@ -321,6 +329,7 @@ class PaperRuntime:
                 ts,
                 persist_money=counts,
                 persist_orders=counts and not warm and strategy_active,
+                persist_balances=counts and not warm,
             )
         # shared risk events (global)
         for e in self.risk.state.events[self._risk_cursor :]:
