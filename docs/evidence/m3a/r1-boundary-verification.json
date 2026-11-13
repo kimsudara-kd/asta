@@ -1,0 +1,78 @@
+{
+ "started": "2026-11-13T09:04:15Z",
+ "baseline": {
+  "negative_tests": {
+   "total": 78,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "compromised_proxy_tests": {
+   "total": 39,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "drop_counters": {
+   "counter packets 20 bytes 1200": "counter packets 20 bytes 1200 drop",
+   "counter packets 108 bytes 6462": "counter packets 108 bytes 6462 drop",
+   "counter packets 0 bytes 0": "counter packets 0 bytes 0 drop"
+  }
+ },
+ "proxy_restart_healthy": true,
+ "after_proxy_restart": {
+  "negative_tests": {
+   "total": 78,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "compromised_proxy_tests": {
+   "total": 39,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "drop_counters": {
+   "counter packets 30 bytes 1800": "counter packets 30 bytes 1800 drop",
+   "counter packets 162 bytes 9693": "counter packets 162 bytes 9693 drop",
+   "counter packets 0 bytes 0": "counter packets 0 bytes 0 drop"
+  }
+ },
+ "proxy_state_right_after_gate_restart": "2/socket.py\", line 850, in create_connection\n    sock.connect(sa)\nConnectionRefusedError: [Errno 111] Connection refused",
+ "gate_restart_healthy": true,
+ "after_gate_restart": {
+  "negative_tests": {
+   "total": 78,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "compromised_proxy_tests": {
+   "total": 39,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "drop_counters": {
+   "counter packets 10 bytes 600": "counter packets 10 bytes 600 drop",
+   "counter packets 54 bytes 3231": "counter packets 54 bytes 3231 drop",
+   "counter packets 0 bytes 0": "counter packets 0 bytes 0 drop"
+  }
+ },
+ "gate_stopped_probe_result": "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nsocket.gaierror: [Errno -3] Temporary failure in name resolution",
+ "recovered_healthy": true,
+ "after_recovery": {
+  "negative_tests": {
+   "total": 78,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "compromised_proxy_tests": {
+   "total": 39,
+   "failed": 0,
+   "failed_tests": []
+  },
+  "drop_counters": {
+   "counter packets 10 bytes 600": "counter packets 10 bytes 600 drop",
+   "counter packets 54 bytes 3231": "counter packets 54 bytes 3231 drop",
+   "counter packets 0 bytes 0": "counter packets 0 bytes 0 drop"
+  }
+ },
+ "probe_after_recovery": "HTTP/1.1 200 Connection Established",
+ "all_passed": true
+}

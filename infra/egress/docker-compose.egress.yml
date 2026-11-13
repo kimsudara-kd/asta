@@ -1,10 +1,17 @@
-# ASTA protected execution boundary (M3A-1). Own compose project; touches no other project's
-# containers or networks. No ports are published to the host. No exchange credentials exist here.
+# ASTA protected execution boundary (M3A-1, hardened in M3A-R1). Own compose project; touches no
+# other project's containers or networks. No ports are published to the host. No exchange
+# credentials exist here.
 #
-#   protected runtime  --(internal network, NO route out)-->  egress proxy  --(egress bridge)--> Internet
+#   protected runtime --(internal net, NO route out)--> [egress-gate netns: proxy + netfilter + DNS] --> Internet
 #
-# `asta_protected` is a Docker *internal* network: containers on it have no gateway and no
-# NAT, so a process that ignores the proxy cannot reach anything outside the network.
+# * asta_protected is a Docker *internal* network: no gateway, no NAT.
+# * The proxy shares the network namespace of egress-gate (network_mode: service:...). That namespace
+#   carries kernel netfilter rules owned by the gate container (the only one with NET_ADMIN): OUTPUT
+#   default DROP, only TCP to addresses that allowlisted names resolved to, only on allowlisted
+#   ports; IPv6 fully dropped; DNS only for allowlisted names. These rules bind the proxy process
+#   independently of the proxy's own code. If the gate dies the proxy has no network (fail closed).
+# * This is NOT a dedicated VM: the gate shares the Docker Desktop kernel/VM with every other project
+#   (finding F-02 stays OPEN; see docs/m3a/VM-BOUNDARY-DESIGN.md).
 name: asta-egress
 
 networks:
@@ -13,10 +20,16 @@ networks:
     driver: bridge
     internal: true
     enable_ipv6: false
+    ipam:
+      config:
+        - subnet: 172.31.250.0/24
   asta_egress:
     name: asta_egress
     driver: bridge
     enable_ipv6: false
+    ipam:
+      config:
+        - subnet: 172.31.251.0/24
 
 x-hardening: &hardening
   read_only: true
@@ -29,12 +42,42 @@ x-hardening: &hardening
     - /tmp:rw,noexec,nosuid,size=16m
 
 services:
+  egress-gate:
+    <<: *hardening
+    build:
+      context: ./gate
+    image: asta-egress-gate:1
+    container_name: asta-egress-gate
+    restart: unless-stopped
+    # the ONLY container with network administration, and only inside its own namespace
+    cap_add: [NET_ADMIN, NET_BIND_SERVICE, SETUID, SETGID]
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+      - /run:rw,nosuid,size=4m
+    environment:
+      ASTA_EGRESS_PROFILE: ${ASTA_EGRESS_PROFILE:-runtime}
+      PROTECTED_SUBNET: 172.31.250.0/24
+    volumes:
+      - ./allowlist.json:/etc/asta-egress/allowlist.json:ro
+    networks:
+      asta_protected:
+        ipv4_address: 172.31.250.2
+        aliases: [asta-egress-proxy]
+      asta_egress:
+        ipv4_address: 172.31.251.2
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/gate-healthcheck.sh"]
+      interval: 10s
+      timeout: 4s
+      retries: 3
+
   egress-proxy:
     <<: *hardening
     image: python:3.12-slim
     container_name: asta-egress-proxy
     restart: unless-stopped
     user: "65534:65534"
+    network_mode: "service:egress-gate"
     command: ["python", "-u", "/app/proxy.py"]
     environment:
       ASTA_EGRESS_PROFILE: ${ASTA_EGRESS_PROFILE:-runtime}
@@ -42,9 +85,10 @@ services:
     volumes:
       - ./proxy.py:/app/proxy.py:ro
       - ./allowlist.json:/etc/asta-egress/allowlist.json:ro
-    networks:
-      asta_protected:
-      asta_egress:
+      - ./gate/resolv.conf:/etc/resolv.conf:ro
+    depends_on:
+      egress-gate:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 3128), 3).close()"]
       interval: 10s
@@ -72,4 +116,23 @@ services:
       asta_protected:
     depends_on:
       egress-proxy:
+        condition: service_healthy
+
+  # Test-only (profile "lab"): simulates a COMPROMISED proxy. It is unprivileged, shares the proxy's
+  # network namespace and runs attacker-style attempts; the kernel rules must still hold.
+  compromised-proxy-sim:
+    <<: *hardening
+    image: python:3.12-slim
+    container_name: asta-compromised-proxy-sim
+    profiles: ["lab"]
+    user: "65534:65534"
+    network_mode: "service:egress-gate"
+    command: ["sleep", "infinity"]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ./gate_tests.py:/app/gate_tests.py:ro
+      - ./gate/resolv.conf:/etc/resolv.conf:ro
+    depends_on:
+      egress-gate:
         condition: service_healthy

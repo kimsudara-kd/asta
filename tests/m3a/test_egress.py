@@ -164,6 +164,8 @@ def test_compose_hardening_is_declared():
             "compose",
             "-f",
             str(EGRESS / "docker-compose.egress.yml"),
+            "--profile",
+            "lab",
             "config",
             "--format",
             "json",
@@ -178,7 +180,7 @@ def test_compose_hardening_is_declared():
     assert not cfg["networks"]["asta_egress"].get("enable_ipv6")
     for name, svc in cfg["services"].items():
         assert not svc.get("privileged"), name
-        assert svc.get("network_mode") in (None, "bridge"), name
+        assert svc.get("network_mode") in (None, "bridge", "service:egress-gate"), name
         assert svc["read_only"] is True, name
         assert svc["cap_drop"] == ["ALL"], name
         assert "no-new-privileges:true" in svc["security_opt"], name
@@ -187,7 +189,16 @@ def test_compose_hardening_is_declared():
             assert "docker.sock" not in v["source"], name
             assert v["read_only"] is True, (name, v)
     assert set(cfg["services"]["protected-probe"]["networks"]) == {"asta_protected"}
-    assert set(cfg["services"]["egress-proxy"]["networks"]) == {"asta_protected", "asta_egress"}
+    # the proxy (and the compromised-proxy simulator) live INSIDE the gate's network namespace
+    gate = cfg["services"]["egress-gate"]
+    assert set(gate["networks"]) == {"asta_protected", "asta_egress"}
+    assert sorted(gate["cap_add"]) == ["NET_ADMIN", "NET_BIND_SERVICE", "SETGID", "SETUID"]
+    for name in ("egress-proxy", "compromised-proxy-sim", "protected-probe"):
+        assert not cfg["services"][name].get("cap_add"), f"{name} must hold no capabilities"
+    for name in ("egress-proxy", "compromised-proxy-sim"):
+        assert cfg["services"][name]["network_mode"] == "service:egress-gate"
+        assert cfg["services"][name]["user"] == "65534:65534"
+    assert cfg["networks"]["asta_protected"]["ipam"]["config"][0]["subnet"] == "172.31.250.0/24"
 
 
 def _container_running(name: str) -> bool:
@@ -211,3 +222,42 @@ def test_negative_tests_pass_from_inside_the_protected_container():
     out = json.loads(r.stdout)
     failed = [x for x in out["results"] if not x["pass"]]
     assert out["total"] >= 70 and not failed, failed
+
+
+def test_gate_rules_are_default_deny_and_version_controlled():
+    text = (EGRESS / "gate" / "entrypoint.sh").read_text(encoding="utf-8")
+    assert text.count("policy drop;") == 3  # input, output, forward
+    assert "ip daddr @allowed_dst tcp dport" in text
+    assert "flush ruleset" not in text.replace(
+        "# only OUR table", ""
+    )  # never flush Docker's own rules
+    assert "tcp dport 3128 accept" in text and "$PROTECTED_SUBNET" in text
+    assert "udp" not in text.split("chain output")[1].split("chain forward")[0]  # no UDP egress
+    # only public unicast addresses may become allowed destinations
+    for private in ("127.*", "10.*", "169.254.*", "192.168.*", "172.1[6-9].*", "100.6[4-9].*"):
+        assert private in text, private
+
+
+@needs_docker
+def test_kernel_rules_and_compromised_proxy_checks_inside_the_gate_namespace():
+    for c in ("asta-egress-gate", "asta-compromised-proxy-sim"):
+        if not _container_running(c):
+            pytest.skip(f"{c} not running (see docs/m3a/EGRESS-ENFORCEMENT.md)")
+    env = {**__import__("os").environ, "MSYS_NO_PATHCONV": "1"}
+    rules = subprocess.run(
+        ["docker", "exec", "asta-egress-gate", "nft", "list", "table", "inet", "asta"],
+        capture_output=True,
+        text=True,
+        env=env,
+    ).stdout
+    assert rules.count("policy drop") == 3
+    r = subprocess.run(
+        ["docker", "exec", "asta-compromised-proxy-sim", "python", "/app/gate_tests.py"],
+        capture_output=True,
+        text=True,
+        timeout=600,
+        env=env,
+    )
+    out = json.loads(r.stdout)
+    failed = [x for x in out["results"] if not x["pass"]]
+    assert out["total"] >= 35 and not failed, failed

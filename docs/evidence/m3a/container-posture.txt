@@ -1,3 +1,5 @@
 /asta-egress-proxy privileged=false readonly=true capdrop=[ALL] secopt=[no-new-privileges:true] pids=128 mem=268435456 netmode=asta_egress user=65534:65534 ports=map[] restart=unless-stopped networks=asta_egress asta_protected  mounts=E:\Dev\asta\infra\egress\proxy.py->/app/proxy.py(false) E:\Dev\asta\infra\egress\allowlist.json->/etc/asta-egress/allowlist.json(false) 
 /asta-protected-probe privileged=false readonly=true capdrop=[ALL] secopt=[no-new-privileges:true] pids=128 mem=268435456 netmode=asta_protected user=65534:65534 ports=map[] restart=unless-stopped networks=asta_protected  mounts=E:\Dev\asta\infra\egress\negative_tests.py->/app/negative_tests.py(false) E:\Dev\asta\infra\egress\capability_probe.py->/app/capability_probe.py(false) 
 internal=true ipv6=false containers=asta-protected-probe asta-egress-proxy 
+caps_add=[CAP_NET_ADMIN CAP_NET_BIND_SERVICE CAP_SETGID CAP_SETUID] capdrop=[ALL] ro=true priv=false
+netmode=container:eccffe2285b7148d5e16c75e565d0af275cc711dc1b1d58f57dfc7c27491dd3f user=65534:65534 capdrop=[ALL]
