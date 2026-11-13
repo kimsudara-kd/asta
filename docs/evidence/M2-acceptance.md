@@ -322,3 +322,56 @@ M2-G1: **observation incomplete (9.2 / 72 h; supervisor coverage 57.6 %)**; the 
 ## R2-H. Recommendation
 
 **BUILT — NOT ACCEPTED.** Leave the machine awake and the task running; re-run `scripts/paper_observation.py measure 2026-11-12T16:21:00+00:00` and `… gate <session-id> --hours 72` for both sessions at or after ≈ 2026-11-15 20:30 UTC, attach the output, confirm every completed day has a reproducible report, re-run the regression, and only then request acceptance. Any interruption in the meantime will be visible as incidents and availability episodes and must be evaluated honestly. No acceptance tag without separate CEO authorization.
+
+---
+
+# M2-R3 evidence addendum — observation verification (ASTA-M2-R3)
+
+**Status: BUILT — NOT ACCEPTED.** At 2026-11-13 03:16 UTC the original sessions have run **10.9 h of the required 72 h**. The minimum cannot be shortened or substituted; the earliest honest evaluation moment is **2026-11-15 20:11 UTC** (see R3-B). No M2 tag, no push, no credential, no strategy/risk change, no M3. The sessions were **not restarted or recreated**.
+
+## R3-A. Sessions preserved
+
+`observe-1h` `afec3e2b-c5dc-4306-a98d-82da6ea38346` (config hash `dd59484ff7d1…febefb84`, RUNNING since 2026-11-12 16:23:20 UTC) and `observe-5m` `489d0990-6cf9-4120-9ad7-c6d370374dc2` (config hash `f06aaf1a8f6b…2eae72`, RUNNING since 16:24:16 UTC): unchanged ids, hashes and states; cursors continuous. Supervision continues under the scheduled task `ASTA-Paper-Supervisor`.
+
+## R3-B. The exact definition of supervisor coverage, and the evaluation window
+
+* **Definition (`scripts/paper_observation.py gate`, `asta.paper.supervision.summarize`):** the window is `[since, now]`, **expanding** with time (it is re-evaluated at the moment of the run; it is not a fixed 72-hour box). Each supervisor health sample (every 10 s) covers the slice up to the next sample; a slice longer than 30 s (3 intervals) is **unmonitored**. `monitored_fraction = 1 − unmonitored_seconds / window_seconds`; the gate needs ≥ 0.95, duration ≥ 72 h (since the window start), and every downtime episode recovered. Service availability counts only samples where the process was alive, the database reachable and the worker heartbeat fresh. Unmonitored time is never uptime. `since` defaults to the session start; it can be set with `--since` (documented, not a threshold change).
+* **Can the default window (since the session start) reach 95 %?** The supervisor did not exist for the first 3.80 h (13,682 s) and a machine-level interruption later added 66 minutes (below), so the default window carries about **18,100 s ≈ 5.0 h** unmonitored and needs a window of ≥ 20 × that ≈ **101 h**, i.e. it can pass no earlier than about **2026-11-17 21:00 UTC** if nothing else is lost. The 72-hour minimum alone is not the binding constraint there.
+* **Documented valid evaluation window W2 (chosen because it is a supervised window, not to obtain a pass):** `since = 2026-11-12T20:11:22Z`, the timestamp of the supervisor's first health sample (the moment ASTA first had a supervisor). W2 requires **≥ 72 actual hours** (earliest **2026-11-15 20:11:22 UTC**), coverage ≥ 95 %, and all the other gate criteria **unchanged**. W2 does not restart, reset or recreate anything — the underlying sessions and their history are the original ones (their 72 h also complete earlier, 2026-11-15 16:24 UTC). Budget: 5 % of 72 h = 3.6 h of unmonitored time; **1.23 h (4,425 s) has been used**, leaving ≈ 2.4 h for the remainder. Current W2 evaluation: coverage **82.6 %** at 7.07 h (it rises as the window expands: ≥ 95 % once the window exceeds ≈ 24.6 h, i.e. from about 2026-11-13 20:50 UTC, if no further outage), `gate_pass: false` on duration (`docs/evidence/m2/r3-gate-1h.json`, `r3-gate-5m.json`).
+* Both W1 (session start) and W2 outputs are produced by the same script; the evaluation reported at acceptance must state which window it uses and show the other for transparency.
+
+## R3-C. Operational events since R2 (genuine, recorded)
+
+| Time (UTC) | Event | Handling / evidence |
+|---|---|---|
+| 01:53:52 → 03:00:16 | **No supervisor samples for 66 min** — the PC did not run the supervisor (suspend/sleep or session pause; the cause is not observable from the logs) | counted as **unmonitored, not uptime** (3,984 s); on resume Binance reconnected (1 reconnect), **9 gaps (3 markets × 67 min) were detected and all backfilled** from public REST, sessions resumed with verified replay; no reconciliation or ledger impact |
+| ≈ 03:00 | **OKX unreachable again** — `www.okx.com` / `ws.okx.com` resolve to 127.0.0.1 (the upstream DNS sinkhole of residual R-1); "All connection attempts failed" | not bypassed; `FEED_DISCONNECTED` incident, OKX markets blocked from new entries (`DATA_GAP`/`STALE_DATA`), after the supervised restart OKX was **DISABLED with a stored reason**; Binance and all accounting unaffected |
+| 03:07 | planned supervisor restart (adds a per-process "no idle sleep" request, `SetThreadExecutionState`; **not** a Windows policy change; cannot be confirmed without admin rights) | keep-alive trigger relaunched it in < 3 min; unmonitored time recorded |
+| 03:16:51 | planned service restart to load the new venue re-verification | verified-replay recovery, sessions continued |
+
+**Reliability defect found and fixed:** a venue that fails verification at service start (e.g. an upstream network block) stayed disabled **until the next restart**. The service now re-verifies disabled venues every 60 s with the same public checks and starts their feeds only when they pass (`_reverify_loop`; tested with a fake adapter: disabled → block lifted → streams and stores candles). If OKX returns, its candles flow again; the period it was down is recorded (incidents, feed state, step inputs flagged `DATA_GAP`/`STALE_DATA`) — **not silent** — and no candle is fabricated; whether the gate can still be passed with an OKX outage inside the window is a CEO judgement (the gate counts only OPEN/UNRECOVERABLE gap rows and unresolved critical incidents; an unreachable feed is a loud, recorded, non-gap condition).
+
+## R3-D. Integrity verification (requirements 8–10; `docs/evidence/m2/r3-integrity-check.json`)
+
+* **Session recovery preserves state and ledger:** a full `rebuild_runtime` of both live sessions from their durable step inputs reproduced **every stored checkpoint digest** (311 steps / 428 steps verified, last digests `f17dd066…` / `b80f0653…`), the restored risk state is not halted (no halt ever occurred), and ledger reconciliation shows **0 discrepancies**; history tables are insert-only (tested). Tests cover the halted case (`RISK_HALTED` survives worker restarts, never auto-resumed).
+* **Daily reports:** every *latest* revision of every valid day is reproducible (`2026-11-12` revision 1, both sessions). Revision 0 of that day is the documented defective first attempt (7 of 8 steps) and is **superseded by an audited revision record** (`paper.report.supersede` audit events; revision 1). The two **2026-11-11 reports (ids 1 and 2, dated before either session existed)** are invalidated by **audited invalidation records** (`paper.report.invalidate`, one per report, chained in the append-only audit log, which verifies intact: `audit_chain_ok: true`) and are **excluded** from every read model (the daily-reports API hides reports whose day ended before the session's first live step) and from the gate; they never fed any financial figure (they have zero activity).
+* **Financial figures:** performance is computed from equity snapshots/ledger rows of live steps only; nothing derives from the invalid reports.
+
+## R3-E. Current measurements (03:16 UTC; raw `docs/evidence/m2/r3-observation-measure.json`)
+
+Duration 10.87 h (1h) / 10.86 h (5m); candle eventual completeness 1.000 on the markets that have candles; real-time arrival ≤ 180 s: Binance 0.884 (the 66-minute outage), OKX 0.988; gaps 9 detected / 9 backfilled / 0 open / 0 unrecoverable; **0 duplicate postings, 0 reconciliation discrepancies, 0 dead-letter jobs, 0 unresolved critical incidents**, 0 risk halts, 827 jobs DONE; virtual fills 8 (5m) / 0 (1h); incidents recorded (all kinds): DATA_GAP 27, RECOVERY 14, SERVICE_DOWN 6 / SERVICE_RECOVERED 4, FEED_DISCONNECTED 1.
+
+## R3-F. Regression, security, live-lock (changes in this pass: tooling, report API filter, service re-verification)
+
+Regression of record is the run started after the last code change (results in the closing report and `docs/evidence/m2/e2e-full-run-r3.log`): Python with network opt-ins, 39-test browser suite, strict mypy (144 files, clean), pyright, `pip-audit`, `pnpm audit`, secret scan, gitleaks. `git diff 773b604` over `src/asta/risk`, `src/asta/core/egress.py`, `src/asta/core/environment.py` and all M0/M1 evidence is empty; the 15 live-lock tests (no credential/signing vocabulary, import boundaries, gateway DENY, no LIVE environment, route allow-list) pass; no authenticated trading capability exists.
+
+## R3-G. Why this is not an ACCEPTANCE CANDIDATE yet, and the exact finish procedure
+
+The observation is 10.9 / 72 h and the window cannot be completed inside this working session. To finish: keep the PC awake and the task running (any interruption must stay recorded and be evaluated honestly; two further interruptions of the kind above would exhaust the unmonitored budget), then at or after **2026-11-15 20:11:22 UTC** run, for both sessions:
+`python scripts/paper_observation.py measure 2026-11-12T16:21:00+00:00` and `python scripts/paper_observation.py gate <session-id> --hours 72 --since 2026-11-12T20:11:22+00:00` (and without `--since` for transparency), confirm that every completed UTC day has a reproducible latest-revision report (the gate does), re-run regression/security/live-lock, update this document and request CEO review. Risks to completion: PC sleep/restart, OKX staying blocked (R-1), further defects. **Recommendation: BUILT — NOT ACCEPTED.**
+
+## R3-H. Regression of record (final code of this pass)
+
+* **Python (`ASTA_RUN_NETWORK_TESTS=1`): 462 passed, 0 failed, 1 skipped.** The skip is the OKX live contract probe: *"OKX unreachable from this machine: ConnectError"* — it is the DNS sinkhole of R-1 (OKX resolves to 127.0.0.1 again) and is reported as not passed, not worked around. Binance live tests pass.
+* **Browser:** paper 9/9, research 12/12, nodata 1/1, aging 1/1, live 15/16 in the full run — one **transient failure** (`viewer signs in; sign-out ends the session`, URL stayed `/` for 20 s); an isolated rerun of the live phase passed **16/16** (`/tmp` log not committed). I treat it as a timing flake in an M0 test unrelated to this pass; it is disclosed rather than hidden (`docs/evidence/m2/e2e-full-run-r3.log` shows the failed run).
+* **Static/security:** ruff + format clean; pyright 0 errors; mypy strict clean (144 files); `pip-audit` and `pnpm audit` clean; secret scan 0; gitleaks re-run at the closing commit; `git diff 773b604` over gateway/egress/environment code and all M0/M1 evidence is empty; 15 live-lock tests pass.

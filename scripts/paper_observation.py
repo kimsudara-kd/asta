@@ -90,12 +90,15 @@ def main() -> int:
         elif cmd == "reports-repair":
             sid = uuid.UUID(sys.argv[2])
             return repair_reports(db, sid)
+        elif cmd == "reports-invalidate-presession":
+            return invalidate_presession_reports(db)
         elif cmd == "gate":
             sid = uuid.UUID(sys.argv[2])
             hours = (
                 float(sys.argv[sys.argv.index("--hours") + 1]) if "--hours" in sys.argv else 72.0
             )
-            return gate(db, sid, hours)
+            since = sys.argv[sys.argv.index("--since") + 1] if "--since" in sys.argv else None
+            return gate(db, sid, hours, since)
     return 0
 
 
@@ -224,6 +227,35 @@ def measure(db, since: str | None = None):  # type: ignore[no-untyped-def]
     return out
 
 
+def invalidate_presession_reports(db) -> int:  # type: ignore[no-untyped-def]
+    """Audited INVALIDATION record for stored reports whose day ended before their session started
+    (immutable rows cannot be removed; the audit chain records why they are invalid and every read
+    model excludes them)."""
+    rows = db.execute(
+        text(
+            "select r.id, r.session_id, r.report_date from daily_paper_reports r "
+            "join paper_sessions s on s.id = r.session_id "
+            "where r.report_date + interval '1 day' <= s.started_at order by r.id"
+        )
+    ).all()
+    for rid, sid, day in rows:
+        append_audit(
+            db,
+            ACTOR,
+            "paper.report.invalidate",
+            {
+                "report_id": rid,
+                "session": str(sid),
+                "day": day.date().isoformat(),
+                "reason": "report day ended before the session existed (scheduler defect fixed in M2-R1); excluded from all read models",
+            },
+            Environment.PAPER,
+        )
+    db.commit()
+    print(json.dumps({"invalidated_report_ids": [r[0] for r in rows]}))
+    return 0
+
+
 def repair_reports(db, sid: uuid.UUID) -> int:  # type: ignore[no-untyped-def]
     """Explicit, audited correction: append a NEW revision for every completed day whose latest
     report is not reproducible (the old rows stay). Only days the session fully covers."""
@@ -252,9 +284,14 @@ def repair_reports(db, sid: uuid.UUID) -> int:  # type: ignore[no-untyped-def]
     return 0
 
 
-def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-def]
+def gate(db, sid: uuid.UUID, hours: float, since: str | None = None) -> int:  # type: ignore[no-untyped-def]
+    """``since``: optional, documented evaluation-window start (default: the session start). The
+    window is [since, now] and EXPANDS with time; coverage = 1 - unmonitored/window where a slice
+    with no health sample for > 30 s is unmonitored. Thresholds are fixed constants."""
+    from datetime import datetime as _d
+
     s = store.get_session(db, sid)
-    started = s.started_at
+    started = _d.fromisoformat(since) if since else s.started_at
     now = utcnow()
     elapsed = (now - started).total_seconds() / 3600 if started else 0.0
     bad = store.reconcile(db, sid)
@@ -370,6 +407,12 @@ def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-de
         "daily_reports_not_reproducible": unreproducible,
         "supervision_demonstrated": supervised,
         "availability": avail,
+        "evaluation_window": {
+            "since": started,
+            "until": now,
+            "expanding": True,
+            "custom_since": since is not None,
+        },
         "thresholds": {
             "required_hours": hours,
             "supervision_min_monitored_fraction": SUPERVISION_MIN_MONITORED,

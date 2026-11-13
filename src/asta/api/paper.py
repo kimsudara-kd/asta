@@ -14,7 +14,7 @@ from typing import Annotated, Any, Literal
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, model_validator
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from asta.api.deps import Db, require, require_write
@@ -25,7 +25,12 @@ from asta.core.timeutil import utcnow
 from asta.db import research_store as rs
 from asta.db.audit_store import append_audit
 from asta.db.models import MarketRulesVersion
-from asta.db.paper_models import DailyPaperReport, MarketFeedConnection, PaperSession
+from asta.db.paper_models import (
+    DailyPaperReport,
+    MarketFeedConnection,
+    PaperSession,
+    PaperStepInput,
+)
 from asta.paper import ops, reports, store, views
 from asta.paper.config import ConfigError, PaperSessionConfig, StrategySpec
 from asta.paper.states import TERMINAL, IllegalTransition, SessionState
@@ -266,7 +271,18 @@ def register_paper_routes(app: FastAPI, ctx: Any) -> None:
             q = q.where(DailyPaperReport.report_date == d)
         seen: set[tuple[uuid.UUID, datetime]] = set()
         rows = []
+        started = {
+            sid: st
+            for sid, st in db.execute(
+                select(PaperStepInput.session_id, func.min(PaperStepInput.step_ts))
+                .where(PaperStepInput.warm.is_(False))
+                .group_by(PaperStepInput.session_id)
+            )
+        }  # first LIVE step per session
         for r in db.execute(q).scalars():  # highest revision per (session, day)
+            st = started.get(r.session_id)
+            if st is None or r.report_date + timedelta(days=1) <= st:
+                continue  # invalidated: the day ended before the session existed
             if (r.session_id, r.report_date) not in seen:
                 seen.add((r.session_id, r.report_date))
                 rows.append(r)

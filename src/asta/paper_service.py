@@ -216,6 +216,28 @@ class PaperService:
                     log.warning("OKX candle poll %s failed: %s", sym, exc)
                 await asyncio.sleep(0.3)  # rate-limit friendly: 3 calls per 15 s
 
+    def _start_venue_tasks(self, venue: str) -> None:
+        self._tasks.append(asyncio.create_task(self._stream(venue)))
+        if venue == "OKX":
+            self._tasks.append(asyncio.create_task(self._okx_candle_poller()))
+
+    async def _reverify_loop(self) -> None:
+        """A venue that failed verification (e.g. an upstream network block) is retried every 60 s
+        with the SAME public checks; it only starts streaming once they pass. Nothing is bypassed."""
+        while not self.stop.is_set():
+            await asyncio.sleep(60)
+            for venue in list(self.adapters):
+                if not self.enabled.get(venue):
+                    continue  # healthy (empty reason)
+                try:
+                    await self.verify_venue(venue)
+                except Exception as exc:  # noqa: BLE001 - DB/network hiccup: retry next cycle
+                    log.warning("re-verify %s failed: %s", venue, exc)
+                    continue
+                if not self.enabled.get(venue):
+                    log.info("venue %s verified again: starting its feed", venue)
+                    self._start_venue_tasks(venue)
+
     async def _writer(self) -> None:
         while not self.stop.is_set() or not self.queue.empty():
             batch: list[tuple[str, MarketEvent]] = []
@@ -426,7 +448,10 @@ class PaperService:
         self._loop = asyncio.get_running_loop()
         for venue in list(self.adapters):
             await self.verify_venue(venue)
-        tasks: list[asyncio.Task[None]] = [
+        self._tasks: list[asyncio.Task[None]] = []
+        tasks = self._tasks
+        tasks += [
+            asyncio.create_task(self._reverify_loop()),
             asyncio.create_task(self._writer()),
             asyncio.create_task(self._monitor()),
             asyncio.create_task(self._clock_loop()),
@@ -435,9 +460,7 @@ class PaperService:
         ]
         for venue, why in self.enabled.items():
             if not why:
-                tasks.append(asyncio.create_task(self._stream(venue)))
-        if "OKX" in self.enabled and not self.enabled["OKX"]:
-            tasks.append(asyncio.create_task(self._okx_candle_poller()))
+                self._start_venue_tasks(venue)
         await self._db(self.collector.restore)
         self._worker_thread = threading.Thread(
             target=self._worker_loop, daemon=True, name="asta-worker"

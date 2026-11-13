@@ -19,6 +19,7 @@ supervise the supervisor (documented, not installed automatically).
 
 from __future__ import annotations
 
+import contextlib
 import json
 import subprocess
 import sys
@@ -155,6 +156,13 @@ def kill_orphan_services() -> list[int]:
 
 def main() -> int:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
+    with contextlib.suppress(
+        Exception
+    ):  # per-process "do not idle-sleep while I run"; no policy change
+        import ctypes
+
+        ES_CONTINUOUS, ES_SYSTEM_REQUIRED = 0x80000000, 0x00000001
+        ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS | ES_SYSTEM_REQUIRED)  # type: ignore[attr-defined]
     if not acquire_single_instance():
         print("another ASTA paper supervisor is already running; exiting", file=sys.stderr)
         return 3

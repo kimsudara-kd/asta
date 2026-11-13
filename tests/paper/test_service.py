@@ -240,3 +240,32 @@ def test_helpers_map_intervals_and_symbols_and_aggregate_only_closed_bars():
     bars = to_bars([candle("OKX", "BTC-USDT", 2, closed=False), candle("OKX", "BTC-USDT", 3)])
     assert len(bars) == 1 and bars[0].open_time == NOW0 - timedelta(minutes=3)
     assert T0 < NOW0
+
+
+def test_a_disabled_venue_is_re_verified_and_starts_streaming_when_it_becomes_reachable(
+    factory, monkeypatch
+):
+    real_sleep = asyncio.sleep
+
+    async def fast_sleep(s, *a, **k):
+        await real_sleep(min(s, 0.05))
+
+    monkeypatch.setattr("asta.paper_service.asyncio.sleep", fast_sleep)
+    sym = "BTC-USDT"
+    ad = FakeAdapter("OKX", [[candle("OKX", sym, 2), candle("OKX", sym, 1)]], fail_verify="blocked")
+    svc = PaperService(factory, None, ad)
+
+    async def go():
+        task = asyncio.create_task(svc.run())
+        await REAL_SLEEP(0.6)
+        assert svc.enabled["OKX"] and ad.streams == 0  # disabled, nothing streamed
+        ad.fail_verify = None  # the upstream block is lifted
+        await REAL_SLEEP(2.0)
+        svc.stop.set()
+        await asyncio.wait_for(task, 30)
+
+    asyncio.run(go())
+    assert svc.enabled["OKX"] == "" and ad.streams >= 1
+    with factory() as db:
+        n = db.execute(select(func.count()).select_from(MarketObservation)).scalar_one()
+    assert n >= 2
