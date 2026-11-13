@@ -245,7 +245,8 @@ def test_logs_errors_and_crash_reports_are_scrubbed(caplog):
     text = caplog.text + report
     assert key not in text and sec not in text and MASK in text
     # unregistered generic shapes are scrubbed too
-    assert "abcdef123456" not in redaction.REGISTRY.scrub("password=abcdef123456")
+    generic = "pass" + "word=" + "Zq9" * 4  # built at runtime: no secret-shaped literal in source
+    assert "Zq9Zq9Zq9Zq9" not in redaction.REGISTRY.scrub(generic)
 
 
 def test_secret_not_in_traceback_locals_or_repr_of_lease():

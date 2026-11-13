@@ -1,0 +1,22 @@
+[
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 248,
+  "EndLine": 248,
+  "StartColumn": 61,
+  "EndColumn": 82,
+  "Match": "password=REDACTED\"",
+  "Secret": "REDACTED",
+  "File": "tests/m3a/test_security.py",
+  "SymlinkFile": "",
+  "Commit": "23cc0228cdde01dd86469a92ebda1fcf78229c01",
+  "Entropy": 3.5849626,
+  "Author": "Kim Sudara",
+  "Email": "kimsudara123@gmail.com",
+  "Date": "2026-11-13T08:09:01Z",
+  "Message": "M3A-1..3: egress boundary (internal network + allowlist CONNECT proxy), negative tests, mock-only vault and demo binding contracts, capability probes\n\nCo-Authored-By: Claude Sonnet 5.5 \u003cnoreply@anthropic.com\u003e",
+  "Tags": [],
+  "Fingerprint": "23cc0228cdde01dd86469a92ebda1fcf78229c01:tests/m3a/test_security.py:generic-api-key:248"
+ }
+]

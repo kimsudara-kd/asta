@@ -1,0 +1,3 @@
+# Narrow, reviewed false positive (synthetic scrubber test string in commit 23cc022, since rewritten to be built at runtime).
+# Fingerprint = commit:file:rule:line. Not a rule/path allowlist.
+23cc0228cdde01dd86469a92ebda1fcf78229c01:tests/m3a/test_security.py:generic-api-key:248
