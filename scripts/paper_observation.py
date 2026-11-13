@@ -87,6 +87,9 @@ def main() -> int:
                     default=str,
                 )
             )
+        elif cmd == "reports-repair":
+            sid = uuid.UUID(sys.argv[2])
+            return repair_reports(db, sid)
         elif cmd == "gate":
             sid = uuid.UUID(sys.argv[2])
             hours = (
@@ -221,6 +224,34 @@ def measure(db, since: str | None = None):  # type: ignore[no-untyped-def]
     return out
 
 
+def repair_reports(db, sid: uuid.UUID) -> int:  # type: ignore[no-untyped-def]
+    """Explicit, audited correction: append a NEW revision for every completed day whose latest
+    report is not reproducible (the old rows stay). Only days the session fully covers."""
+    from datetime import UTC
+    from datetime import datetime as _dt
+
+    from asta.paper import reports as rep_mod
+
+    s = store.get_session(db, sid)
+    now = utcnow()
+    fixed = []
+    d = s.started_at.date() if s.started_at else now.date()
+    while d < now.date():
+        day = _dt(d.year, d.month, d.day, tzinfo=UTC)
+        cur = rep_mod.latest_report(db, sid, day)
+        if cur is not None and rep_mod.window_is_covered(db, sid, day):
+            row, created = rep_mod.store_report(db, sid, day, supersede=True)
+            if created:
+                fixed.append((d.isoformat(), row.revision))
+        d += timedelta(days=1)
+    append_audit(
+        db, ACTOR, "paper.report.supersede", {"session": str(sid), "days": fixed}, Environment.PAPER
+    )
+    db.commit()
+    print(json.dumps({"session": str(sid), "superseded": fixed}))
+    return 0
+
+
 def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-def]
     s = store.get_session(db, sid)
     started = s.started_at
@@ -262,7 +293,7 @@ def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-de
     from datetime import UTC
     from datetime import datetime as _dt
 
-    from asta.db.paper_models import DailyPaperReport, PaperSessionState
+    from asta.db.paper_models import PaperSessionState
     from asta.paper import reports as rep_mod
     from asta.paper import supervision
 
@@ -301,11 +332,7 @@ def gate(db, sid: uuid.UUID, hours: float) -> int:  # type: ignore[no-untyped-de
         d = started.date()
         while d < now.date():
             day = _dt(d.year, d.month, d.day, tzinfo=UTC)
-            row = db.execute(
-                select(DailyPaperReport).where(
-                    DailyPaperReport.session_id == sid, DailyPaperReport.report_date == day
-                )
-            ).scalar_one_or_none()
+            row = rep_mod.latest_report(db, sid, day)
             if row is None:
                 missing_reports.append(d.isoformat())
             elif not rep_mod.verify_report(db, row):

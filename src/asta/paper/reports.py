@@ -13,7 +13,6 @@ from decimal import Decimal
 from typing import Any
 
 from sqlalchemy import func, select, text
-from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.orm import Session
 
 from asta.core.money import dec_str
@@ -30,6 +29,7 @@ from asta.db.paper_models import (
     StrategySignal,
 )
 from asta.paper import store
+from asta.paper.jobs import JobError
 from asta.research.runner import canonical
 
 ZERO = Decimal(0)
@@ -206,7 +206,11 @@ def build_report(
         feed_avail[v] = dec_str(Decimal(ok) / Decimal(expected_steps))
     gaps = list(
         db.execute(
-            select(MarketDataGap).where(MarketDataGap.gap_start < w1, MarketDataGap.gap_end >= w0)
+            select(MarketDataGap).where(
+                MarketDataGap.gap_start < w1,
+                MarketDataGap.gap_end >= w0,
+                MarketDataGap.detected_at < w1,
+            )
         ).scalars()
     )
     incidents = list(
@@ -219,7 +223,9 @@ def build_report(
     unresolved = list(
         db.execute(
             select(Incident).where(
-                Incident.resolved_at.is_(None),
+                # AS OF the window end: reproducible no matter when the report is recomputed
+                Incident.opened_at < w1,
+                (Incident.resolved_at.is_(None)) | (Incident.resolved_at >= w1),
                 (Incident.session_id == session_id) | (Incident.session_id.is_(None)),
             )
         ).scalars()
@@ -231,6 +237,7 @@ def build_report(
                 MarketObservation.kind == "CANDLE_1M",
                 MarketObservation.event_ts >= w0,
                 MarketObservation.event_ts < w1,
+                MarketObservation.ingested_ts < w1,
                 MarketObservation.venue.in_(cfg.enabled_venues),
             )
             .group_by(MarketObservation.source)
@@ -299,7 +306,7 @@ def build_report(
                     "start": g.gap_start.isoformat(),
                     "end": g.gap_end.isoformat(),
                     "missing": g.missing,
-                    "status": g.status,
+                    "status": g.status if g.closed_at is not None and g.closed_at < w1 else "OPEN",
                 }
                 for g in gaps
             ],
@@ -340,31 +347,56 @@ def report_hash(body: dict[str, Any]) -> str:
     return hashlib.sha256(canonical(body).encode()).hexdigest()
 
 
+def latest_report(db: Session, session_id: uuid.UUID, day: datetime) -> DailyPaperReport | None:
+    return db.execute(
+        select(DailyPaperReport)
+        .where(
+            DailyPaperReport.session_id == session_id,
+            DailyPaperReport.report_date == day_start(day),
+        )
+        .order_by(DailyPaperReport.revision.desc())
+        .limit(1)
+    ).scalar_one_or_none()
+
+
+def window_is_covered(db: Session, session_id: uuid.UUID, day: datetime) -> bool:
+    """The session has processed every step of the day (cursor reached the window end)."""
+    sess = store.get_session(db, session_id)
+    if sess.last_step_ts is None:
+        return False
+    cfg = store.load_config(db, session_id)
+    return sess.last_step_ts + timedelta(seconds=cfg.timeframe.seconds) >= day_start(
+        day
+    ) + timedelta(days=1)
+
+
 def store_report(
-    db: Session, session_id: uuid.UUID, day: datetime
+    db: Session, session_id: uuid.UUID, day: datetime, supersede: bool = False
 ) -> tuple[DailyPaperReport, bool]:
-    """Persist (immutable, one per day). Returns (row, created)."""
+    """Persist one immutable report per day. Returns (latest row, created).
+
+    ``supersede=True`` (explicit correction) appends a NEW revision, only if the latest revision is
+    not reproducible from the durable data; the old row is never modified or removed."""
     w0 = day_start(day)
+    cur = latest_report(db, session_id, w0)
+    if cur is not None:
+        if not supersede or verify_report(db, cur):
+            return cur, False
+        rev = cur.revision + 1
+    else:
+        rev = 0
     body = build_report(db, session_id, w0)
-    stmt = (
-        pg_insert(DailyPaperReport)
-        .values(
-            session_id=session_id,
-            report_date=w0,
-            window_end=w0 + timedelta(days=1),
-            body=body,
-            content_hash=report_hash(body),
-        )
-        .on_conflict_do_nothing(constraint="uq_daily_report")
-        .returning(DailyPaperReport.id)
+    row = DailyPaperReport(
+        session_id=session_id,
+        report_date=w0,
+        window_end=w0 + timedelta(days=1),
+        body=body,
+        content_hash=report_hash(body),
+        revision=rev,
     )
-    created = db.execute(stmt).first() is not None
-    row = db.execute(
-        select(DailyPaperReport).where(
-            DailyPaperReport.session_id == session_id, DailyPaperReport.report_date == w0
-        )
-    ).scalar_one()
-    return row, created
+    db.add(row)
+    db.flush()
+    return row, True
 
 
 def verify_report(db: Session, row: DailyPaperReport) -> bool:
@@ -378,6 +410,10 @@ def handle_report_job(db: Session, sid: uuid.UUID | None, payload: dict[str, Any
     sess = store.get_session(db, sid)
     if sess.started_at is None or day_start(day) + timedelta(days=1) <= sess.started_at:
         return  # the session did not exist on that day: no report (never invent an empty one)
+    if not window_is_covered(db, sid, day):
+        # steps of the day are still being posted: a report now would be incomplete and, being
+        # immutable, wrong forever -> retry later (found live: 7 of 8 steps in a first report)
+        raise JobError("reporting window not fully processed yet")
     # the day must be COMPLETE and the ledger must reconcile before it is reported
     if day_start(day) + timedelta(days=1) > datetime.now(UTC):
         raise ValueError("reporting window is not complete yet")

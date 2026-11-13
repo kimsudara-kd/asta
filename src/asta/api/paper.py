@@ -256,19 +256,28 @@ def register_paper_routes(app: FastAPI, ctx: Any) -> None:
         session_id: uuid.UUID | None = None,
         day: str | None = Query(default=None, pattern=r"^\d{4}-\d{2}-\d{2}$"),
     ) -> dict[str, Any]:
-        q = select(DailyPaperReport).order_by(DailyPaperReport.report_date.desc()).limit(60)
+        q = select(DailyPaperReport).order_by(
+            DailyPaperReport.report_date.desc(), DailyPaperReport.revision.desc()
+        )
         if session_id:
             q = q.where(DailyPaperReport.session_id == session_id)
         if day:
             d = datetime.fromisoformat(day).replace(tzinfo=UTC)
             q = q.where(DailyPaperReport.report_date == d)
-        rows = db.execute(q).scalars().all()
+        seen: set[tuple[uuid.UUID, datetime]] = set()
+        rows = []
+        for r in db.execute(q).scalars():  # highest revision per (session, day)
+            if (r.session_id, r.report_date) not in seen:
+                seen.add((r.session_id, r.report_date))
+                rows.append(r)
+        rows = rows[:60]
         return {
             "labels": reports.LABELS,
             "reports": [
                 {
                     "session_id": str(r.session_id),
                     "date": r.report_date.date().isoformat(),
+                    "revision": r.revision,
                     "content_hash": r.content_hash,
                     "reproducible": reports.verify_report(db, r),
                     "body": r.body,
@@ -503,6 +512,8 @@ def register_paper_routes(app: FastAPI, ctx: Any) -> None:
         day = datetime.fromisoformat(body.day).replace(tzinfo=UTC)
         if day + timedelta(days=1) > utcnow():
             raise HTTPException(409, "the reporting day is not complete yet")
+        if not reports.window_is_covered(db, body.session_id, day):
+            raise HTTPException(409, "the session has not processed every step of that day yet")
         bad = store.reconcile(db, body.session_id)
         if bad:
             raise HTTPException(409, "report refused: reconciliation failed: " + bad[0].detail)

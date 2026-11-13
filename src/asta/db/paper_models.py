@@ -353,7 +353,10 @@ class DailyPaperReport(Base):
     body: Mapped[dict[str, Any]] = mapped_column(JSONB)
     content_hash: Mapped[str] = mapped_column(String(64))
     created_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
-    __table_args__ = (UniqueConstraint("session_id", "report_date", name="uq_daily_report"),)
+    revision: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
+    __table_args__ = (
+        UniqueConstraint("session_id", "report_date", "revision", name="uq_daily_report_rev"),
+    )
 
 
 # partial unique index: at most one OPEN incident per dedupe key (M0 `incidents` table reused)

@@ -1,0 +1,885 @@
+{
+ "measured_at": "2026-11-13T01:07:38.217379+00:00",
+ "since": "2026-11-12T16:21:00+00:00",
+ "sessions": [
+  {
+   "id": "afec3e2b-c5dc-4306-a98d-82da6ea38346",
+   "name": "observe-1h",
+   "state": "RUNNING",
+   "timeframe": "1h",
+   "started_at": "2026-11-12 16:23:20.916397+00:00",
+   "elapsed_hours": 8.738,
+   "live_steps": 9,
+   "expected_steps_approx": 8,
+   "muted_late_or_paused_steps": 0,
+   "steps_with_blocked_markets": 1,
+   "fills": 0,
+   "reconciliation_discrepancies": 0,
+   "last_reconcile_ok": true,
+   "equity": "1000.000000000000000000",
+   "partial_day_report": {
+    "report_version": "paper-report-1",
+    "labels": [
+     "PAPER TRADING \u2014 VIRTUAL FUNDS ONLY",
+     "SIMULATED",
+     "ESTIMATED FILLS",
+     "NOT LIVE TRADING"
+    ],
+    "session_id": "afec3e2b-c5dc-4306-a98d-82da6ea38346",
+    "config_hash": "dd59484ff7d1da598c9a946ecf5662955372d0eda40cd2ea5ecd9266febefb84",
+    "window": {
+     "start": "2026-11-13T00:00:00+00:00",
+     "end": "2026-11-13T01:07:38.217379+00:00",
+     "timezone": "UTC",
+     "partial": true
+    },
+    "kind": "OBSERVED_PAPER_SIMULATION",
+    "financial": {
+     "opening_equity": "1000.000000000000000000",
+     "closing_equity": "1000.000000000000000000",
+     "net_pnl": "0.000000000000000000",
+     "realized_pnl": "0",
+     "unrealized_pnl_movement": "0.000000000000000000",
+     "fees": "0",
+     "estimated_slippage": "0",
+     "return_pct": "0",
+     "max_drawdown_window": "0",
+     "max_drawdown_since_start": "0",
+     "cash": "1000.000000000000000000",
+     "exposure": "0.000000000000000000",
+     "inventory_by_account": {
+      "BINANCE:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "BINANCE:sma_cross": {
+       "USDT": "166.666666660000000000"
+      },
+      "BINANCE:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      },
+      "OKX:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "OKX:sma_cross": {
+       "USDT": "166.666666660000000000"
+      },
+      "OKX:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      }
+     },
+     "venue_contribution": {
+      "BINANCE": "0.00000000",
+      "OKX": "0.00000000"
+     },
+     "account_equity": {
+      "BINANCE:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:sma_cross": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "OKX:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "OKX:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "OKX:sma_cross": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      }
+     }
+    },
+    "trading": {
+     "signals_generated": 0,
+     "signals_rejected": 0,
+     "orders_created": 0,
+     "orders_filled": 0,
+     "partial_fills": 0,
+     "orders_cancelled": 0,
+     "fills": 0,
+     "closed_sells": 0,
+     "win_rate": "N/A",
+     "average_gain": "N/A",
+     "average_loss": "N/A",
+     "strategy_pnl": {
+      "regime_grid": "0.00000000",
+      "sma_cross": "0.00000000",
+      "trend_pullback": "0.00000000"
+     },
+     "benchmarks": {
+      "BENCH:all_cash": {
+       "open": "1000",
+       "close": "1000",
+       "pnl": "0"
+      },
+      "BENCH:hold_constrained": {
+       "open": "999.1128074900000000000000000",
+       "close": "998.0561043509000000000000000",
+       "pnl": "-1.0567031391000000000000000"
+      },
+      "BENCH:hold_unconstrained": {
+       "open": "997.3370969260000000000000000",
+       "close": "994.4264371993000000000000000",
+       "pnl": "-2.9106597267000000000000000"
+      }
+     },
+     "strategies_are_deployment_candidates": false
+    },
+    "operations": {
+     "steps_processed": 1,
+     "steps_expected": 1,
+     "uptime_fraction": "1",
+     "feed_availability": {
+      "BINANCE": "1",
+      "OKX": "1"
+     },
+     "data_gaps": [],
+     "worker_restarts_recoveries": 1,
+     "reconciliation_failures": 0,
+     "risk_incidents": [],
+     "unresolved_alerts": []
+    },
+    "research_conclusion": {
+     "profitable_period": false,
+     "risk_compliant_period": true,
+     "market_data": "STORED_PUBLIC_OBSERVATIONS",
+     "observation_sources": {
+      "LIVE": 402
+     },
+     "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
+     "statement": "Simulated net P&L 0.00000000 USDT on 1000.00000000 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
+     "ai_commentary": null
+    }
+   }
+  },
+  {
+   "id": "489d0990-6cf9-4120-9ad7-c6d370374dc2",
+   "name": "observe-5m",
+   "state": "RUNNING",
+   "timeframe": "5m",
+   "started_at": "2026-11-12 16:24:16.954683+00:00",
+   "elapsed_hours": 8.723,
+   "live_steps": 105,
+   "expected_steps_approx": 104,
+   "muted_late_or_paused_steps": 0,
+   "steps_with_blocked_markets": 3,
+   "fills": 7,
+   "reconciliation_discrepancies": 0,
+   "last_reconcile_ok": true,
+   "equity": "999.016318787200000000",
+   "partial_day_report": {
+    "report_version": "paper-report-1",
+    "labels": [
+     "PAPER TRADING \u2014 VIRTUAL FUNDS ONLY",
+     "SIMULATED",
+     "ESTIMATED FILLS",
+     "NOT LIVE TRADING"
+    ],
+    "session_id": "489d0990-6cf9-4120-9ad7-c6d370374dc2",
+    "config_hash": "f06aaf1a8f6b4595349ee6b591390480ddddee94de0689aec824e58ce42eae72",
+    "window": {
+     "start": "2026-11-13T00:00:00+00:00",
+     "end": "2026-11-13T01:07:38.217379+00:00",
+     "timezone": "UTC",
+     "partial": true
+    },
+    "kind": "OBSERVED_PAPER_SIMULATION",
+    "financial": {
+     "opening_equity": "999.445967845200000000",
+     "closing_equity": "999.016318787200000000",
+     "net_pnl": "-0.429649058000000000",
+     "realized_pnl": "0",
+     "unrealized_pnl_movement": "-0.429649058000000000",
+     "fees": "0",
+     "estimated_slippage": "0",
+     "return_pct": "-0.0004298872293479966723954704922",
+     "max_drawdown_window": "0.0005620127134886365505598713855",
+     "max_drawdown_since_start": "0.001876239563209032498945483542",
+     "cash": "909.450710670000000000",
+     "exposure": "89.565608117200000000",
+     "inventory_by_account": {
+      "BINANCE:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "BINANCE:sma_cross": {
+       "ETH": "0.000055200000000000",
+       "SOL": "1.099899000000000000",
+       "USDT": "76.797090270000000000"
+      },
+      "BINANCE:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      },
+      "OKX:regime_grid": {
+       "USDT": "166.666666680000000000"
+      },
+      "OKX:sma_cross": {
+       "SOL": "0.000000260000000000",
+       "USDT": "165.986953720000000000"
+      },
+      "OKX:trend_pullback": {
+       "USDT": "166.666666660000000000"
+      }
+     },
+     "venue_contribution": {
+      "BINANCE": "-0.4296489540000000000000000",
+      "OKX": "-0.0000001040000000000000000"
+     },
+     "account_equity": {
+      "BINANCE:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "BINANCE:sma_cross": {
+       "open": "166.7923261980000000000000000",
+       "close": "166.3626772440000000000000000",
+       "pnl": "-0.4296489540000000000000000"
+      },
+      "OKX:regime_grid": {
+       "open": "166.66666668",
+       "close": "166.66666668",
+       "pnl": "0.00000000"
+      },
+      "OKX:trend_pullback": {
+       "open": "166.66666666",
+       "close": "166.66666666",
+       "pnl": "0.00000000"
+      },
+      "OKX:sma_cross": {
+       "open": "165.9869749672000000000000000",
+       "close": "165.9869748632000000000000000",
+       "pnl": "-0.0000001040000000000000000"
+      }
+     }
+    },
+    "trading": {
+     "signals_generated": 20,
+     "signals_rejected": 15,
+     "orders_created": 21,
+     "orders_filled": 0,
+     "partial_fills": 0,
+     "orders_cancelled": 5,
+     "fills": 0,
+     "closed_sells": 0,
+     "win_rate": "N/A",
+     "average_gain": "N/A",
+     "average_loss": "N/A",
+     "strategy_pnl": {
+      "regime_grid": "0.00000000",
+      "sma_cross": "-0.4296490580000000000000000",
+      "trend_pullback": "0.00000000"
+     },
+     "benchmarks": {
+      "BENCH:all_cash": {
+       "open": "1000",
+       "close": "1000",
+       "pnl": "0"
+      },
+      "BENCH:hold_constrained": {
+       "open": "999.0535607360000000000000000",
+       "close": "997.1035821665000000000000000",
+       "pnl": "-1.9499785695000000000000000"
+      },
+      "BENCH:hold_unconstrained": {
+       "open": "997.5932011260000000000000000",
+       "close": "992.6926965360000000000000000",
+       "pnl": "-4.9005045900000000000000000"
+      }
+     },
+     "strategies_are_deployment_candidates": false
+    },
+    "operations": {
+     "steps_processed": 13,
+     "steps_expected": 13,
+     "uptime_fraction": "1",
+     "feed_availability": {
+      "BINANCE": "1",
+      "OKX": "1"
+     },
+     "data_gaps": [],
+     "worker_restarts_recoveries": 3,
+     "reconciliation_failures": 0,
+     "risk_incidents": [],
+     "unresolved_alerts": [
+      {
+       "kind": "RECOVERY",
+       "severity": "INFO",
+       "detail": "runtime restored by verified replay of 303 steps (digest f8cfa7436779)"
+      }
+     ]
+    },
+    "research_conclusion": {
+     "profitable_period": false,
+     "risk_compliant_period": true,
+     "market_data": "STORED_PUBLIC_OBSERVATIONS",
+     "observation_sources": {
+      "LIVE": 402
+     },
+     "outcome_type": "OBSERVED_PAPER_OUTCOME (not a hypothetical scenario)",
+     "statement": "Simulated net P&L -0.42964906 USDT on 999.44596785 opening equity; risk limits were not breached. This is a short paper observation, not evidence of a profitable edge.",
+     "ai_commentary": null
+    }
+   }
+  }
+ ],
+ "feeds": {
+  "BINANCE:BTC-USDT": {
+   "candles": 525,
+   "span_minutes": 525,
+   "present_fraction": 1.0,
+   "from_backfill": 9,
+   "realtime_candles_within_180s": 516,
+   "realtime_fraction": 0.98286,
+   "first": "2026-11-12 16:22:00+00:00",
+   "last": "2026-11-13 01:06:00+00:00"
+  },
+  "BINANCE:ETH-USDT": {
+   "candles": 525,
+   "span_minutes": 525,
+   "present_fraction": 1.0,
+   "from_backfill": 9,
+   "realtime_candles_within_180s": 516,
+   "realtime_fraction": 0.98286,
+   "first": "2026-11-12 16:22:00+00:00",
+   "last": "2026-11-13 01:06:00+00:00"
+  },
+  "BINANCE:SOL-USDT": {
+   "candles": 525,
+   "span_minutes": 525,
+   "present_fraction": 1.0,
+   "from_backfill": 9,
+   "realtime_candles_within_180s": 516,
+   "realtime_fraction": 0.98286,
+   "first": "2026-11-12 16:22:00+00:00",
+   "last": "2026-11-13 01:06:00+00:00"
+  },
+  "OKX:BTC-USDT": {
+   "candles": 526,
+   "span_minutes": 526,
+   "present_fraction": 1.0,
+   "from_backfill": 5,
+   "realtime_candles_within_180s": 519,
+   "realtime_fraction": 0.98669,
+   "first": "2026-11-12 16:21:00+00:00",
+   "last": "2026-11-13 01:06:00+00:00"
+  },
+  "OKX:ETH-USDT": {
+   "candles": 526,
+   "span_minutes": 526,
+   "present_fraction": 1.0,
+   "from_backfill": 5,
+   "realtime_candles_within_180s": 519,
+   "realtime_fraction": 0.98669,
+   "first": "2026-11-12 16:21:00+00:00",
+   "last": "2026-11-13 01:06:00+00:00"
+  },
+  "OKX:SOL-USDT": {
+   "candles": 526,
+   "span_minutes": 526,
+   "present_fraction": 1.0,
+   "from_backfill": 5,
+   "realtime_candles_within_180s": 519,
+   "realtime_fraction": 0.98669,
+   "first": "2026-11-12 16:21:00+00:00",
+   "last": "2026-11-13 01:06:00+00:00"
+  }
+ },
+ "gaps": [
+  {
+   "venue": "OKX",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "OKX",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "OKX",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 8,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "BTC-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 9,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "ETH-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 9,
+   "status": "BACKFILLED"
+  },
+  {
+   "venue": "BINANCE",
+   "symbol": "SOL-USDT",
+   "start": "2026-11-12 16:36:00+00:00",
+   "missing": 9,
+   "status": "BACKFILLED"
+  }
+ ],
+ "incidents": [
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T01:00:17.861329+00:00",
+   "resolved": "2026-11-13T01:00:17.989880+00:00",
+   "detail": "runtime restored by verified replay of 308 steps (digest 8b24218aeb35)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:44:32.343591+00:00",
+   "resolved": "2026-11-13T00:44:32.358660+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:44:21.269530+00:00",
+   "resolved": "2026-11-13T00:44:32.370596+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:43:30.130343+00:00",
+   "resolved": "2026-11-13T00:43:30.144788+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [37708, 30168] left by a previous supervisor"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T21:00:21.774220+00:00",
+   "resolved": "2026-11-12T21:00:21.881336+00:00",
+   "detail": "runtime restored by verified replay of 304 steps (digest 2a6f88718bd8)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:16:00.938373+00:00",
+   "resolved": "2026-11-12T20:16:00.944844+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:15:49.861032+00:00",
+   "resolved": "2026-11-12T20:16:00.953305+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:12:53.556679+00:00",
+   "resolved": "2026-11-12T20:12:53.564855+00:00",
+   "detail": "service healthy again after 1 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:12:52.470501+00:00",
+   "resolved": "2026-11-12T20:12:53.578839+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T18:00:19.097621+00:00",
+   "resolved": "2026-11-12T18:00:19.250918+00:00",
+   "detail": "runtime restored by verified replay of 301 steps (digest f67c06915e74)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.340377+00:00",
+   "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T17:02:32.880966+00:00",
+   "detail": "runtime restored by verified replay of 300 steps (digest 6798fb36f634)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.328671+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.323523+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.319785+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.334052+00:00",
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T17:02:32.690020+00:00",
+   "resolved": "2026-11-12T18:00:19.346573+00:00",
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:00:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:50:20.808750+00:00",
+   "resolved": "2026-11-13T00:50:20.986981+00:00",
+   "detail": "runtime restored by verified replay of 401 steps (digest 0ff4bef3cce3)"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:45:18.975726+00:00",
+   "resolved": "2026-11-13T00:45:19.157524+00:00",
+   "detail": "runtime restored by verified replay of 400 steps (digest 20ba1a1235e4)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:44:32.343591+00:00",
+   "resolved": "2026-11-13T00:44:32.358660+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:44:21.269530+00:00",
+   "resolved": "2026-11-13T00:44:32.370596+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-13T00:43:30.130343+00:00",
+   "resolved": "2026-11-13T00:43:30.144788+00:00",
+   "detail": "supervisor start: terminated orphaned service process(es) [37708, 30168] left by a previous supervisor"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-13T00:40:19.550452+00:00",
+   "resolved": "2026-11-13T00:40:19.876112+00:00",
+   "detail": "runtime restored by verified replay of 399 steps (digest 7b0a9924f56d)"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:20:18.052352+00:00",
+   "resolved": "2026-11-12T20:20:18.198351+00:00",
+   "detail": "runtime restored by verified replay of 347 steps (digest 9eb1ce4a2e9b)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:16:00.938373+00:00",
+   "resolved": "2026-11-12T20:16:00.944844+00:00",
+   "detail": "service healthy again after 11 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:15:49.861032+00:00",
+   "resolved": "2026-11-12T20:16:00.953305+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:15:21.216010+00:00",
+   "resolved": "2026-11-12T20:15:21.360361+00:00",
+   "detail": "runtime restored by verified replay of 346 steps (digest f7ffebb5016c)"
+  },
+  {
+   "kind": "SERVICE_RECOVERED",
+   "severity": "INFO",
+   "opened": "2026-11-12T20:12:53.556679+00:00",
+   "resolved": "2026-11-12T20:12:53.564855+00:00",
+   "detail": "service healthy again after 1 s downtime (fresh feeds verified)"
+  },
+  {
+   "kind": "SERVICE_DOWN",
+   "severity": "WARNING",
+   "opened": "2026-11-12T20:12:52.470501+00:00",
+   "resolved": "2026-11-12T20:12:53.578839+00:00",
+   "detail": "paper service exited unexpectedly (code 4294967295); supervisor restarting"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T17:05:04.534321+00:00",
+   "resolved": "2026-11-12T17:05:04.713089+00:00",
+   "detail": "runtime restored by verified replay of 308 steps (digest 37c20b3466e2)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.566222+00:00",
+   "detail": "OKX:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.560604+00:00",
+   "detail": "OKX:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.553583+00:00",
+   "detail": "OKX:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.546151+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "RECOVERY",
+   "severity": "INFO",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": null,
+   "detail": "runtime restored by verified replay of 303 steps (digest f8cfa7436779)"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:46:35.539140+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:45:30.378617+00:00",
+   "resolved": "2026-11-12T16:50:06.447108+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:35:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:26:34.283317+00:00",
+   "resolved": "2026-11-12T16:30:05.381824+00:00",
+   "detail": "BINANCE:ETH-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:26:34.283317+00:00",
+   "resolved": "2026-11-12T16:30:05.390875+00:00",
+   "detail": "BINANCE:SOL-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
+  },
+  {
+   "kind": "DATA_GAP",
+   "severity": "WARNING",
+   "opened": "2026-11-12T16:26:34.283317+00:00",
+   "resolved": "2026-11-12T16:30:05.381824+00:00",
+   "detail": "BINANCE:BTC-USDT: new entries blocked (DATA_GAP) at 2026-11-12T16:20:00+00:00"
+  }
+ ],
+ "availability": {
+  "window_seconds": 31598.217379,
+  "samples": 1752,
+  "available_seconds": 17458.32706,
+  "unavailable_seconds": 60.06922900000001,
+  "unmonitored_seconds": 14071.093379,
+  "service_availability": 0.5525098726487877,
+  "monitored_fraction": 0.5546871138258713,
+  "feed_fresh_fraction": {
+   "BINANCE": 0.9965710771688779,
+   "OKX": 0.9965710771688779
+  },
+  "downtime_episodes": [
+   {
+    "start": "2026-11-12T20:14:39.779619+00:00",
+    "end": "2026-11-12T20:14:49.790939+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.01132
+   },
+   {
+    "start": "2026-11-12T20:15:50.917586+00:00",
+    "end": "2026-11-12T20:16:00.927629+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.010043
+   },
+   {
+    "start": "2026-11-13T00:38:22.389261+00:00",
+    "end": "2026-11-13T00:38:32.401492+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.012231
+   },
+   {
+    "start": "2026-11-13T00:43:31.211487+00:00",
+    "end": "2026-11-13T00:43:41.223475+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.011988
+   },
+   {
+    "start": "2026-11-13T00:44:22.315783+00:00",
+    "end": "2026-11-13T00:44:32.325916+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.010133
+   },
+   {
+    "start": "2026-11-13T00:46:48.083385+00:00",
+    "end": "2026-11-13T00:46:58.096899+00:00",
+    "cause": "worker_heartbeat",
+    "recovery_seconds": 10.013514
+   }
+  ]
+ },
+ "queue": {
+  "counts": {
+   "DONE": 790
+  },
+  "backlog": 0,
+  "dead": 0,
+  "oldest_runnable_age_s": null
+ },
+ "workers_seen": [
+  {
+   "id": "worker-6212",
+   "started": "2026-11-12 16:21:14.832534+00:00",
+   "last_heartbeat": "2026-11-12 16:21:55.156103+00:00"
+  },
+  {
+   "id": "worker-4432",
+   "started": "2026-11-12 16:22:12.795191+00:00",
+   "last_heartbeat": "2026-11-12 16:36:11.839255+00:00"
+  },
+  {
+   "id": "worker-37820",
+   "started": "2026-11-12 16:45:29.342057+00:00",
+   "last_heartbeat": "2026-11-12 17:01:29.175597+00:00"
+  },
+  {
+   "id": "worker-41164",
+   "started": "2026-11-12 17:01:37.220935+00:00",
+   "last_heartbeat": "2026-11-12 17:03:33.542490+00:00"
+  },
+  {
+   "id": "worker-35724",
+   "started": "2026-11-12 17:03:43.868313+00:00",
+   "last_heartbeat": "2026-11-12 20:11:12.289622+00:00"
+  },
+  {
+   "id": "worker-45852",
+   "started": "2026-11-12 20:11:23.656535+00:00",
+   "last_heartbeat": "2026-11-12 20:12:49.371405+00:00"
+  },
+  {
+   "id": "worker-45716",
+   "started": "2026-11-12 20:12:54.724747+00:00",
+   "last_heartbeat": "2026-11-12 20:14:30.500476+00:00"
+  },
+  {
+   "id": "worker-29080",
+   "started": "2026-11-12 20:14:40.750139+00:00",
+   "last_heartbeat": "2026-11-12 20:15:41.602124+00:00"
+  },
+  {
+   "id": "worker-37020",
+   "started": "2026-11-12 20:15:51.945524+00:00",
+   "last_heartbeat": "2026-11-13 00:38:14.977165+00:00"
+  },
+  {
+   "id": "worker-30168",
+   "started": "2026-11-13 00:38:23.544582+00:00",
+   "last_heartbeat": "2026-11-13 00:43:26.737360+00:00"
+  },
+  {
+   "id": "worker-39532",
+   "started": "2026-11-13 00:43:32.309403+00:00",
+   "last_heartbeat": "2026-11-13 00:44:12.629962+00:00"
+  },
+  {
+   "id": "worker-34480",
+   "started": "2026-11-13 00:44:23.451869+00:00",
+   "last_heartbeat": "2026-11-13 00:46:39.875862+00:00"
+  },
+  {
+   "id": "worker-35908",
+   "started": "2026-11-13 00:46:49.098921+00:00",
+   "last_heartbeat": "2026-11-13 01:07:34.876463+00:00"
+  }
+ ],
+ "feed_status": [
+  {
+   "venue": "BINANCE",
+   "state": "CONNECTED",
+   "source": "LIVE",
+   "reason": "",
+   "reconnects": 0,
+   "since": "2026-11-12T16:21:14.188856+00:00",
+   "last_event_at": "2026-11-13T01:07:34.559851+00:00",
+   "last_event_age_s": 3.955911,
+   "clock_offset_ms": -689,
+   "connection_id": "svc-3ab1a5c869"
+  },
+  {
+   "venue": "OKX",
+   "state": "CONNECTED",
+   "source": "LIVE",
+   "reason": "",
+   "reconnects": 0,
+   "since": "2026-11-12T16:21:14.770743+00:00",
+   "last_event_at": "2026-11-13T01:07:36.043078+00:00",
+   "last_event_age_s": 2.472684,
+   "clock_offset_ms": -875,
+   "connection_id": "svc-3ab1a5c869"
+  }
+ ]
+}

@@ -353,3 +353,67 @@ def test_report_job_skips_days_before_the_session_existed(client, db):
     reports.handle_report_job(db, sid, {"day": "2026-01-01T00:00:00+00:00"})
     db.commit()
     assert db.execute(text("select count(*) from daily_paper_reports")).scalar_one() == 0
+
+
+def test_daily_report_stays_reproducible_after_later_incident_and_gap_changes(client, db):
+    """Found live in M2-R2: a stored report failed verification once an incident resolved later.
+    Inputs are now AS OF the window end, so later operational changes cannot alter the recomputation."""
+    from datetime import UTC, datetime
+
+    sid = build_session(db, 460)
+    day = datetime(2026, 1, 15, tzinfo=UTC)
+    # an alert that is open at the end of the report day but resolved afterwards
+    inc, _ = ops.open_incident(db, ops.DATA_GAP, ops.SEV_WARN, "x", f"asof:{sid}", sid)
+    db.execute(text("update incidents set opened_at = '2026-01-15 10:00+00'"))
+    db.commit()
+    row, _ = reports.store_report(db, sid, day)
+    db.commit()
+    assert row.body["operations"]["unresolved_alerts"], "the alert is open at the window end"
+    ops.resolve_incident(db, f"asof:{sid}")  # resolved later (today)
+    db.commit()
+    assert reports.verify_report(db, row)
+
+
+def test_a_defective_report_is_superseded_by_a_new_revision_never_edited(client, db):
+    from datetime import UTC, datetime
+
+    sid = build_session(db, 460)
+    day = datetime(2026, 1, 15, tzinfo=UTC)
+    row0, _ = reports.store_report(db, sid, day)
+    db.commit()
+    same, created = reports.store_report(
+        db, sid, day, supersede=True
+    )  # reproducible: no new revision
+    assert not created and same.id == row0.id
+    db.execute(
+        text("SET LOCAL session_replication_role = replica")
+    )  # simulate a defective stored report
+    db.execute(text("update daily_paper_reports set content_hash = repeat('0', 64)"))
+    db.commit()
+    db.expire_all()  # the session cached the old hash
+    new, created = reports.store_report(db, sid, day, supersede=True)
+    db.commit()
+    assert created and new.revision == 1 and reports.verify_report(db, new)
+    assert reports.latest_report(db, sid, day).id == new.id
+    assert (
+        db.execute(text("select count(*) from daily_paper_reports")).scalar_one() == 2
+    )  # old row kept
+    with pytest.raises(Exception):  # noqa: B017  (append-only: revisions are the only correction path)
+        db.execute(text("update daily_paper_reports set body = '{}'::jsonb where revision = 1"))
+    db.rollback()
+
+
+def test_report_job_waits_until_every_step_of_the_day_is_processed(client, db):
+    from datetime import UTC, datetime
+
+    from asta.paper.jobs import JobError
+
+    sid = build_session(db, 330)  # cursor ends well inside 2026-01-14 (step 329 = 01-14 17:00)
+    assert not reports.window_is_covered(db, sid, datetime(2026, 1, 14, tzinfo=UTC))
+    db.execute(
+        text("update paper_sessions set started_at = '2026-01-01 00:00+00' where id = :s"),
+        {"s": str(sid)},
+    )
+    db.commit()
+    with pytest.raises(JobError, match="not fully processed"):
+        reports.handle_report_job(db, sid, {"day": "2026-01-14T00:00:00+00:00"})
