@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "c4b40ddde0d43f59fedd781cbde1358e17b762fd",
+ "generated_from_commit": "a8ed63b7f9ede01b7b7727f8c97282335ce9f37d",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -500,7 +500,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/asta-db-backup.service",
-   "sha256": "f5879e5939ece696035b48cf7efbb69e2d109de0f24d727cf5e37170f37db1c1"
+   "sha256": "b78793a618ae214b4631002e1218c925bd4421aab8d9619cb88cebc29ad0bfcf"
   },
   {
    "path": "infra/security-host/mac/app-vm/asta-db-backup.timer",
@@ -524,7 +524,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/asta-security-monitor.service",
-   "sha256": "b040833bd8cf9eb743c46ea19e836bd9cbd74f24c8f42b4b48188e2192e85528"
+   "sha256": "295420664cf23a367385473a4f3fb86891b6fddff2e3b3258346716f95d2580c"
   },
   {
    "path": "infra/security-host/mac/app-vm/asta-security-monitor.timer",
@@ -540,7 +540,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/install-security-services.sh",
-   "sha256": "f3c394779166c22e702fd6c23b6930817ef2e855eb445a8b154e05180b47cc0f"
+   "sha256": "14f639a0229d986f9daa1c108842b372883709d4d4dfbef1216110a3149b758a"
   },
   {
    "path": "infra/security-host/mac/app-vm/netplan-50-asta.yaml",
@@ -608,7 +608,7 @@
   },
   {
    "path": "infra/security-host/mac/firewall-vm/asta-deadman.sh",
-   "sha256": "d857f3225fd86d15c38c4a473afa81545c5b7390b7448c3a6a3eba99fa6a17f4"
+   "sha256": "74d5dc77ad5e8681d0049816d215195cc2800625243bf159d1bd06900c875089"
   },
   {
    "path": "infra/security-host/mac/firewall-vm/asta-deadman.timer",
@@ -799,6 +799,10 @@
    "sha256": "644afb0b38f9104ed6f7993111621a05d23ed55674d21a061c6b18627f2566e9"
   },
   {
+   "path": "src/asta/orders/alerting.py",
+   "sha256": "6f421b038239b39b773a905b0a779a02101d39010e8326baa07c609f15550781"
+  },
+  {
    "path": "src/asta/orders/boundary.py",
    "sha256": "9cc613b4a9a686aa411c48343acafad8889efa9956a3362edb888b9729039460"
   },
@@ -828,7 +832,7 @@
   },
   {
    "path": "src/asta/orders/monitor.py",
-   "sha256": "16f07b5e823ec8438bf13dc3002379b64675d066eeaf79dc52aaa3f55db876a9"
+   "sha256": "0aa0e898baa98afcf6ce81026981643b22aa50cae881c1c0e58f13e15f3b120b"
   },
   {
    "path": "src/asta/orders/ports.py",
@@ -873,6 +877,10 @@
   {
    "path": "src/asta/security/redaction.py",
    "sha256": "1ca46373152e710362ce134a67226793da59f77b4b32556a7e8a10e49d15a534"
+  },
+  {
+   "path": "src/asta/security/signer.py",
+   "sha256": "84c0cb8fe1737108344f165beb620cec78d110732ca4b6252af63a61dfedbc0d"
   },
   {
    "path": "src/asta/security/vault.py",
