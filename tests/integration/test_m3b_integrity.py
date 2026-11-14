@@ -293,17 +293,21 @@ def make_env(i=1, seq=1, nonce="n1", sender="app-1", issued=1_000, expires=1_030
 
 
 def receiver(sessions, auth) -> Receiver:
-    return Receiver(auth, frozenset({"app-1"}), SqlReplayStore(sessions))
+    return Receiver(
+        auth, frozenset({"app-1"}), SqlReplayStore(sessions), allowed_key_ids=frozenset({"k1"})
+    )
 
 
 def test_a_replay_is_refused_across_a_process_restart(sessions, salt):
     auth = FakeAuth({"k1": b"k" * 32})
     sender = "app-" + salt[:8]
-    a = Receiver(auth, frozenset({sender}), SqlReplayStore(sessions))
+    a = Receiver(
+        auth, frozenset({sender}), SqlReplayStore(sessions), allowed_key_ids=frozenset({"k1"})
+    )
     wire = seal(make_env(seq=5, nonce="x" + salt[:6], sender=sender, salt=salt), auth)
     assert a.open(wire, 1_005)[1] == ""
     restarted = Receiver(
-        auth, frozenset({sender}), SqlReplayStore(sessions)
+        auth, frozenset({sender}), SqlReplayStore(sessions), allowed_key_ids=frozenset({"k1"})
     )  # new process, same database
     assert restarted.open(wire, 1_005) == (None, "REPLAYED_OR_OUT_OF_ORDER")
     older = seal(make_env(seq=4, nonce="o" + salt[:6], sender=sender, salt=salt), auth)
@@ -317,9 +321,9 @@ def test_concurrent_receivers_accept_one_message_exactly_once(sessions, salt):
     sender = "app-" + salt[:8]
     wire = seal(make_env(seq=1, nonce="c" + salt[:6], sender=sender, salt=salt), auth)
     res = run_threads(
-        lambda i: Receiver(auth, frozenset({sender}), SqlReplayStore(sessions)).open(wire, 1_005)[
-            1
-        ],
+        lambda i: Receiver(
+            auth, frozenset({sender}), SqlReplayStore(sessions), allowed_key_ids=frozenset({"k1"})
+        ).open(wire, 1_005)[1],
         8,
     )
     assert res.count("") == 1 and res.count("REPLAYED_OR_OUT_OF_ORDER") == 7
@@ -330,7 +334,9 @@ def test_forged_expired_oversized_wrong_sender_and_unauthenticated_are_refused_a
 ):
     auth = FakeAuth({"k1": b"k" * 32})
     sender = "app-" + salt[:8]
-    r = Receiver(auth, frozenset({sender}), SqlReplayStore(sessions))
+    r = Receiver(
+        auth, frozenset({sender}), SqlReplayStore(sessions), allowed_key_ids=frozenset({"k1"})
+    )
     good = seal(make_env(seq=1, nonce="g" + salt[:6], sender=sender, salt=salt), auth)
     forged = bytearray(good)
     forged[5] ^= 1  # inside the authentication tag
@@ -358,7 +364,12 @@ def test_without_a_valid_authenticator_nothing_is_ever_accepted(sessions, salt):
     real = FakeAuth({"k1": b"k" * 32})
     sender = "app-" + salt[:8]
     wire = seal(make_env(seq=1, nonce="f" + salt[:6], sender=sender, salt=salt), real)
-    r = Receiver(FailClosedAuthenticator(), frozenset({sender}), SqlReplayStore(sessions))
+    r = Receiver(
+        FailClosedAuthenticator(),
+        frozenset({sender}),
+        SqlReplayStore(sessions),
+        allowed_key_ids=frozenset({"k1"}),
+    )
     assert r.open(wire, 1_005) == (None, "NOT_AUTHENTIC")
     with pytest.raises(NotImplementedError):
         FailClosedAuthenticator().tag_for("k1", b"x")
@@ -368,7 +379,12 @@ def test_a_non_durable_replay_store_is_refused_and_the_sequence_cannot_move_back
     sessions, salt
 ):
     with pytest.raises(ValueError):
-        Receiver(FailClosedAuthenticator(), frozenset({"a"}), MemoryReplayStore())
+        Receiver(
+            FailClosedAuthenticator(),
+            frozenset({"a"}),
+            MemoryReplayStore(),
+            allowed_key_ids=frozenset({"k1"}),
+        )
     SqlReplayStore(sessions).accept("seq-" + salt[:6], 9, "n", 2_000, 1_000)
     with pytest.raises(DBAPIError):
         raw(

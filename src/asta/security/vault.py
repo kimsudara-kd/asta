@@ -1,7 +1,8 @@
 """Credential vault contract + mock/test backends (M3A-2).
 
 Scope (ASTA-M3A-IMPLEMENTATION-01 section 4): interface, policy and tests with RANDOM SYNTHETIC
-secrets only. No real exchange credential exists in this repository, the vault is not wired into any
+secrets only - enforced in ``Vault.store`` (``is_synthetic``), not by convention (M3-B-R2).
+No real exchange credential exists in this repository, the vault is not wired into any
 runtime path, and the real backend is a later, independently reviewed decision.
 
 Policy enforced here, by construction:
@@ -37,6 +38,21 @@ from asta.security.redaction import REGISTRY, SecretValue
 
 class VaultError(Exception):
     pass
+
+
+class NonSyntheticSecret(VaultError):
+    """The M3-B mock vault holds RANDOM SYNTHETIC test values only."""
+
+
+SYNTHETIC_PREFIX = "SYNTH-"
+
+
+def is_synthetic(value: str) -> bool:
+    """True only for values made by ``synthetic_secret()``: the fixed prefix then URL-safe base64.
+    A real exchange credential has no such prefix, so it can never be stored here."""
+    body = value[len(SYNTHETIC_PREFIX) :]
+    ok_chars = set("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_")
+    return value.startswith(SYNTHETIC_PREFIX) and len(body) >= 16 and set(body) <= ok_chars
 
 
 class AccessDenied(VaultError):
@@ -227,6 +243,12 @@ class Vault:
             raise ForbiddenPermission(f"permissions not allowed: {sorted(bad) or 'none given'}")
         if not parts:
             raise VaultError("empty credential")
+        if not all(is_synthetic(v.reveal()) for v in parts.values()):
+            # synthetic-only: refuse BEFORE anything is encrypted, stored, registered or logged
+            self.log.append(actor, "store.refused", {"identity": identity, "why": "non-synthetic"})
+            raise NonSyntheticSecret(
+                "only random synthetic test values can be stored in this vault"
+            )
         prev = self.backend.get(identity)
         version = (prev["version"] + 1) if prev else 1
         now = datetime.now(UTC)

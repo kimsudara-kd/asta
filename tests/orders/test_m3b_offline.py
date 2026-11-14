@@ -185,7 +185,13 @@ def env(
 @pytest.fixture
 def chan() -> tuple[FakeAuth, Receiver]:
     a = FakeAuth({"k1": b"x" * 32})
-    return a, Receiver(a, frozenset({"app-1"}), MemoryReplayStore(), require_durable=False)
+    return a, Receiver(
+        a,
+        frozenset({"app-1"}),
+        MemoryReplayStore(),
+        allowed_key_ids=frozenset({"k1"}),
+        require_durable=False,
+    )
 
 
 def test_a_valid_message_round_trips(chan):

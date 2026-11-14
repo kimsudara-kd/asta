@@ -12,7 +12,8 @@ refused with a reason code and never reaches the dispatcher.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Protocol
 
@@ -22,6 +23,8 @@ from asta.orders.lifecycle import Intent
 VERSION = 1
 MAX_BYTES = 2_048  # an intent is tiny; anything larger is hostile or broken
 MAX_NONCE_MEMORY = 10_000
+MIN_TAG, MAX_TAG = 16, 128  # authentication tag length bounds (bytes)
+_KEY_ID = re.compile(rb'"key_id":"([A-Za-z0-9._-]{1,64})"')
 
 
 class Authenticator(Protocol):
@@ -137,6 +140,9 @@ class Receiver:
     auth: Authenticator
     allowed_senders: frozenset[str]
     replay: ReplayStore
+    #: key ids THIS receiver accepts (explicit, no default): a key valid for another receiver is
+    #: refused here, which is the receiver/audience binding without changing the wire format
+    allowed_key_ids: frozenset[str] = field(kw_only=True)
     max_skew_seconds: int = 30
     max_validity_seconds: int = 60
     require_durable: bool = True
@@ -148,22 +154,36 @@ class Receiver:
             )
 
     def open(self, wire: bytes, now: int) -> tuple[Envelope | None, str]:
-        """(envelope, "") if accepted, else (None, REASON). Replay state changes only on accept."""
+        """(envelope, "") if accepted, else (None, REASON); state changes only on accept."""
         if len(wire) > MAX_BYTES + 2 + 64:
             return None, "TOO_LARGE"
         if len(wire) < 3:
             return None, "MALFORMED"
         n = int.from_bytes(wire[:2], "big")
+        if not MIN_TAG <= n <= MAX_TAG:
+            return None, "MALFORMED"
         tag, payload = wire[2 : 2 + n], wire[2 + n :]
         if len(payload) > MAX_BYTES or not payload:
             return None, "TOO_LARGE" if payload else "MALFORMED"
-        try:
-            body = json.loads(payload.decode("utf-8"))
-            key_id = str(body["key_id"])
-        except (ValueError, KeyError, TypeError):
+        # No JSON is parsed before authentication: the key id is cut out of the canonical bytes
+        # with a strict, bounded pattern (quotes inside strings are escaped, so it cannot be
+        # spoofed from within a value), checked against this receiver's allowlist, then used
+        # to authenticate.
+        m = _KEY_ID.search(payload)
+        if m is None:
             return None, "MALFORMED"
+        key_id = m.group(1).decode("ascii")
+        if key_id not in self.allowed_key_ids:
+            return None, "KEY_NOT_ALLOWED"
         if not self.auth.verify(key_id, payload, tag):  # authenticate BEFORE trusting any field
             return None, "NOT_AUTHENTIC"
+        try:
+            body = json.loads(payload.decode("utf-8"))
+            canonical = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
+        except (ValueError, TypeError):
+            return None, "MALFORMED"
+        if canonical != payload or str(body.get("key_id")) != key_id:
+            return None, "NOT_CANONICAL"  # duplicate keys, odd whitespace or a mismatched key id
         try:
             env = self._parse(body)
         except (ValueError, KeyError, TypeError, InvalidOperation):

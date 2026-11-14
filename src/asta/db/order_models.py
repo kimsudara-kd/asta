@@ -137,3 +137,12 @@ class ChannelNonce(Base):
     nonce: Mapped[str] = mapped_column(String(128))
     expires_at: Mapped[int] = mapped_column(BigInteger)
     accepted_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class RiskHaltBridgeSeen(Base):
+    __tablename__ = "risk_halt_bridge_seen"
+    __table_args__ = (PrimaryKeyConstraint("source", "event_key"),)
+    source: Mapped[str] = mapped_column(String(32))
+    event_key: Mapped[str] = mapped_column(String(96))
+    detail: Mapped[str] = mapped_column(Text)
+    seen_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
