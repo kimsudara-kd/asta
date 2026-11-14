@@ -25,22 +25,39 @@ UBUNTU_IMG="${UBUNTU_IMG:-$BASE/images/ubuntu-24.04-server-cloudimg-arm64.img}"
 
 run() { echo "> $*"; [ "$DRY_RUN" = "0" ] && "$@" || true; }
 
+# QEMU integrity (M3-B-R4): the VM is not started unless the pinned binary, firmware and libraries match.
+# The pin is installed root-owned by provision-host.sh; a mismatch makes this script fail (KeepAlive retries).
+QEMU_PIN="${ASTA_QEMU_PIN:-/usr/local/libexec/asta/qemu-pin.sha256}"
+verify_qemu() {
+  echo "> shasum -a 256 -c $QEMU_PIN"
+  if [ "$DRY_RUN" = "0" ]; then
+    [ -r "$QEMU_PIN" ] || { echo "REFUSING: QEMU pin file missing: $QEMU_PIN" >&2; exit 70; }
+    shasum -a 256 -c "$QEMU_PIN" >/dev/null 2>&1 || { echo "REFUSING: the QEMU binary, firmware or a library no longer matches the pin" >&2; exit 70; }
+  fi
+}
+
 # name vcpus ram_mb disk_gb
 spec() {
   case "$1" in
-    fw)   echo "1 1024 8" ;;
-    app)  echo "3 5120 60" ;;     # paper service, API, PostgreSQL, backups
-    cred) echo "1 2048 10" ;;     # vault + connector only (M3-B services not installed yet)
+    fw)   echo "1 768 8" ;;       # M3-B-R4 two-VM phase: sized for a contended 16 GiB host (docs/m3b/CAPACITY-ASSESSMENT.md)
+    app)  echo "3 3072 40" ;;     # paper service, API, PostgreSQL, risk-halt bridge, monitor, backups
+    cred) echo "1 1024 10" ;;     # vault + connector only; NOT enabled until M3-B is authorised (ASTA_ENABLE_CRED=1)
     *) echo "unknown vm $1" >&2; exit 2 ;;
   esac
 }
+
+# The credential VM is a LATER phase: without ASTA_ENABLE_CRED=1 it cannot be prepared or started and the
+# firewall VM has no second (cred0) link at all.
+ENABLE_CRED="${ASTA_ENABLE_CRED:-0}"
 
 # point-to-point links: server side listens, client side connects (unix sockets, no host network)
 # L1 fw<->app, L2 fw<->cred. L3 app<->cred is NOT attached until M3-B is authorized.
 nics() {
   case "$1" in
-    fw)   echo "-netdev stream,id=app0,addr.type=unix,addr.path=$RUN/l1.sock,server=on,reconnect-ms=2000 -device virtio-net-pci,netdev=app0,mac=52:54:00:77:01:01 \
-                -netdev stream,id=cred0,addr.type=unix,addr.path=$RUN/l2.sock,server=on,reconnect-ms=2000 -device virtio-net-pci,netdev=cred0,mac=52:54:00:77:02:01 \
+    fw)   CRED_LINK=""
+          [ "$ENABLE_CRED" = "1" ] && CRED_LINK="-netdev stream,id=cred0,addr.type=unix,addr.path=$RUN/l2.sock,server=on,reconnect-ms=2000 -device virtio-net-pci,netdev=cred0,mac=52:54:00:77:02:01"
+          echo "-netdev stream,id=app0,addr.type=unix,addr.path=$RUN/l1.sock,server=on,reconnect-ms=2000 -device virtio-net-pci,netdev=app0,mac=52:54:00:77:01:01 \
+                $CRED_LINK \
                 -netdev stream,id=up0,addr.type=unix,addr.path=$UPLINK_SOCK -device virtio-net-pci,netdev=up0,mac=52:54:00:77:00:01" ;;
     app)  echo "-netdev stream,id=fw0,addr.type=unix,addr.path=$RUN/l1.sock,server=off,reconnect-ms=2000 -device virtio-net-pci,netdev=fw0,mac=52:54:00:77:01:02" ;;
     cred) echo "-netdev stream,id=fw0,addr.type=unix,addr.path=$RUN/l2.sock,server=off,reconnect-ms=2000 -device virtio-net-pci,netdev=fw0,mac=52:54:00:77:02:02" ;;
@@ -50,9 +67,9 @@ nics() {
 case "${1:-describe}" in
   describe)
     cat <<'EOT'
-asta-fw   10.77.1.1 (app0) 10.77.2.1 (cred0) up0 = bridged uplink   1 vCPU  1 GB   8 GB   nftables + proxy, never forwards
-asta-app  10.77.1.2 (fw0)                                           3 vCPU  5 GB  60 GB   paper service, API, PostgreSQL (unix socket), backups; NO credentials
-asta-cred 10.77.2.2 (fw0)                                           1 vCPU  2 GB  10 GB   vault + connector only (future)
+asta-fw   10.77.1.1 (app0) [10.77.2.1 (cred0) only if ASTA_ENABLE_CRED=1] up0 = bridged uplink   1 vCPU 768 MB   8 GB   nftables + proxy, never forwards
+asta-app  10.77.1.2 (fw0)                                           3 vCPU  3 GB  40 GB   paper service, API, PostgreSQL (unix socket), bridge, monitor, backups; NO credentials
+asta-cred 10.77.2.2 (fw0)   LATER PHASE, disabled by default        1 vCPU  1 GB  10 GB   vault + connector only (M3-B authorisation required)
 No host file sharing, no USB, no clipboard, no host-only/NAT/vmnet adapters; consoles are unix sockets in a 0700 directory.
 EOT
     ;;
@@ -60,6 +77,7 @@ EOT
     run mkdir -p "$RUN" "$SEEDS" "$BASE/images" "$BASE/vars" "$BASE/disks"
     run chmod 700 "$BASE" "$RUN"
     for vm in fw app cred; do
+      [ "$vm" = "cred" ] && [ "$ENABLE_CRED" != "1" ] && continue   # credential VM: later phase
       set -- $(spec "$vm")
       run qemu-img create -f qcow2 -F qcow2 -b "$UBUNTU_IMG" "$BASE/disks/asta-$vm.qcow2" "${3}G"
       run cp "$FW_VARS_TEMPLATE" "$BASE/vars/asta-$vm.vars.fd"
@@ -70,7 +88,12 @@ EOT
     run qemu-img create -f raw "$BASE/disks/asta-backup.img" 20G
     ;;
   run)
+    verify_qemu
     vm="${2:?fw|app|cred}"
+    if [ "$vm" = "cred" ] && [ "$ENABLE_CRED" != "1" ]; then
+      echo "REFUSING: the credential VM is a later phase (M3-B is not authorised); set ASTA_ENABLE_CRED=1 only after that authorisation" >&2
+      exit 71
+    fi
     set -- $(spec "$vm")
     cpus="$1"; ram="$2"
     # shellcheck disable=SC2046

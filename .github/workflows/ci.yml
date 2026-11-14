@@ -38,7 +38,9 @@ jobs:
       - name: Secret scan (history)
         run: uv run python scripts/secret_scan.py
       - uses: gitleaks/gitleaks-action@v2
-        env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" }
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITLEAKS_VERSION: "8.30.1"   # pinned (M3-B-R4): the version used for the local full-history scans; the action otherwise uses a hard-coded version of its own
 
   web:
     runs-on: ubuntu-24.04

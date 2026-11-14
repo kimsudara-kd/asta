@@ -73,11 +73,12 @@ def halt(sessions, why: str = "drawdown halt") -> str:
     return sid
 
 
-def authorize(sessions, name: str = "alice") -> None:
+def authorize(sessions) -> None:
+    who = SqlKillSwitch(sessions).session_actor()
     with sessions() as db:
         db.execute(
             text("INSERT INTO kill_switch_releasers (name) VALUES (:n) ON CONFLICT DO NOTHING"),
-            {"n": name},
+            {"n": who},
         )
         db.commit()
 
@@ -112,7 +113,7 @@ def test_restart_does_not_trip_twice_for_the_same_event_but_a_new_halt_trips_aga
         assert RiskHaltBridge(sessions).poll().tripped == []
     assert trips(sessions) == first
     authorize(sessions)
-    assert k.release("alice", "operator reviewed the halt and re-armed the session") is True
+    assert k.release("operator reviewed the halt and re-armed the session") is True
     assert (
         RiskHaltBridge(sessions).poll().tripped == [] and not k.active()
     )  # the old event does not re-latch

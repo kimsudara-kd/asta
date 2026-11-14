@@ -133,9 +133,22 @@ def roles(migrated_engine):
     with migrated_engine.begin() as c:
         for stmt in stmts:
             c.exec_driver_sql(stmt)
+        for human in (
+            "rel_alice",
+            "rel_eve",
+        ):  # one LOGIN-style role per human, member of asta_release
+            c.execute(text(f"DROP ROLE IF EXISTS {human}"))
+            c.execute(text(f"CREATE ROLE {human} NOLOGIN IN ROLE asta_release"))
     yield
     with migrated_engine.begin() as c:
-        for r in ("asta_bridge", "asta_orders", "asta_release"):
+        for r in (
+            "rel_alice",
+            "rel_eve",
+            "asta_bridge",
+            "asta_orders",
+            "asta_monitor",
+            "asta_release",
+        ):
             c.execute(text(f"DROP OWNED BY {r}"))
             c.execute(text(f"DROP ROLE IF EXISTS {r}"))
 
@@ -154,13 +167,29 @@ def as_role(engine, role: str, sql: str, **params):
             raise
 
 
+def as_login(engine, login: str, sql: str, **params):
+    """Run as an authenticated session user (SET SESSION AUTHORIZATION changes session_user too)."""
+    with engine.connect() as c:
+        trans = c.begin()
+        try:
+            c.execute(text(f"SET SESSION AUTHORIZATION {login}"))
+            r = c.execute(text(sql), params)
+            out = r.all() if r.returns_rows else None
+            c.execute(text("RESET SESSION AUTHORIZATION"))
+            trans.commit()
+            return out
+        except Exception:
+            trans.rollback()
+            raise
+
+
 def test_the_bridge_role_can_latch_and_beat_but_nothing_else(roles, migrated_engine):
     e = migrated_engine
     as_role(e, "asta_bridge", "SELECT bridge_heartbeat()")
     as_role(e, "asta_bridge", "SELECT trip_kill_switch('RISK_HALT', 'risk-bridge', 'role test')")
     assert as_role(e, "asta_bridge", "SELECT active FROM kill_switch_state")[0][0] is True
     for sql in (
-        "SELECT release_kill_switch('alice', 'a perfectly good reason here')",  # no EXECUTE
+        "SELECT release_kill_switch('a perfectly good reason here')",  # no EXECUTE
         "UPDATE kill_switch_state SET active = false",  # no table write
         "UPDATE kill_switch_state SET active = true",
         "INSERT INTO kill_switch_releasers (name) VALUES ('mallory')",
@@ -182,7 +211,7 @@ def test_the_orders_role_cannot_release_or_edit_the_halt_tables(roles, migrated_
         e, "asta_orders", "SELECT trip_kill_switch('FILL_CONFLICT', 'fill-ingest', 'role test')"
     )
     for sql in (
-        "SELECT release_kill_switch('alice', 'a perfectly good reason here')",
+        "SELECT release_kill_switch('a perfectly good reason here')",
         "UPDATE kill_switch_state SET active = false",
         "INSERT INTO kill_switch_releasers (name) VALUES ('mallory')",
         "DELETE FROM order_fills",
@@ -193,15 +222,18 @@ def test_the_orders_role_cannot_release_or_edit_the_halt_tables(roles, migrated_
             as_role(e, "asta_orders", sql)
 
 
-def test_the_release_role_can_only_release_and_only_as_a_listed_actor(roles, migrated_engine):
+def test_the_releaser_is_the_authenticated_session_user_and_cannot_be_claimed(
+    roles, migrated_engine
+):
     e = migrated_engine
     as_role(e, "asta_bridge", "SELECT trip_kill_switch('RISK_HALT', 'risk-bridge', 'role test')")
-    with pytest.raises(DBAPIError):  # nobody is listed yet
-        as_role(
-            e, "asta_release", "SELECT release_kill_switch('alice', 'a perfectly good reason here')"
-        )
+    reason = "reviewed the halt and releasing for the test"
+    with pytest.raises(
+        DBAPIError
+    ):  # nobody is listed yet: even a member of asta_release is refused
+        as_login(e, "rel_alice", f"SELECT release_kill_switch('{reason}')")
     with e.begin() as c:
-        c.execute(text("INSERT INTO kill_switch_releasers (name) VALUES ('alice')"))
+        c.execute(text("INSERT INTO kill_switch_releasers (name) VALUES ('rel_alice')"))
     for sql in (
         "SELECT trip_kill_switch('MANUAL', 'x', 'y')",
         "UPDATE kill_switch_state SET active = false",
@@ -209,21 +241,23 @@ def test_the_release_role_can_only_release_and_only_as_a_listed_actor(roles, mig
         "INSERT INTO kill_switch_releasers (name) VALUES ('eve')",
     ):
         with pytest.raises(DBAPIError):
-            as_role(e, "asta_release", sql)
-    with pytest.raises(DBAPIError):  # an unlisted actor name is still refused
-        as_role(
-            e,
-            "asta_release",
-            "SELECT release_kill_switch('mallory', 'a perfectly good reason here')",
+            as_login(e, "rel_alice", sql)  # a releaser gets the release function and nothing else
+    with pytest.raises(DBAPIError):  # a role that is not listed (an impersonator) is refused...
+        as_login(e, "rel_eve", f"SELECT release_kill_switch('{reason}')")
+    with pytest.raises(
+        DBAPIError
+    ):  # ...and there is no parameter to claim a name (2-arg form gone)
+        as_login(
+            e, "rel_eve", "SELECT release_kill_switch('rel_alice', 'a perfectly good reason here')"
         )
-    assert (
-        as_role(
-            e,
-            "asta_release",
-            "SELECT release_kill_switch('alice', 'reviewed and releasing for the test')",
-        )[0][0]
-        is True
-    )
+    assert as_role(e, "asta_bridge", "SELECT active FROM kill_switch_state")[0][0] is True
+    with pytest.raises(DBAPIError):
+        as_login(e, "rel_alice", "SELECT release_kill_switch('short')")  # reason still required
+    assert as_login(e, "rel_alice", f"SELECT release_kill_switch('{reason}')")[0][0] is True
+    last = as_role(
+        e, "asta_orders", "SELECT action, actor FROM kill_switch_events ORDER BY id DESC LIMIT 1"
+    )[0]
+    assert tuple(last) == ("RELEASE", "rel_alice")  # recorded under the authenticated identity
 
 
 def test_public_has_no_execute_on_the_halt_functions(migrated_engine):
@@ -241,3 +275,59 @@ def test_public_has_no_execute_on_the_halt_functions(migrated_engine):
             name,
             acl,
         )  # no PUBLIC grant
+
+
+def test_alert_state_changes_go_to_the_hash_chained_audit_log_once_per_change(
+    sessions, migrated_engine
+):
+    from asta.db.audit_store import verify_audit_chain
+
+    def n_events() -> int:
+        with sessions() as db:
+            return int(
+                db.execute(
+                    text("SELECT count(*) FROM audit_events WHERE action = 'security.alert_state'")
+                ).scalar_one()
+            )
+
+    def last_codes() -> list[str]:
+        with sessions() as db:
+            return sorted(
+                db.execute(
+                    text(
+                        "SELECT payload FROM audit_events WHERE action = 'security.alert_state' ORDER BY id DESC LIMIT 1"
+                    )
+                ).scalar_one()["codes"]
+            )
+
+    RiskHaltBridge(sessions).poll()  # healthy
+    monitor.record_changes(sessions, monitor.check(sessions, 30))  # normalise to the current state
+    base = n_events()
+    set_beat_age(migrated_engine, 300)  # the bridge dies
+    a = monitor.check(sessions, 30)
+    assert monitor.record_changes(sessions, a) is True and n_events() == base + 1
+    assert "BRIDGE_HEARTBEAT_STALE" in last_codes()
+    for _ in range(3):  # the 30 s timer fires again and again: no new events while nothing changes
+        assert monitor.record_changes(sessions, monitor.check(sessions, 30)) is False
+    assert n_events() == base + 1
+    RiskHaltBridge(sessions).poll()  # restarted: the alert clears
+    assert monitor.record_changes(sessions, monitor.check(sessions, 30)) is True
+    assert "BRIDGE_HEARTBEAT_STALE" not in last_codes() and n_events() == base + 2
+    with sessions() as db:
+        ok, bad = verify_audit_chain(db)
+    assert ok and bad is None
+
+
+def test_the_monitor_role_can_append_audit_events_but_still_cannot_touch_the_halt(
+    roles, migrated_engine
+):
+    e = migrated_engine
+    as_role(e, "asta_monitor", "SELECT active FROM kill_switch_state")
+    for sql in (
+        "UPDATE kill_switch_state SET active = true",
+        "SELECT trip_kill_switch('MANUAL', 'x', 'yyyyyyyyyyyy')",
+        "SELECT bridge_heartbeat()",
+        "DELETE FROM audit_events",
+    ):
+        with pytest.raises(DBAPIError):
+            as_role(e, "asta_monitor", sql)

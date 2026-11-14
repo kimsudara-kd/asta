@@ -5,9 +5,9 @@
 --                  cannot release, cannot write the halt tables directly, cannot add releasers.
 --   asta_orders  : the order-path worker (dispatcher, fill ingest, reconciler). Can write intents/fills/
 --                  replay state and trip the switch; cannot release, cannot touch releasers.
---   asta_monitor : read-only: heartbeat and kill-switch state for the failure monitor.
---   asta_release : the operator role that releases a halt (only through release_kill_switch(), and only
---                  actors listed in kill_switch_releasers). Nothing else.
+--   asta_monitor : reads heartbeat/kill-switch state; may only APPEND alert-state changes to the audit chain.
+--   asta_release : the operator role that releases a halt (only through release_kill_switch(reason), and only
+--                  for a session user listed in kill_switch_releasers). Nothing else.
 -- Everything is deny-by-default: the migrations REVOKE EXECUTE on the halt functions from PUBLIC.
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'asta_bridge')  THEN CREATE ROLE asta_bridge  NOLOGIN; END IF;
@@ -35,7 +35,12 @@ GRANT EXECUTE ON FUNCTION trip_kill_switch(text, text, text) TO asta_orders;
 GRANT SELECT ON kill_switch_state, kill_switch_events, kill_switch_releasers TO asta_release;
 GRANT SELECT, INSERT ON audit_events TO asta_release;
 GRANT USAGE ON SEQUENCE audit_events_id_seq TO asta_release;
-GRANT EXECUTE ON FUNCTION release_kill_switch(text, text) TO asta_release;
+-- the releaser is session_user (the authenticated DB login), which must be listed in kill_switch_releasers.
+-- One LOGIN role per human, a member of asta_release (e.g. CREATE ROLE rel_alice LOGIN IN ROLE asta_release;).
+GRANT EXECUTE ON FUNCTION release_kill_switch(text) TO asta_release;
 
 -- failure monitor: read-only
 GRANT SELECT ON kill_switch_state, risk_halt_bridge_heartbeat TO asta_monitor;
+-- the monitor records alert-state CHANGES in the append-only audit chain (and nothing else)
+GRANT SELECT, INSERT ON audit_events TO asta_monitor;
+GRANT USAGE ON SEQUENCE audit_events_id_seq TO asta_monitor;

@@ -53,6 +53,38 @@ def check(sessions: sessionmaker[Session], max_heartbeat_age_s: float = 30.0) ->
     return out
 
 
+def record_changes(sessions: sessionmaker[Session], alerts: list[Alert]) -> bool:
+    """Append ``security.alert_state`` to the hash-chained audit log when the SET of active alert
+    codes changed since the last such event (entering or leaving an alert state), never on every
+    run. Returns True if an event was written. Payload: codes and severities only, no secrets."""
+    from asta.core.environment import Environment
+    from asta.db.audit_store import append_audit
+
+    codes = sorted(a.code for a in alerts)
+    with sessions() as db:
+        row = db.execute(
+            text(
+                "SELECT payload FROM audit_events WHERE action = 'security.alert_state'"
+                " ORDER BY id DESC LIMIT 1"
+            )
+        ).first()
+        last = sorted(row[0].get("codes", [])) if row else []
+        if row is None and not codes:
+            return False  # nothing was ever wrong and nothing is wrong now
+        if codes == last:
+            return False
+        sev = {a.code: a.severity for a in alerts}
+        append_audit(
+            db,
+            "security-monitor",
+            "security.alert_state",
+            {"codes": codes, "severity": sev, "cleared": sorted(set(last) - set(codes))},
+            Environment.EXCHANGE_DEMO,
+        )
+        db.commit()
+        return True
+
+
 def exit_code(alerts: list[Alert]) -> int:
     return 2 if any(a.severity == "critical" for a in alerts) else 1 if alerts else 0
 
@@ -61,7 +93,12 @@ def main() -> int:  # pragma: no cover - supervised entry point
     from asta.core.settings import load_settings
     from asta.db.session import make_engine, make_session_factory
 
-    alerts = check(make_session_factory(make_engine(load_settings().database_url)))
+    factory = make_session_factory(make_engine(load_settings().database_url))
+    alerts = check(factory)
+    try:
+        record_changes(factory, alerts)
+    except Exception as exc:  # noqa: BLE001 - the alert exit code must still be returned
+        print(json.dumps({"audit_write_failed": type(exc).__name__}), file=sys.stderr)
     print(json.dumps({"ok": not alerts, "alerts": [a.__dict__ for a in alerts]}))
     return exit_code(alerts)
 

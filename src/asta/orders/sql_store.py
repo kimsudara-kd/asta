@@ -392,25 +392,30 @@ class SqlKillSwitch:
             )
             db.commit()
 
-    def release(self, actor: str, reason: str) -> bool:
-        """True if released, False if not latched. Raises if the actor is not authorised or the
-        reason is too short (the audit chain records the refusal)."""
+    def session_actor(self) -> str:
+        """The authenticated database login: the ONLY identity a release can use (G-10)."""
+        with self._sessions() as db:
+            return str(db.execute(text("SELECT session_user")).scalar_one())
+
+    def release(self, reason: str) -> bool:
+        """True if released, False if not latched. The releaser is the authenticated session user
+        (it must be listed in kill_switch_releasers); a refusal (unlisted user, short reason) raises
+        and is recorded in the audit chain with that same identity."""
         from asta.core.environment import Environment
         from asta.db.audit_store import append_audit
 
+        actor = self.session_actor()
         with self._sessions() as db:
             try:
                 done = bool(
-                    db.execute(
-                        text("SELECT release_kill_switch(:a, :r)"), {"a": actor, "r": reason}
-                    ).scalar_one()
+                    db.execute(text("SELECT release_kill_switch(:r)"), {"r": reason}).scalar_one()
                 )
             except DBAPIError:
                 db.rollback()
                 with self._sessions() as db2:
                     append_audit(
                         db2,
-                        actor or "?",
+                        actor,
                         "killswitch.release_refused",
                         {"reason": (reason or "")[:200]},
                         Environment.EXCHANGE_DEMO,

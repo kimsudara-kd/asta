@@ -443,3 +443,159 @@ def test_every_service_role_has_peer_only_authentication_and_a_distinct_os_user(
         assert re.search(rf"{osuser}\s+{role}\b", ident), role
     active = "\n".join(ln for ln in hba.splitlines() if not ln.startswith("#"))
     assert not re.search(r"\b(md5|password|trust|scram-sha-256)\b", active)
+
+
+# ---------------------------------------------------------------- M3-B-R4: two-VM phase, host-network bypass
+def vm_cmd(vm: str, **env: str) -> str:
+    import os
+    import subprocess
+
+    r = subprocess.run(  # noqa: S603
+        ["/bin/sh", str(MAC / "qemu-vms.sh"), "run", vm],
+        capture_output=True, text=True, timeout=30,
+        env={"DRY_RUN": "1", "PATH": "/usr/bin:/bin", **env, "HOME": os.environ.get("HOME", "/")},
+    )  # fmt: skip
+    return r.stdout + r.stderr
+
+
+def test_two_vm_phase_the_credential_vm_cannot_start_and_the_firewall_has_no_cred_link():
+    fw = vm_cmd("fw")
+    assert (
+        "cred0" not in fw and "l2.sock" not in fw and fw.count("-netdev") == 2
+    )  # app link + uplink only
+    out = vm_cmd("cred")
+    assert "REFUSING" in out and "qemu-system-aarch64 -name" not in out
+    assert "cred0" in vm_cmd(
+        "fw", ASTA_ENABLE_CRED="1"
+    )  # the later phase attaches it, deliberately
+
+
+def test_no_vm_has_a_host_network_file_share_usb_or_forwarding_device():
+    for vm, env in (
+        ("fw", {}),
+        ("app", {}),
+        ("fw", {"ASTA_ENABLE_CRED": "1"}),
+        ("cred", {"ASTA_ENABLE_CRED": "1"}),
+    ):
+        cmd = vm_cmd(vm, **env)
+        line = next(ln for ln in cmd.splitlines() if ln.startswith("> qemu-system-aarch64"))
+        for banned in (
+            "hostfwd",
+            "-nic",
+            "vmnet-",
+            "tap,",
+            "user,",
+            "-virtfs",
+            "-usb",
+            "usb-",
+            "-fsdev",
+            "vhost-user",
+            "-spice",
+            "-vnc",
+        ):
+            assert banned not in line, (vm, banned)
+        assert all("type=unix" in n for n in line.split("-netdev ")[1:]), (
+            vm
+        )  # every NIC is a unix-socket stream
+        assert "-display none" in line and "-monitor none" in line and "-nodefaults" in line
+    app = next(ln for ln in vm_cmd("app").splitlines() if ln.startswith("> qemu-system-aarch64"))
+    assert (
+        app.count("-netdev") == 1 and "socket_vmnet" not in app
+    )  # the app VM has exactly one NIC, to the firewall VM
+
+
+def test_two_vm_phase_sizes_fit_the_contended_host():
+    sizes = {"fw": (1, 768, 8), "app": (3, 3072, 40), "cred": (1, 1024, 10)}
+    text = read(MAC / "qemu-vms.sh")
+    for vm, (cpu, ram, disk) in sizes.items():
+        assert f'echo "{cpu} {ram} {disk}"' in text, vm
+    assert (
+        sizes["fw"][1] + sizes["app"][1] <= 4096
+    )  # the two-VM phase stays within 4 GiB of guest RAM
+
+
+def test_security_services_installer_is_dry_run_by_default_linux_only_and_password_free():
+    import subprocess
+
+    script = MAC / "app-vm" / "install-security-services.sh"
+    text = read(script)
+    code = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith("#"))
+    assert "APPLY=0" in code and "needs root" in code and "not the Mac host" in code
+    assert "password" not in "\n".join(
+        ln for ln in code.splitlines() if "ASTA_DATABASE_URL" in ln
+    ).lower().replace("no password", "")
+    assert "--no-create-home" in code and "/usr/sbin/nologin" in code
+    for u in (
+        "asta-risk-bridge.service",
+        "asta-security-monitor.timer",
+        "asta-security-alert@.service",
+        "pg_roles_m3b.sql",
+    ):
+        assert u in code
+    assert (
+        "asta-orders" in code and "only when the order path is authorised" in code
+    )  # the order worker is NOT installed
+    r = subprocess.run(["/bin/sh", str(script)], capture_output=True, text=True, timeout=30)  # noqa: S603
+    assert r.returncode == 1 and "Linux app VM" in r.stderr  # on macOS it refuses at once
+
+
+# ---------------------------------------------------------------- M3-B-R4: host separation check
+def test_host_separation_check_is_read_only_and_reports_the_current_shared_state_as_failing(
+    tmp_path,
+):
+    import json
+    import re
+    import subprocess
+
+    script = MAC / "host-separation-check.sh"
+    code = "\n".join(ln for ln in read(script).splitlines() if not ln.lstrip().startswith("#"))
+    for banned in (
+        "docker stop",
+        "docker rm",
+        "docker kill",
+        "docker rmi",
+        "docker volume rm",
+        "docker system prune",
+        "kill ",
+        "pkill",
+        "launchctl bootout",
+        "launchctl unload",
+        "sudo",
+        "rm ",
+        "diskutil",
+        "networksetup",
+        "systemsetup",
+    ):
+        assert banned not in code, banned
+    assert not re.search(
+        r"\b(stop|rm|prune|delete)\b", " ".join(re.findall(r"docker [a-z]+", code))
+    ), "only read verbs of docker are used"
+    out = tmp_path / "r.json"
+    r = subprocess.run(
+        ["/bin/sh", str(script), str(out)], capture_output=True, text=True, timeout=120
+    )  # noqa: S603
+    d = json.loads(out.read_text())
+    assert {c["check"] for c in d["host_separation"]} >= {
+        "no_lan_reachable_listeners",
+        "filevault_on",
+        "app_firewall_on",
+        "no_exo",
+    }
+    assert r.returncode == (0 if d["failed"] == 0 else 1)
+
+
+def test_the_prepared_sshd_dropin_is_key_only_restricted_and_has_no_forwarding():
+    conf = "\n".join(
+        ln for ln in read(MAC / "sshd-asta.conf").splitlines() if ln and not ln.startswith("#")
+    )
+    for want in (
+        "PasswordAuthentication no",
+        "KbdInteractiveAuthentication no",
+        "PermitRootLogin no",
+        "AuthenticationMethods publickey",
+        "AllowUsers apple",
+        "AllowTcpForwarding no",
+        "X11Forwarding no",
+    ):
+        assert want in conf, want
+    assert "PasswordAuthentication yes" not in conf

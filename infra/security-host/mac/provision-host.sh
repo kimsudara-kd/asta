@@ -4,6 +4,8 @@
 # DRY RUN BY DEFAULT: prints what it would do and changes nothing. Review the output, then run with sudo:
 #     sudo sh provision-host.sh --apply [--vm-base DIR] [--socket-vmnet-tarball F --socket-vmnet-sha256 H] [--load] [--firewall]
 #
+# Default is the TWO-VM phase (firewall + application). --with-cred adds the credential VM daemon: LATER, only
+# after a separate M3-B authorisation (docs/m3b/SECURITY-TOPOLOGY.md).
 # What --apply does (each step is idempotent):
 #   1. service user/group `_astavm` (no login shell, hidden, no home)
 #   2. /var/lib/asta-vm (+ run, images, vars, disks, seeds) 0700 _astavm; /var/log/asta; root-owned launcher dir.
@@ -19,12 +21,13 @@
 # building/starting the VMs (that needs seeds + the Ubuntu image: see `qemu-vms.sh prepare`, Phase C).
 set -eu
 
-APPLY=0; LOAD=0; FIREWALL=0; TARBALL=""; SHA=""; VMBASE=""
+APPLY=0; LOAD=0; FIREWALL=0; WITHCRED=0; TARBALL=""; SHA=""; VMBASE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) APPLY=1 ;;
     --load) LOAD=1 ;;
     --firewall) FIREWALL=1 ;;
+    --with-cred) WITHCRED=1 ;;   # LATER PHASE: the credential VM daemon; not part of the two-VM phase
     --vm-base) VMBASE="${2:?dir}"; shift ;;
     --socket-vmnet-tarball) TARBALL="${2:?path}"; shift ;;
     --socket-vmnet-sha256) SHA="${2:?hex}"; shift ;;
@@ -40,7 +43,9 @@ REAL="${VMBASE:-$BASE}"      # where the data really lives (a symlink at $BASE w
 SVC=_astavm
 LIBEXEC=/usr/local/libexec/asta
 LOGDIR=/var/log/asta
-DAEMONS="com.asta.socket_vmnet com.asta.vm.fw com.asta.vm.app com.asta.vm.cred"
+ALL_DAEMONS="com.asta.socket_vmnet com.asta.vm.fw com.asta.vm.app com.asta.vm.cred"
+DAEMONS="com.asta.socket_vmnet com.asta.vm.fw com.asta.vm.app"   # two-VM phase; the credential VM daemon only with --with-cred
+[ "$WITHCRED" = 1 ] && DAEMONS="$DAEMONS com.asta.vm.cred"
 
 say() { printf '%s\n' "$*"; }
 run() { if [ "$APPLY" = 1 ]; then say "+ $*"; "$@"; else say "[dry-run] $*"; fi; }
@@ -55,7 +60,7 @@ for f in qemu-vms.sh launchd/com.asta.socket_vmnet.plist launchd/com.asta.vm.fw.
          launchd/com.asta.vm.app.plist launchd/com.asta.vm.cred.plist; do
   [ -f "$HERE/$f" ] || die "missing $f next to this script"
 done
-for d in $DAEMONS; do plutil -lint "$HERE/launchd/$d.plist" >/dev/null || die "invalid plist $d"; done
+for d in $ALL_DAEMONS; do plutil -lint "$HERE/launchd/$d.plist" >/dev/null || die "invalid plist $d"; done
 [ -x /opt/homebrew/bin/qemu-system-aarch64 ] || say "note: qemu-system-aarch64 not found in /opt/homebrew/bin (install QEMU via Homebrew first)"
 if [ -x /opt/homebrew/bin/qemu-system-aarch64 ]; then
   QOWN="$(stat -f %Su "$(readlink -f /opt/homebrew/bin/qemu-system-aarch64 2>/dev/null || echo /opt/homebrew/bin/qemu-system-aarch64)" 2>/dev/null || echo unknown)"
@@ -133,6 +138,9 @@ run chmod 755 "$LIBEXEC"
 run chown "root:$SVC" "$LOGDIR"
 run chmod 770 "$LOGDIR"    # only root (socket_vmnet) and $SVC (the VM daemons) can write logs here
 run install -o root -g wheel -m 0755 "$HERE/qemu-vms.sh" "$LIBEXEC/qemu-vms.sh"   # launched as $SVC: must not be writable by it
+[ -f "$HERE/qemu-pin.sha256" ] || die "missing qemu-pin.sha256: run 'python3 qemu_pin.py generate' on this Mac after checking the bottle (docs/m3b/HOST-SECURITY-CHECKLIST.md)"
+shasum -a 256 -c "$HERE/qemu-pin.sha256" >/dev/null 2>&1 || die "the QEMU pin does not match the installed QEMU: regenerate it deliberately (qemu_pin.py generate) after re-verifying the bottle"
+run install -o root -g wheel -m 0644 "$HERE/qemu-pin.sha256" "$LIBEXEC/qemu-pin.sha256"   # the pre-boot check reads this root-owned copy
 
 # ---------------------------------------------------------------- 3 socket_vmnet (root-owned, checksum-pinned)
 say; say "== 3 socket_vmnet"
@@ -148,7 +156,7 @@ else
 fi
 
 # ---------------------------------------------------------------- 4 LaunchDaemons
-say; say "== 4 LaunchDaemons (installed; loaded only with --load)"
+say; say "== 4 LaunchDaemons: $DAEMONS (installed; loaded only with --load)"
 for d in $DAEMONS; do
   run install -o root -g wheel -m 0644 "$HERE/launchd/$d.plist" "/Library/LaunchDaemons/$d.plist"
 done

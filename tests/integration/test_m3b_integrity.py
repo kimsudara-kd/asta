@@ -414,11 +414,13 @@ def disp(sessions, ex, kill) -> Dispatcher:
     )
 
 
-def authorize_releaser(sessions, name: str) -> None:
+def authorize_releaser(sessions, name: str | None = None) -> None:
+    """List a releaser. Default: the connection's own session user (the identity a release uses)."""
+    who = name or SqlKillSwitch(sessions).session_actor()
     raw(
         sessions,
         "INSERT INTO kill_switch_releasers (name) VALUES (:n) ON CONFLICT DO NOTHING",
-        n=name,
+        n=who,
     )
 
 
@@ -432,18 +434,16 @@ def test_the_halt_latches_survives_restart_and_only_an_authorised_operator_with_
     with pytest.raises(DBAPIError):
         raw(sessions, "UPDATE kill_switch_state SET active = false")  # no side door
     with pytest.raises(DBAPIError):
-        k.release("mallory", "I would like to trade now please")  # nobody is authorised by default
-    authorize_releaser(sessions, "alice")
+        k.release("I would like to trade now please")  # nobody is authorised by default
+    authorize_releaser(sessions)
     with pytest.raises(DBAPIError):
-        k.release("mallory", "I would like to trade now please")
+        k.release("too short")
     with pytest.raises(DBAPIError):
-        k.release("alice", "too short")
-    with pytest.raises(DBAPIError):
-        k.release("alice", "")
+        k.release("")
     assert k.active()
-    assert k.release("alice", "reconciled by hand and reviewed the incident") is True
+    assert k.release("reconciled by hand and reviewed the incident") is True
     assert not SqlKillSwitch(sessions).active()
-    assert k.release("alice", "second release has nothing to do") is False
+    assert k.release("second release has nothing to do") is False
     h = k.history()
     assert [a for a, _, _ in h][-2:] == ["TRIP", "RELEASE"] and (
         "TRIP",
@@ -454,11 +454,11 @@ def test_the_halt_latches_survives_restart_and_only_an_authorised_operator_with_
 
 def test_halt_changes_and_refused_releases_are_in_the_audit_chain(sessions):
     k = SqlKillSwitch(sessions)
-    authorize_releaser(sessions, "alice")
+    authorize_releaser(sessions)
     k.trip("MANUAL", "alice", "testing the chain")
     with pytest.raises(DBAPIError):
-        k.release("mallory", "this must be refused and logged")
-    k.release("alice", "chain test finished, releasing")
+        k.release("short")  # refused (reason too short) and logged
+    k.release("chain test finished, releasing")
     with sessions() as db:
         acts = [
             str(a)
@@ -495,8 +495,8 @@ def test_a_latched_halt_stops_dispatch_in_every_worker_and_in_the_database_itsel
             "UPDATE order_intents SET state = 'DISPATCHED' WHERE decision_id = :d",
             d=it.decision_id,
         )
-    authorize_releaser(sessions, "alice")
-    k.release("alice", "incident reviewed, resuming simulated demo")
+    authorize_releaser(sessions)
+    k.release("incident reviewed, resuming simulated demo")
     assert disp(sessions, ex, k).handle(make_intent(3, session=salt)).state == State.ACCEPTED
 
 
@@ -565,8 +565,8 @@ def test_reconciler_halts_on_foreign_orders_immediately_and_on_persistent_mismat
     assert rec.cycle().halted and k.active()  # persisted across two consecutive cycles
     # a foreign order halts at once (fresh switch state)
     k2 = SqlKillSwitch(sessions)
-    authorize_releaser(sessions, "alice")
-    k2.release("alice", "mismatch explained, releasing to test the next case")
+    authorize_releaser(sessions)
+    k2.release("mismatch explained, releasing to test the next case")
     rec2 = Reconciler(
         lambda: [it], lambda: {**mine, "e" * 32: ExchangeView("e" * 32, State.ACCEPTED)}, k2
     )
@@ -587,7 +587,7 @@ def test_a_fill_conflict_or_overfill_halts_processing_through_the_ingest_path(se
     res = ingest_fill(fs, k, it.decision_id, fl(it, "A", q="0.5", p="120"))
     assert res.status == Ingest.HALTED and k.active()
     assert ("TRIP", "FILL_CONFLICT", "fill-ingest") in k.history()
-    authorize_releaser(sessions, "alice")
-    k.release("alice", "conflict investigated with the exchange statement")
+    authorize_releaser(sessions)
+    k.release("conflict investigated with the exchange statement")
     res2 = ingest_fill(fs, k, it.decision_id, fl(it, "B", q="0.9"))
     assert res2.status == Ingest.HALTED and ("TRIP", "FILL_REJECTED", "fill-ingest") in k.history()

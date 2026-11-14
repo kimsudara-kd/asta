@@ -142,3 +142,14 @@ def test_vm_base_refuses_protected_locations_and_foreign_non_empty_directories()
 
 def test_the_symlink_parent_is_created_before_linking_when_the_base_is_elsewhere():
     assert 'run mkdir -p "$(dirname "$BASE")"; run ln -s "$REAL" "$BASE"' in CODE
+
+
+def test_the_default_phase_is_two_vms_and_the_credential_vm_needs_an_explicit_flag():
+    assert 'DAEMONS="com.asta.socket_vmnet com.asta.vm.fw com.asta.vm.app"' in CODE
+    assert '[ "$WITHCRED" = 1 ] && DAEMONS="$DAEMONS com.asta.vm.cred"' in CODE
+    out = subprocess.run(["/bin/sh", str(SCRIPT)], capture_output=True, text=True, timeout=60)
+    assert out.returncode == 0 and "com.asta.vm.cred.plist /Library" not in out.stdout
+    assert (
+        "com.asta.vm.fw.plist /Library" in out.stdout
+        and "com.asta.vm.app.plist /Library" in out.stdout
+    )

@@ -77,15 +77,15 @@ def listen(ns: str, ip: str, port: int) -> None:
     sh(f'ip netns exec {ns} nohup python3 -c "{code}" >/dev/null 2>&1 &', check=False)
 
 
-def udp_probe(ns: str, dst: str, user: str | None = None) -> bool:
-    """Send a UDP datagram to dst:53 from ns; True when the lab's fake DNS (in the default ns) gets it."""
+def udp_probe(ns: str, dst: str, user: str | None = None, port: int = 53) -> bool:
+    """Send a UDP datagram to dst:port from ns; True when the lab's receiver (in the default ns) gets it."""
     prefix = f"setpriv --reuid={user} --regid={user} --clear-groups " if user else ""
     token = f"probe-{ns}-{user or 'root'}-{time.time_ns()}"
     log = Path(tempfile.gettempdir()) / "lab-udp.log"
     log.unlink(missing_ok=True)
     recv_code = (
         "import socket;s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);s.settimeout(6);"
-        f"s.bind(('{dst}',53));d,_=s.recvfrom(100);open('{log}','wb').write(d)"
+        f"s.bind(('{dst}',{port}));d,_=s.recvfrom(100);open('{log}','wb').write(d)"
     )
     recv = subprocess.Popen(  # noqa: S603  (lab: fixed argv)
         ["python3", "-c", recv_code], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
@@ -94,7 +94,7 @@ def udp_probe(ns: str, dst: str, user: str | None = None) -> bool:
     nsx(
         ns,
         f'{prefix}python3 -c "import socket;s=socket.socket(socket.AF_INET,socket.SOCK_DGRAM);'
-        f"s.sendto(b'{token}',('{dst}',53))\"",
+        f"s.sendto(b'{token}',('{dst}',{port}))\"",
         check=False,
     )
     try:
@@ -111,6 +111,89 @@ def teardown() -> None:
         sh(f"ip netns del {ns}", check=False)
     sh("ip link del labup", check=False)
     sh("iptables -t nat -D POSTROUTING -s 10.99.0.0/30 -j MASQUERADE", check=False)
+
+
+CONNECT6 = (
+    "import socket,sys;s=socket.socket(socket.AF_INET6);s.settimeout(3)\n"
+    "try:\n s.connect((sys.argv[1],int(sys.argv[2])));print('CONNECTED')\n"
+    "except Exception as e:\n print('FAILED',type(e).__name__)\n"
+)
+
+
+def can_connect6(ns: str, addr: str, port: int) -> bool:
+    out = nsx(ns, f'python3 -c "{CONNECT6}" {addr} {port}', check=False, timeout=15).stdout
+    return "CONNECTED" in out
+
+
+def bypass_checks(inet_ip: str) -> None:
+    """M3-B-R4: alternate routes, direct IP, DNS, IPv6, metadata/LAN ranges, QUIC/DoT/TCP-53, host-network."""
+    # the app VM must have exactly the interfaces of the design: loopback and the one link to the firewall
+    links = nsx("asta-app", "ip -o link show", check=False).stdout
+    names = sorted(re.findall(r"^\d+: ([\w.@-]+?)(?:@\w+)?:", links, re.M))
+    record(
+        "app has only lo and fw0 (no second NIC, no host-network device)",
+        "[fw0, lo]",
+        names == ["fw0", "lo"],
+        str(names),
+    )
+    v6 = nsx("asta-app", "ip -6 -o addr show scope global", check=False).stdout.strip()
+    record("app has no global IPv6 address", "none", v6 == "", v6[:80])
+    for label, addr in (("Cloudflare", "2606:4700:4700::1111"), ("Google", "2001:4860:4860::8888")):
+        record(
+            f"app -> IPv6 {label} [{addr}]:443", "blocked", not can_connect6("asta-app", addr, 443)
+        )
+    ll = nsx("asta-fw", "ip -6 -o addr show dev app0 scope link", check=False).stdout
+    m = re.search(r"inet6 (fe80:[0-9a-f:]+)", ll)
+    if m:
+        sh(
+            "ip netns exec asta-fw nohup python3 -c \"import socket,time;s=socket.socket(socket.AF_INET6);s.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1);s.bind(('::',8081));s.listen(4)\nwhile True:\n c,_=s.accept();c.close()\" >/dev/null 2>&1 &",
+            check=False,
+        )
+        time.sleep(1)
+        record(
+            "app -> fw link-local IPv6 :8081 (listener exists)",
+            "blocked",
+            not can_connect6("asta-app", f"{m.group(1)}%fw0", 8081),
+        )
+    for label, ip in (
+        ("cloud metadata", "169.254.169.254"),
+        ("RFC1918 192.168/16", "192.168.1.1"),
+        ("RFC1918 10/8", "10.0.0.1"),
+        ("RFC1918 172.16/12", "172.16.0.1"),
+        ("CGNAT 100.64/10", "100.64.0.1"),
+    ):
+        record(f"app -> {label} {ip}:80", "blocked", not can_connect("asta-app", ip, 80))
+    for label, port in (("DNS over TCP 53", 53), ("DNS over TLS 853", 853), ("HTTP 80", 80)):
+        record(
+            f"app -> {inet_ip}:{port} ({label})",
+            "blocked",
+            not can_connect("asta-app", inet_ip, port),
+        )
+    record(
+        "app -> UDP/443 (QUIC) to the lab gateway",
+        "blocked",
+        not udp_probe("asta-app", LAB_GW, port=443),
+    )
+    # alternate routes: an on-link /32, a lower-metric default via the link, and a policy rule must not open anything
+    nsx("asta-app", f"ip route add {inet_ip}/32 dev fw0", check=False)
+    nsx("asta-app", "ip route add default dev fw0 metric 1", check=False)
+    nsx("asta-app", "ip rule add from all lookup main priority 100", check=False)
+    record(
+        f"app with extra on-link/low-metric routes -> {inet_ip}:443",
+        "blocked",
+        not can_connect("asta-app", inet_ip, 443),
+    )
+    nsx("asta-app", f"ip route del {inet_ip}/32 dev fw0", check=False)
+    nsx("asta-app", "ip route del default dev fw0 metric 1", check=False)
+    nsx("asta-app", "ip rule del priority 100", check=False)
+    out = nsx("asta-app", "nft list chain inet asta_app output", check=False).stdout
+    hits = re.findall(r"counter packets (\d+)", out)
+    record(
+        "app's OWN output chain dropped the bypass attempts (counter > 0: the rule, not luck)",
+        "> 0",
+        bool(hits) and int(hits[-1]) > 0,
+        out.strip().replace("\n", " ")[:100],
+    )
 
 
 def build(mac_dir: Path) -> None:
@@ -246,6 +329,7 @@ def main() -> int:
             "blocked",
             not udp_probe("asta-fw", LAB_GW, user="nobody"),
         )
+        bypass_checks(inet_ip)
         # ---- defence in depth: a COMPROMISED app VM (its own firewall removed) must still not get through asta-fw
         nsx("asta-app", "nft flush ruleset")
         record(
