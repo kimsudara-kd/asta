@@ -1,0 +1,22 @@
+{
+ "xarch-default": {
+  "id": "ad1705f7-9204-429d-8a4b-2c5a82f9e648",
+  "config_hash": "90c72305af8ee064b016399ecfa637d35317232ce5374b1c43acd85345539a0e",
+  "state": "RUNNING",
+  "last_step_ts": "2026-02-07T11:00:00+00:00",
+  "replay_steps_verified": 900,
+  "reconcile_discrepancies": 0,
+  "fills": 35,
+  "fills_digest": "f9d8e770d765ee84"
+ },
+ "xarch-guard-on": {
+  "id": "64803d9d-441c-46f3-931d-6553ca95879f",
+  "config_hash": "5b845235654c05b7f218666319855c654ea7de39dd10da67ea7741af66633fc2",
+  "state": "RUNNING",
+  "last_step_ts": "2026-02-07T11:00:00+00:00",
+  "replay_steps_verified": 900,
+  "reconcile_discrepancies": 0,
+  "fills": 35,
+  "fills_digest": "be76eb9ef1a917a5"
+ }
+}
