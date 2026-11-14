@@ -118,3 +118,10 @@ Every offline item of the order path is now built and proven (fills ledger, amen
 # 2026-11-14 (4) ASTA-M3B-GOVERNANCE-01 reconciliation
 
 **Decision: NO-GO. M3-B BUILT (offline only), NOT ACCEPTED; no acceptance tag.** Full report: `docs/evidence/M3B-GOVERNANCE-01.md`. Verified: nothing in the repository can sign, authenticate or send an exchange request; live-lock controls unchanged since `fb7770b`; no key material found by supplementary history scan. Newly recorded blockers: G-01 (gateway not on the order path), G-06 (8 mandatory security tests skipped on this host), G-07 (gitleaks full-history scan not run), G-08 (push identity); D-1..D-4 await owner ratification. Updated gates: add G-A..G-F (report s.13) to R2-D.
+
+
+---
+
+# 2026-11-14 (5) ASTA-DECISION-007 remediation
+
+**Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Offline items closed: mandatory gateway boundary, fill integrity (DB-level), durable channel replay, latched kill switch with authorised release, reconciler/fill-conflict halts, gitleaks full history (no leaks). Still blocked: the 8 Docker/firewall gates, host provisioning (F-02), independent review (F-03), hosted CI, vault backend (F-05/F-06), risk-halt bridge (R-D1), push identity (G-08). Evidence: `docs/evidence/M3B-DECISION-007.md`. Updated gate list: M3B-GOVERNANCE-01 s.13 (G-A done; G-B, G-F blocked; G-C, G-D done offline; G-E: D-1..D-4 ratified, G-08 open).

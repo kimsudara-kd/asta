@@ -74,3 +74,7 @@ Kill switch (manual, or automatically on: `RISK_HALT`, reconciliation anomaly, a
 
 ## 9. What must happen before any of this is connected
 B-1..B-7 of the readiness document (independent review, boundary deployed on the dedicated host, real vault backend and key ceremony, durable store and wire protocol designed and reviewed, U-1..U-4 measured on the testnet with a demo key created by the account owner), and a fresh M3-B directive with its own acceptance gates. Nothing in this file or in `src/asta/orders/` may be treated as that authorization.
+
+
+## 10. Gateway boundary, durable halt and integrity (ASTA-DECISION-007, 2026-11-14)
+The order path is reachable only through `orders/boundary.py` (`GatedExchange`, `InternalGate`) over the shared contract `core/order_gate.py`; external execution is a constant DENY and an external port is passed to the unchanged `ExecutionGateway`. The kill switch is a database latch (migration 0008) consulted by the gate and by a trigger on every advancement to DISPATCHED. Fills are applied atomically with the state under DB-level overfill/limit/state guards, with conflicts recorded in an append-only table. Channel replay state is transactional (`docs/m3b/INTENT-CHANNEL-SECURITY.md`). Evidence: `docs/evidence/M3B-DECISION-007.md`. Still no connector, credential or signing.

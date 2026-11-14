@@ -126,3 +126,6 @@ Security architecture (`SECURITY-ARCHITECTURE.md`, `VM-BOUNDARY-DESIGN.md` **inc
 
 ## Addendum 2026-11-14: M3B-GOVERNANCE-01
 Repository state `924da22`. Read first: `docs/evidence/M3B-GOVERNANCE-01.md` (baseline, deviation register D-1..D-7, findings G-01..G-09, intent-authentication gap analysis, migration 0007 review, skipped-test classification, host status, signing-introduction change list, updated gates). Additional prerequisites for the reviewer: run the 8 skipped mandatory gates on a Docker-capable host; a full-history gitleaks result; `docs/m3b/ORDER-PATH-DESIGN.md` and `M3B-GATE-CHECKLIST.md`. Reviewer's scope should include G-01 (gateway on the order path) before any connector exists.
+
+## Addendum 2026-11-14 (2): ASTA-DECISION-007
+Read `docs/evidence/M3B-DECISION-007.md` (gateway boundary, fill integrity, durable replay, latched kill switch, security-gate results with blocked items, deviation closure register) and `docs/m3b/INTENT-CHANNEL-SECURITY.md`. Local commits `14b4fc9`, `b49ea95` plus the documentation commit; remote unchanged at `924da22`. Reviewer-run items still required: the 8 Docker/firewall gates, host provisioning verification, hosted CI.
