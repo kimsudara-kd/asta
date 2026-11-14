@@ -43,7 +43,7 @@ def test_no_credential_like_file_exists_and_the_removed_one_stays_removed():
     assert not problems, problems
 
 
-def test_gitleaks_suppression_is_exactly_the_two_reviewed_fingerprints():
+def test_gitleaks_suppression_is_exactly_the_five_reviewed_fingerprints():
     entries = [
         ln.strip()
         for ln in (ROOT / ".gitleaksignore").read_text(encoding="utf-8").splitlines()
@@ -53,6 +53,10 @@ def test_gitleaks_suppression_is_exactly_the_two_reviewed_fingerprints():
         [
             "23cc0228cdde01dd86469a92ebda1fcf78229c01:tests/m3a/test_security.py:generic-api-key:248",
             "968252f427e213bf04c3b87d57ebdfdfc65d0811:tests/m3a/test_credential_hygiene.py:generic-api-key:19",
+            # 2026-11-14 owner decision: 3 SHA-256 manifest digests (not secrets)
+            "e71706faf67bad42bb117a24b38db334fdcaf4e5:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:43",
+            "e71706faf67bad42bb117a24b38db334fdcaf4e5:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:44",
+            "e71706faf67bad42bb117a24b38db334fdcaf4e5:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:82",
         ]
     )
     toml = (ROOT / ".gitleaks.toml").read_text(encoding="utf-8")
