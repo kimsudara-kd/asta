@@ -1,0 +1,63 @@
+{
+ "rehearsal": "synthetic-only, mock backend",
+ "real_credentials": false,
+ "checks": [
+  {
+   "check": "1 two synthetic identities stored",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "2 backup contains no plaintext secret and no KEK",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "3 vault directory lost",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "4 records, versions and permissions survive the restore",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "5 a granted connector can lease again and receives the same synthetic values",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "6 a wrong KEK is refused",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "7 a tampered vault file is detected",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "8 a restored vault can rotate (version increments)",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "9 a revoked identity can never be leased",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "10 revocation destroyed the material",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "11 no plaintext secret in the live vault or the backup at the end",
+   "result": "PASS",
+   "detail": ""
+  }
+ ],
+ "passed": 11,
+ "failed": 0
+}

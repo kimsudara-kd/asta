@@ -1,5 +1,7 @@
 # Dedicating the Mac mini to ASTA: unrelated-project inventory and migration plan (ASTA-M3B-R4, workstream A)
 
+> **R5 redaction and correction (2026-11-14).** Project names, ports-to-names mapping and addresses were replaced by aliases P1..P8 / `<LAN-IP>` because this repository is public and its local history may one day be pushed; the mapping is kept outside the repository (`~/asta-private/`). **Correction:** this document said the P1 source tree is "present on disk". It is not: `~/<P1 dir>` and its `infrastructure/cloudflared/config.yml/` were **created as empty directories by Docker at 18:11:48 when I started Docker Desktop** (birth times equal the Docker start), so none of the compose projects has its source on this Mac any more. See `D0-EXPOSURE-AND-MIGRATION-REGISTER.md` for the R5 assessment.
+
 **Inventory and plan only. Nothing unrelated was stopped, deleted, migrated or modified.** The only writes to anything outside this repository were temporary, then removed: database *dumps* taken from two running databases (read-only `pg_dump`) restored into a scratch database to prove restorability, and read-only mounts of two volumes. No migration may be executed without your separate approval.
 
 ## 0. Disclosure: a side effect of my earlier work (action needed from you)
@@ -9,12 +11,12 @@ In ASTA-M3B-R2 I started Docker Desktop (a user application) to run the Docker/f
 Owner of all listed projects: the same person (the Mac's only human account `apple`); dependencies identified from compose labels, mounts and image names. Secrets were never read or printed (environment variables were not dumped).
 | Project (compose) | Containers (state) | Published ports | Data | Dependencies | Source on this Mac |
 |---|---|---|---|---|---|
-| **P1** | `P1-{web,api,db}-1` **running**; `-cloudflared-1` exited (127) | none on the host (3000/tcp internal) | volumes `P1_postgres_data` 71 MB, `_import_data`, `_attachment_data` (0 B); DB 13 MB, 57 tables, 3,788 rows | Cloudflare tunnel (config + credentials mounted from files); locally built images `P1-web` 1.6 GB, `-api` 353 MB | `~/My Development/P1` (present) |
+| **P1** | `P1-{web,api,db}-1` **running**; `-cloudflared-1` exited (127) | none on the host (3000/tcp internal) | volumes `P1_postgres_data` 71 MB, `_import_data`, `_attachment_data` (0 B); DB 13 MB, 57 tables, 3,788 rows | Cloudflare tunnel (config + credentials mounted from files); locally built images `P1-web` 1.6 GB, `-api` 353 MB | `~/<P1 dir>`: **NOT a project source**: see the R5 correction |
 | **P2** | `P2-db` **running** | **`0.0.0.0:5442` -> 5432** | volume `..._pgdata` 570 MB; DB 248 MB, 129 tables, **412,096 rows** | none other found; `postgres:16-alpine` | `~/P2` **missing** (compose directory gone) |
 | **P3** | `P3` **running** (`restart=always`) | **`0.0.0.0:3000` -> 8080** | volume `P3` 1.1 GB (SQLite `webui.db`, 43 tables, integrity ok) | an LLM backend it connects to (not identified) | image `ghcr.io/P3/P3:main` (re-pullable) |
-| P4 | 7 containers exited 6 weeks ago (gateway, commerce, portal, postgres, minio, tunnel) | none while stopped | volumes: postgres 48 MB, product data, caddy | Cloudflare tunnel; images `ghcr.io/kimsudara/sdr-ecosystem/*:production` (registry-hosted) | `~/P4-dir/deploy` **missing** |
-| P5 (prod + developer pack) | 5 exited (frontend, backend, db, tunnel, db of dev pack) | none | pgdata 49 MB + 84 MB, uploads 0 B | tunnel; locally built images | `~/Downloads/P5-devpack` (Downloads: not readable without Full Disk Access) |
-| P6 | `P6-db` exited | none | `P6_sdr_audit_data` 48 MB | | `~/P6` **missing** |
+| P4 | 7 containers exited 6 weeks ago (gateway, commerce, portal, postgres, minio, tunnel) | none while stopped | volumes: postgres 48 MB, product data, caddy | Cloudflare tunnel; images `ghcr.io/<owner>/<project>/*:production` (registry-hosted) | `~/<P4 deploy dir>` **missing** |
+| P5 (prod + developer pack) | 5 exited (frontend, backend, db, tunnel, db of dev pack) | none | pgdata 49 MB + 84 MB, uploads 0 B | tunnel; locally built images | `~/Downloads/<P5 developer pack>` (Downloads: not readable without Full Disk Access) |
+| P6 | `P6-db` exited | none | `P6_data` 48 MB | | `~/P6` **missing** |
 | P7 (`app`) | frontend, backend, db exited | none | `app_db-data` 48 MB | locally built images | `~/Desktop/P7/app` (Desktop: not readable here) |
 | P8 | api, dashboard, main-db, audit-db exited | none | `P8_{main,audit}_db_data` 49 + 48 MB | locally built images | `~/Documents/P8` (not readable here) |
 Totals (`docker system df`): 27 images 15.1 GB (1.96 GB reclaimable), 24 containers, **88 volumes 7.06 GB** (5.0 GB reclaimable, mostly anonymous), build cache 4.4 GB; Docker's data disk `Docker.raw` occupies **50.6 GiB** on the internal SSD; Docker VM memory limit 7.75 GiB.
@@ -37,7 +39,7 @@ Common pre-steps for every project (once, owner-approved window): (1) record the
 | P1 | move to another machine or a hosted container platform; if it must stay on this Mac it contradicts the dedicated-host goal | decide whether the tunnel is production; export `postgres_data` + `attachment_data`/`import_data`; keep `~/My Development/P1` (the only source on disk) backed up before the move |
 | P2 | dump (done in verification, repeat at migration time), run elsewhere | the compose directory is missing: recreate from `docker inspect`; **bind to 127.0.0.1** meanwhile |
 | P3 | run on another machine, or keep only if the owner accepts it on the host and binds it to 127.0.0.1 | back up the 1.1 GB volume; check which LLM backend it uses |
-| P4 / P5 / SDR agent / P7 / P8 | archive (images saved, DB dumps, volumes tarred) and **remove from this host**, or restart on another machine; they are stopped since 6 weeks (apparently dormant) | confirm with the owner whether each is still needed; the `ghcr.io/kimsudara/...` images can be re-pulled; local images cannot |
+| P4 / P5 / P6 / P7 / P8 | archive (images saved, DB dumps, volumes tarred) and **remove from this host**, or restart on another machine; they are stopped since 6 weeks (apparently dormant) | confirm with the owner whether each is still needed; the `ghcr.io/<owner>/...` images can be re-pulled; local images cannot |
 | EXO | uninstall or move; it listens on all interfaces | owner decision |
 | Tailscale | keep (ASTA's phone access) or move behind the dedicated host policy | decide D-A1 |
 | Microsoft/Google updaters, browsers | remove or accept as residual | residual of D-A |

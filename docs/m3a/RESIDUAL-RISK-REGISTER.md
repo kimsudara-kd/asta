@@ -72,3 +72,16 @@ Closed in R3: P-1..P-4 (provisioning script), S-1 (scanner exception scope). R-D
 | S-2 | Low | five stale gitleaks fingerprints | CEO | analysed, kept until the pinned CI version confirms |
 | F-07 | Med | alert-state changes now in the audit chain; shipper and off-host alerts not built | Eng | OPEN (designed) |
 **F-01, F-02, F-03 remain OPEN (High).**
+
+## ASTA-M3B-R5 additions (2026-11-14; detail `docs/evidence/M3B-R5.md`)
+| ID | Sev | Risk | Owner | Status |
+|---|---|---|---|---|
+| D-0 | Med | two unrelated services published on all interfaces: **not reachable from the Internet** (3000, 5442, 445 refused from outside), reachable by the whole LAN and tailnet; auth: app login (sign-up off) / scram | CEO | OPEN: containment options C1-C5; C4 recommended now |
+| D-0b | Med | **my R2 Docker start created five empty directories in the home folder** (birth 18:11:48) for a missing bind-mount source and restarted unrelated containers; my R4 inventory wrongly said a source tree was present (corrected) | CEO | OPEN (disclosed; nothing removed) |
+| N-R1 | High (outside the Mac) | the router answers SSH on its WAN address from the Internet; Telnet/HTTP on the LAN | CEO | OPEN |
+| N-R2 | Med | fw VM rules assume resolver/NTP at 192.168.1.1; this LAN uses `<router>` with DHCP DNS 8.8.8.8; NTP undefined | Eng | OPEN (set at deployment; allowlist NTP) |
+| G-13 | Med | the dead-man's heartbeat attests the firewall VM only; app/bridge death is not carried off-host | Eng | OPEN (design) |
+| G-12 | Med | this repository is public and its local history (not pushed) now contains project names, addresses and host-exposure details from R3/R4 | CEO | OPEN: review/redact before any push; R4/R5 docs now use aliases, history is unchanged |
+| H-3 | Med | SSH/SMB/88 on the LAN, auto-login on, firewall off, FileVault off: runbook H1-H12 prepared | CEO | OPEN |
+| CI | Med | hosted CI never run; workflow now has mandatory security jobs, a skip guard and a pinned gitleaks | CEO | OPEN (needs a push, not authorised) |
+**F-01, F-02, F-03 and H-1 remain OPEN (High).**

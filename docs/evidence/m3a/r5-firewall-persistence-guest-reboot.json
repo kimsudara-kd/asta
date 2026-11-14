@@ -1,0 +1,15 @@
+{
+ "scope": "scratch Ubuntu 24.04 aarch64 VM (QEMU/HVF, user level) loading infra/security-host/mac/app-vm/nftables.conf (+2 lab-only ssh accept lines); GUEST reboots only, NOT a host reboot, NOT the deployed VM",
+ "kernel": "6.8.0-147-generic",
+ "service": {"unit": "nftables.service", "enabled": true, "ordering": "Before=network-pre.target", "result": "success"},
+ "policy_drop_chains": 3,
+ "normalized_ruleset_sha256_prefix": {
+  "freshly_loaded_from_file": "9eda96b8857e0fe6",
+  "after_service_restart": "9eda96b8857e0fe6",
+  "after_real_guest_reboot_2": "9eda96b8857e0fe6"
+ },
+ "note_on_hash": "counters are normalised away; the raw `nft list ruleset` hash differs between boots only because packet counters differ",
+ "result": "PASS (guest only)",
+ "lessons": ["applying the app-VM default-drop output policy over an SSH session locks the session out (expected; the real VM is reached through the console socket)", "/tmp is cleared on reboot in this image"],
+ "not_covered": ["host (Mac) reboot and power loss", "the real fw/app VMs", "socket_vmnet and launchd persistence", "ordering relative to real network bring-up on the deployed uplink"]
+}

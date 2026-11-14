@@ -141,3 +141,7 @@ Baseline `a6623a2` plus the R3 commits (local only; remote head `924da22`). Read
 
 ## Addendum 2026-11-14 (5): ASTA-M3B-R4
 Read `docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md` s.7 (R4 baseline, unresolved findings H-1/F-01/F-02/F-03, the network + host-hardening acceptance matrix N1-N10/S1-S5), `docs/evidence/M3B-R4.md`, `docs/m3b/HOST-DEDICATION-INVENTORY.md`, `HOST-SECURITY-CHECKLIST.md`, `CAPACITY-ASSESSMENT.md`, `VAULT-FEASIBILITY.md`, `SECURITY-EVENTS-AND-ALERTS.md`. Independent approval is **unsigned**.
+
+
+## Addendum 2026-11-14 (6): ASTA-M3B-R5
+Read `docs/evidence/M3B-R5.md`, `docs/m3b/D0-EXPOSURE-AND-MIGRATION-REGISTER.md`, `HOST-HARDENING-RUNBOOK.md`, `VM-READINESS-REPORT.md` (s.7 lists the additional reviewer evidence), `GITLEAKS-EXCEPTIONS-REVIEW.md` and `SECURITY-EVENTS-AND-ALERTS.md` s.4. F-01, F-02, F-03, H-1 and H-3 are unresolved. Independent approval is **unsigned**.
