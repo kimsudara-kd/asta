@@ -274,3 +274,6 @@ Positive result for R-X: the paper replay, durable-queue crash/restart, reconcil
 1. Commit `src/asta/research/data/` (the `/data/` fix makes it trackable), run `scripts/secret_scan.py`, push.
 2. Document in the README: on macOS use a TCP PostgreSQL with `timezone=UTC` for tests.
 3. Phase C (aarch64 Linux VMs) remains unauthorized; it is where the full suite, the boundary tests and the M2-database replay must be repeated.
+
+## MAC-A4. Full-history gitleaks: CLOSED (2026-11-14)
+gitleaks 8.30.1 (official arm64 release, checksum verified) over 73 commits reported exactly the 3 known findings (`e71706f`, `REVIEW-MANIFEST.json` lines 43/44/82): 64-hex SHA-256 file digests keyed by file path, not secrets. Owner decision: three exact-fingerprint entries in `.gitleaksignore` (no rule/path allowlist); history is public, so no rewrite. Re-run: **no leaks found**. Also found: `EXO.app` (general-purpose distributed-AI app) listens on all interfaces on this Mac (ports 49366, 52415); unrelated to ASTA, but the host does not meet "no inbound services" while it runs (F-19).

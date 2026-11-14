@@ -3,3 +3,7 @@
 23cc0228cdde01dd86469a92ebda1fcf78229c01:tests/m3a/test_security.py:generic-api-key:248
 # Second reviewed false positive: a SHA-256 hash (file-integrity pin) in commit 968252f, next to a file name; not a secret. The test now stores a 16-char prefix.
 968252f427e213bf04c3b87d57ebdfdfc65d0811:tests/m3a/test_credential_hygiene.py:generic-api-key:19
+# Third set of reviewed false positives (2026-11-14, owner decision): three SHA-256 file digests (64 hex chars) in the review manifest of commit e71706f, each next to a file path containing "CREDENTIAL". File-integrity pins, not secrets (verified by reading the lines). Exact commit:file:rule:line fingerprints only; no rule or path allowlist.
+e71706faf67bad42bb117a24b38db334fdcaf4e5:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:43
+e71706faf67bad42bb117a24b38db334fdcaf4e5:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:44
+e71706faf67bad42bb117a24b38db334fdcaf4e5:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:82
