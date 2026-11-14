@@ -599,3 +599,26 @@ def test_the_prepared_sshd_dropin_is_key_only_restricted_and_has_no_forwarding()
     ):
         assert want in conf, want
     assert "PasswordAuthentication yes" not in conf
+
+
+# ---------------------------------------------------------------- M3-B-R5: dead-man's-switch (firewall VM)
+def test_deadman_is_disabled_until_configured_https_only_and_never_prints_the_url(tmp_path):
+    import subprocess
+
+    script = MAC / "firewall-vm" / "asta-deadman.sh"
+    text = read(script)
+    code = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith("#"))
+    assert (
+        "http://" not in code and "hc-ping" not in code and "https://" in code
+    )  # no destination in git; https enforced
+    assert (
+        "--fail" in code
+        and "not printing the URL" in code
+        and 'echo "$URL"' not in code
+        and 'echo "$DEADMAN_URL"' not in code
+    )
+    assert "ruleset.sha256" in code and "ip_forward" in code and "asta-egress-proxy.service" in code
+    r = subprocess.run(["/bin/sh", str(script)], capture_output=True, text=True, timeout=30)  # noqa: S603
+    assert r.returncode == 0 and "not configured" in r.stdout  # nothing sent without configuration
+    assert "OnUnitActiveSec=60" in read(MAC / "firewall-vm" / "asta-deadman.timer")
+    assert "asta-deadman.sh" in read(MAC / "firewall-vm" / "asta-deadman.service")

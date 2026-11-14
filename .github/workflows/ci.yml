@@ -4,13 +4,23 @@ on:
   push:
     branches: [main]
 
+# Least privilege for every job; no job gets a write token. No exchange credentials exist in CI: tests use recorded
+# fixtures and throw-away databases. Nothing here deploys anything or touches an exchange.
 permissions:
   contents: read
 
-# No exchange credentials exist in CI. Tests use recorded fixtures and a throw-away Postgres.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# MANDATORY SECURITY CHECKS (M3-B-R5): the jobs backend, security, egress-boundary and web must all pass; the final
+# `required` job aggregates them and is the single status to require in branch protection. A skipped security gate
+# fails the build (scripts/ci_skip_guard.py). Actions are pinned to tags here; pin them to commit SHAs when the CI
+# is first run on a network-connected maintainer machine (the SHAs cannot be verified offline).
 jobs:
   backend:
     runs-on: ubuntu-24.04
+    timeout-minutes: 45
     services:
       postgres:
         image: postgres:16.4-alpine
@@ -26,27 +36,79 @@ jobs:
       ASTA_TEST_DATABASE_URL: postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5432/asta_test
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }
+        with: { fetch-depth: 0, persist-credentials: false }
       - uses: astral-sh/setup-uv@v5
       - run: uv sync --frozen
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy
-      - run: uv run python -m pytest tests -q
+      - name: Full test suite (all skips are listed)
+        run: uv run python -m pytest tests -q -rs 2>&1 | tee pytest.log; test ${PIPESTATUS[0]} -eq 0
+        shell: bash
+      - name: No security gate may be skipped
+        run: python3 scripts/ci_skip_guard.py pytest.log
+
+  security:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16.4-alpine
+        env: { POSTGRES_USER: asta_test, POSTGRES_PASSWORD: asta_test_only, POSTGRES_DB: asta_test }
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U asta_test" --health-interval 5s --health-timeout 3s
+          --health-retries 20
+    env:
+      ASTA_TEST_DATABASE_URL: postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5432/asta_test
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0, persist-credentials: false }
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Live-lock and order-path gates (default-deny gateway, import graph, bypass negatives)
+        run: uv run python -m pytest tests/live_lock tests/orders/test_gateway_boundary.py tests/unit/test_risk.py tests/m3a/test_security.py tests/m3a/test_legacy_isolation.py -q
+      - name: Frozen M0-M2 evidence and review manifest
+        run: |
+          uv run python scripts/verify_frozen_evidence.py
+          uv run python scripts/review_manifest.py --verify
       - name: Dependency audit
         run: uv run pip-audit
-      - name: Secret scan (history)
+      - name: Secret scan (tree and history)
         run: uv run python scripts/secret_scan.py
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-          GITLEAKS_VERSION: "8.30.1"   # pinned (M3-B-R4): the version used for the local full-history scans; the action otherwise uses a hard-coded version of its own
+          GITLEAKS_VERSION: "8.30.1"   # pinned: the version used for the local full-history scans
+
+  egress-boundary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - name: Start the Docker egress boundary (internal network, kernel gate, proxy, compromised-proxy simulator)
+        run: docker compose -f infra/egress/docker-compose.egress.yml --profile lab up -d --build --wait
+      - name: Docker/firewall security gates (must run, not skip)
+        run: |
+          uv run python -m pytest tests/m3a/test_egress.py tests/m3a/test_mac_deployment.py tests/m3a/test_security_host_config.py -q -rs 2>&1 | tee gates.log
+          test ${PIPESTATUS[0]} -eq 0
+          python3 scripts/ci_skip_guard.py gates.log
+        shell: bash
+      - name: Boundary restart / fail-closed verification
+        run: uv run python infra/egress/verify_boundary.py boundary.json
+      - if: always()
+        run: docker compose -f infra/egress/docker-compose.egress.yml --profile lab down
 
   web:
     runs-on: ubuntu-24.04
+    timeout-minutes: 30
     defaults: { run: { working-directory: apps/web } }
     steps:
       - uses: actions/checkout@v4
+        with: { persist-credentials: false }
       - uses: actions/setup-node@v4
         with: { node-version: 24 }
       - run: corepack enable && pnpm install --frozen-lockfile
@@ -54,3 +116,16 @@ jobs:
       - run: pnpm run test
       - run: pnpm run build
       - run: pnpm audit --audit-level=high
+
+  required:
+    # The one status to require in branch protection: green only when every mandatory job is green.
+    if: always()
+    needs: [backend, security, egress-boundary, web]
+    runs-on: ubuntu-24.04
+    steps:
+      - run: |
+          echo '${{ toJSON(needs) }}'
+          test "${{ needs.backend.result }}" = success
+          test "${{ needs.security.result }}" = success
+          test "${{ needs.egress-boundary.result }}" = success
+          test "${{ needs.web.result }}" = success
