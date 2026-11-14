@@ -122,3 +122,7 @@ Security architecture (`SECURITY-ARCHITECTURE.md`, `VM-BOUNDARY-DESIGN.md` **inc
 | Credential-readiness opinion (ready / not ready / ready with conditions) | _pending_ |
 | Critical/High findings closed or accepted | _pending_ |
 | Signature / date | _pending_ |
+
+
+## Addendum 2026-11-14: M3B-GOVERNANCE-01
+Repository state `924da22`. Read first: `docs/evidence/M3B-GOVERNANCE-01.md` (baseline, deviation register D-1..D-7, findings G-01..G-09, intent-authentication gap analysis, migration 0007 review, skipped-test classification, host status, signing-introduction change list, updated gates). Additional prerequisites for the reviewer: run the 8 skipped mandatory gates on a Docker-capable host; a full-history gitleaks result; `docs/m3b/ORDER-PATH-DESIGN.md` and `M3B-GATE-CHECKLIST.md`. Reviewer's scope should include G-01 (gateway on the order path) before any connector exists.

@@ -111,3 +111,10 @@ The dedicated host is the existing Apple Mac mini M4 (16 GB / 256 GB) with Linux
 # 2026-11-14 (3) offline completion
 
 Every offline item of the order path is now built and proven (fills ledger, amend, channel format, reconciliation, rate budget, clock guard, kill-switch triggers): `ORDER-PATH-DESIGN.md` s.7, MAC-A15. **Decision unchanged: NO-GO.** The remaining blockers need the owner (reviewer, sudo provisioning, vault custody, a testnet key, a signed directive): `docs/m3b/M3B-GATE-CHECKLIST.md`.
+
+
+---
+
+# 2026-11-14 (4) ASTA-M3B-GOVERNANCE-01 reconciliation
+
+**Decision: NO-GO. M3-B BUILT (offline only), NOT ACCEPTED; no acceptance tag.** Full report: `docs/evidence/M3B-GOVERNANCE-01.md`. Verified: nothing in the repository can sign, authenticate or send an exchange request; live-lock controls unchanged since `fb7770b`; no key material found by supplementary history scan. Newly recorded blockers: G-01 (gateway not on the order path), G-06 (8 mandatory security tests skipped on this host), G-07 (gitleaks full-history scan not run), G-08 (push identity); D-1..D-4 await owner ratification. Updated gates: add G-A..G-F (report s.13) to R2-D.

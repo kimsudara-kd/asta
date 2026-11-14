@@ -1,4 +1,4 @@
-# Residual-risk register (M3A-R3, status 2026-11-13)
+# Residual-risk register (M3A-R3, status 2026-11-13; M3B-GOVERNANCE-01 update 2026-11-14 appended below)
 
 Severity: Critical (credentials/live trading exposed now), High (blocks credential readiness), Medium, Low, Info. "Owner" is who must act; "Closure" is the evidence that closes it. No finding is Critical. **Mandatory gates F-01, F-02, F-03 are High and OPEN.**
 
@@ -27,3 +27,17 @@ Severity: Critical (credentials/live trading exposed now), High (blocks credenti
 | F-19 | Med | Mac host (macOS) is the hypervisor and trust base: a compromise of its administrator rights defeats the VM boundaries; the Mac is not yet verified dedicated/hardened (Phase A not performed); FileVault vs unattended recovery trade-off open | host hardening list (sharing/Wi-Fi/Bluetooth off, firewall, no other use, no secrets on the host), unprivileged `_astavm`, root helper limited to a group socket, encrypted backups | CEO + reviewer | Phase A inventory reviewed; hardening applied and verified; reviewer accepts the residual; FileVault decision | Open |
 | R-X | Med | Cross-architecture determinism of replay/checkpoint digests and ledger arithmetic (Windows x86 -> Linux ARM64) unverified; no ARM64 emulation available on the dev PC | restore-and-replay drill executed 2026-11-14 macOS arm64 -> aarch64 Linux (MAC-A10): all 1,800 stored checkpoint digests verified, identical output | Eng | remaining: the REAL M2 database from the Windows x86_64 PC (a different CPU architecture and OS than either side of this drill) | Narrowed (arm64<->aarch64 verified; x86_64 source not yet) |
 | Closed | - | F-08 (obsolete dev-login file deleted), F-16 (evidence integrity), F-17 (gitleaks exceptions reviewed) | see R1/R2 | - | - | Closed |
+
+## M3B-GOVERNANCE-01 additions (2026-11-14; detail in `docs/evidence/M3B-GOVERNANCE-01.md`)
+| ID | Sev | Risk | Current mitigation | Owner | Closure condition | Status |
+|---|---|---|---|---|---|---|
+| G-01 | High | ExecutionGateway is not on the order path: `orders` never consults it (its only caller is the status probe) | no `ExchangePort` implementation exists, so nothing can send | Eng + reviewer | dispatch routed through the gateway/signed-privilege check at the port boundary, with a test that no dispatch bypasses it | **OPEN** (design gate) |
+| G-02 | Med | Vault "synthetic only" is convention, not enforcement; no real backend | not wired to any runtime path; DEMO classes and READ/SPOT_TRADE only | Eng + reviewer | backend chosen, testnet-key guard, key ceremony (with F-05/F-06) | Open |
+| G-03 | Med | Fill ledger silently drops a conflicting repeated trade; no DB-level overfill or state guard; rebuilt book lacks the order size | in-memory `FillBook` flags these; nothing consumes fills yet | Eng | content comparison, DB guards, tests | Open |
+| G-04 | Med/Low | Intent channel: in-memory replay state (restart replays within 60 s), key id parsed before authentication, no audience binding, no authenticator | decision-id claim makes a replayed intent a no-op; channel is wired to nothing | Eng + reviewer | durable high-water mark, authenticated header, audience field, reviewed authenticator | Open |
+| G-05 | Med | Reconciliation, reset classifier and kill switch not wired to risk halt, dispatcher day state or audit chain | pure logic, tested | Eng | wiring with end-to-end tests | Open |
+| G-06 | Med | 8 mandatory security tests skipped on this Mac (no Docker daemon); earlier evidence omitted the skips | run on the previous host; MAC-A11 lab covers the rule sets | Eng | run on a Docker-capable host | Open (evidence corrected) |
+| G-07 | Med | gitleaks full-history scan not executed (tool absent, Docker down, CI never run) | supplementary regex scan of all 99 commits: no key material | Eng/CEO | run in an approved environment, five reviewed fingerprints only | Open |
+| G-08 | Med | Push path uses an overridden credential helper; inconsistent commit identities | none | CEO | repair keychain entry, set git identity, document the path | Open |
+| G-09 | Info | Dashboard reachable on the tailnet (authenticated, credential-free) | Tailscale tailnet-only, session auth, secure cookie | CEO | review under F-01 | Accepted for now |
+| F-12 | Med | (updated) dispatch/recovery, durable claim store, cancel/kill flush, fills ledger proven offline | see `ORDER-PATH-DESIGN.md` | Eng | real-exchange U-1..U-4 and connector test | Open (offline mitigations complete; unverified against a real exchange) |
