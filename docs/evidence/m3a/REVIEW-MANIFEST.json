@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "dc0c1b5b99dd35045a205c107629872862e9f7d4",
+ "generated_from_commit": "b6b3ecea2c0a397769ebfbea541e89f9c3ae9350",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -243,6 +243,18 @@
    "sha256": "a8604e165e92e26b548bd6db14808a7a992c87720a13096307431e53f79fd41d"
   },
   {
+   "path": "docs/evidence/m3a/r4-host-separation-baseline-macos.json",
+   "sha256": "f7e91eeb7aa5f6b90f8d1ff28a24f3bb059f406b90c2c2a474543ec9a5f604f3"
+  },
+  {
+   "path": "docs/evidence/m3a/r4-netns-lab-aarch64.json",
+   "sha256": "5c1cbe8b2572d82e9c03c09969a5ff94dd63e73e94c827fe8b124758cc6ac873"
+  },
+  {
+   "path": "docs/evidence/m3a/r4-two-vm-load-test-macos.json",
+   "sha256": "d902dce56097f68453b30550493f5ce909abe88d461d75dae0c2cecd8ca6b13c"
+  },
+  {
    "path": "docs/m3a/CREDENTIAL-HYGIENE.md",
    "sha256": "046976197b93e5e52889063c88472adfe13dedbc22a72bef45a536ddc971d886"
   },
@@ -264,11 +276,11 @@
   },
   {
    "path": "docs/m3a/INDEPENDENT-REVIEW-PACKAGE.md",
-   "sha256": "6230acb1b89623bb2c6afd97ad84af33e865b97965320dbfa00aa4150fdb80e8"
+   "sha256": "fc5deb909f13a5c2f923c74afe37276eb4e4e63b04dcb6d90904eb4a4eac1912"
   },
   {
    "path": "docs/m3a/M3B-READINESS.md",
-   "sha256": "c43939a5ddcba6f137b9649fd341a186716ecfdba094faa78d7d8ed6369be246"
+   "sha256": "35b4d83bd41686e8a60a97b3866343bb90b9eda755bf71f5fff5b5041644ead4"
   },
   {
    "path": "docs/m3a/MAC-MINI-DEPLOYMENT-DESIGN.md",
@@ -280,7 +292,7 @@
   },
   {
    "path": "docs/m3a/RESIDUAL-RISK-REGISTER.md",
-   "sha256": "dc7877c3eb6be048193697786cecebb39463a7d2c9fe8ab70e2aa2094c9a1bc7"
+   "sha256": "dd704c565a2daffb42c1532ae2fa0bb86095c1725454dff9293a30522ecd3fb5"
   },
   {
    "path": "docs/m3a/REVIEW-INDEX.md",
@@ -307,8 +319,20 @@
    "sha256": "257cbcdb9836f2a90701f36cb4c829b928e0f0849564714dd572a6da3d40d4ca"
   },
   {
+   "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
+   "sha256": "96dbe9f24f2a7359eb104ff37c5e530463259eb0135ca59ed36cbf7996378107"
+  },
+  {
+   "path": "docs/m3b/HOST-DEDICATION-INVENTORY.md",
+   "sha256": "3af7ef666cdfd6f7e31dfb0ee5fc7f2576fbf2d9851d37effc4334d93ead8059"
+  },
+  {
+   "path": "docs/m3b/HOST-SECURITY-CHECKLIST.md",
+   "sha256": "811dda9f98644ca1480263d4af1f02bc928ed51729b71566ae1d6a02f616f7ae"
+  },
+  {
    "path": "docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md",
-   "sha256": "f091c4fd73c530726e3553c3879c7a0ffe7629f86404530f45b4128a8f4f12a2"
+   "sha256": "09643013136caa131af4929455a026f220fa554f849d84b7e4eb43718789ef8e"
   },
   {
    "path": "docs/m3b/INTENT-CHANNEL-SECURITY.md",
@@ -331,12 +355,20 @@
    "sha256": "69604b8f39c4384045d1b2390826679f974f464433606d0501874550c5acaefb"
   },
   {
+   "path": "docs/m3b/SECURITY-EVENTS-AND-ALERTS.md",
+   "sha256": "419a44f4e686a20b18ae3f004e30d9df2a8da293159b597a6168307d7df876ec"
+  },
+  {
    "path": "docs/m3b/SECURITY-TOPOLOGY.md",
    "sha256": "f14db36f538914113e6c516530e09bc780e7fce1f5a05f550733cc2ced587a63"
   },
   {
    "path": "docs/m3b/VAULT-AND-BACKUP.md",
-   "sha256": "46c2bb2f73a313803f928bc2a9b95c19074c0f09a21652b7f256c48364c8b289"
+   "sha256": "87037134135e5a2a8cefeb93792fc52f29076023073c1a76d01164c899a3bad8"
+  },
+  {
+   "path": "docs/m3b/VAULT-FEASIBILITY.md",
+   "sha256": "6633b29e3d24ed33520bf6e965e886e6221d583b7bb630a1eb17eeddb98260f2"
   },
   {
    "path": "infra/egress/allowlist.json",
@@ -388,7 +420,7 @@
   },
   {
    "path": "infra/security-host/acceptance/netns_lab.py",
-   "sha256": "cc6f00ad8c635c20219dc94e638238850b8b2f776688ff2e6460b0ad32832c62"
+   "sha256": "1c9e5dd49370b38381f7d2775613154e015d75e9dbfc1a7f50a6698c37c1aa09"
   },
   {
    "path": "infra/security-host/acceptance/vault_validation.py",
@@ -463,6 +495,10 @@
    "sha256": "f5140f3e4b5cf5aa60078bace0603009731bd7c2f58b0e457cca656909fff968"
   },
   {
+   "path": "infra/security-host/mac/app-vm/install-security-services.sh",
+   "sha256": "f3c394779166c22e702fd6c23b6930817ef2e855eb445a8b154e05180b47cc0f"
+  },
+  {
    "path": "infra/security-host/mac/app-vm/netplan-50-asta.yaml",
    "sha256": "87fd7a981fa86abebbbf28456752c8858077486c6d2a86772682b0f255ad24e7"
   },
@@ -480,7 +516,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_roles_m3b.sql",
-   "sha256": "9fd09f907388907c12081d909a483ab92522f7061dd37c932707e32031e43cfd"
+   "sha256": "ac0ea2cc97f8e64fda6a1475778f0b30614af810c02e7e54ae57045b180d802b"
   },
   {
    "path": "infra/security-host/mac/app-vm/postgresql-hardening.conf",
@@ -493,6 +529,10 @@
   {
    "path": "infra/security-host/mac/backup-key-rehearsal.sh",
    "sha256": "76cce14e48b686b334ebc6e2e1cfa252e35ffe44d35bb31faa6d7e8de3e61a5b"
+  },
+  {
+   "path": "infra/security-host/mac/backup-key-replace.sh",
+   "sha256": "c482f767d27d323e212d44272832c0629fcea75744d2c8fd7df0b845e45877a8"
   },
   {
    "path": "infra/security-host/mac/backup-recipient.pub",
@@ -531,6 +571,10 @@
    "sha256": "8cd4dc3a273f573f5805edd9ce219889aa0acd17a911ffc843728519f3341bec"
   },
   {
+   "path": "infra/security-host/mac/host-separation-check.sh",
+   "sha256": "617cf53b7a0bf7975308acb98ff835911c180a4c19e41e89d10f12d76fd991d8"
+  },
+  {
    "path": "infra/security-host/mac/launchd/com.asta.socket_vmnet.plist",
    "sha256": "474b228d3a905ee70dbb6c9c8f475379f7c61be96af36b4390c4f7e5b29cf0b7"
   },
@@ -552,15 +596,31 @@
   },
   {
    "path": "infra/security-host/mac/provision-host.sh",
-   "sha256": "ea474f030587daca04770581b63bb0336adce2281b655393373f6ff84ea75bf3"
+   "sha256": "b9e0f9a72c1ec3386447bc96820c55d3ab58f38b1fded7a7a565594e3a9c7e75"
+  },
+  {
+   "path": "infra/security-host/mac/qemu-pin.json",
+   "sha256": "ff6ce97d22423fe0b3c72bdf89fdd554c813eaeeb4e2486fb5b292f9e0d6f2dd"
+  },
+  {
+   "path": "infra/security-host/mac/qemu-pin.sha256",
+   "sha256": "0b11c11c7d6905cf602705c1d9e5042fd1f90365282f44597ca33c576708f34d"
   },
   {
    "path": "infra/security-host/mac/qemu-vms.sh",
-   "sha256": "441f5ab6d65c1322e81eab55289caca6ed03a5f54b6c23c19aca6c1b854a1435"
+   "sha256": "1d92cad7ec84e6096603178c320d86f5ac5f4f8e6b93e626b1e099a781126494"
+  },
+  {
+   "path": "infra/security-host/mac/qemu_pin.py",
+   "sha256": "ad04643ec4edbfabe77639d18a80320ded058df6463db9344ef4057ade87642b"
   },
   {
    "path": "infra/security-host/mac/rollback-host.sh",
    "sha256": "ee798688b9c15ec42ac30f4a17d192ccd837784d6b4f431313ac33e7a2db4a16"
+  },
+  {
+   "path": "infra/security-host/mac/sshd-asta.conf",
+   "sha256": "66a0fdfa6bfdd94f65ac26f5f0b0e930dfa45c1747a97313c20e3dab7b03547e"
   },
   {
    "path": "infra/security-host/provision/build_seed.py",
@@ -647,6 +707,10 @@
    "sha256": "af2dd3e9ea38b9ed6e8cec283c6f0c1f494ff258616972d308e25047e1b53084"
   },
   {
+   "path": "migrations/versions/0011_m3b_release_identity_from_session_user.py",
+   "sha256": "1eb071bc2e394dbfbcdafc4b4ef0c4ae97b233ff2838fd0b2987fcd2531ff60c"
+  },
+  {
    "path": "scripts/review_manifest.py",
    "sha256": "e779cf4c561a7e25bcf9247d82117306ecfd2dfa8088ef898aded8fcff8f36a0"
   },
@@ -696,7 +760,7 @@
   },
   {
    "path": "src/asta/orders/monitor.py",
-   "sha256": "4f280079a226e7a840008e004a5c9bba805c22982deb0c4debcefdc4c3098b9b"
+   "sha256": "16f07b5e823ec8438bf13dc3002379b64675d066eeaf79dc52aaa3f55db876a9"
   },
   {
    "path": "src/asta/orders/ports.py",
@@ -724,7 +788,7 @@
   },
   {
    "path": "src/asta/orders/sql_store.py",
-   "sha256": "019bd25ef3eadd7bfb19cc349a2190815aa599b445cbd0e1dff2a3fe50e5e685"
+   "sha256": "fa1fb3f9c0275873a18f0029a006eb01ffbe8f779dfe720cefda4b20d4c5fe45"
   },
   {
    "path": "src/asta/orders/supervisor.py",
@@ -748,19 +812,23 @@
   },
   {
    "path": "tests/integration/test_bridge_supervision.py",
-   "sha256": "10d5ac5d5d2c17c835f1b816e747638feb812c9833bb0f7c0727fe7d2db2781e"
+   "sha256": "44f391302356aaa43622c314edf856280f4e99b1da304d687053696a97254357"
   },
   {
    "path": "tests/integration/test_m3b_integrity.py",
-   "sha256": "0c91d62693a9bdfae02005bd309fcb045c629c0b084b032a0484ed87e160b43a"
+   "sha256": "11ef701ec6e8851f628e861b99c808db6d94b5a419d94bc27a76a209bb27ca11"
   },
   {
    "path": "tests/integration/test_risk_bridge.py",
-   "sha256": "691031628988f09736699288769a7c92d5df7b219cfad2f3e8998235f35d307b"
+   "sha256": "aceb6460dd6966ac2cb6c5fed498d8033a860221425cb8087c8c93f15c18eb53"
   },
   {
    "path": "tests/m3a/test_backup_key_rehearsal.py",
    "sha256": "b5636326b1d04c41a4d0d6f46e71937207f585772939aeb18e59b20bea4ffd86"
+  },
+  {
+   "path": "tests/m3a/test_backup_key_replace.py",
+   "sha256": "f926bc8de564e7c39cf1ad3d2114129188dfa89a49eef58ec603ffa2acba3a3c"
   },
   {
    "path": "tests/m3a/test_credential_hygiene.py",
@@ -784,11 +852,11 @@
   },
   {
    "path": "tests/m3a/test_mac_deployment.py",
-   "sha256": "b1fa1517cb28fcbbdff2364f6c52972f513c16bb021eb60c92e4e115ff70518b"
+   "sha256": "b08aab5e30a1f9926bd575c45a5a7a5c231f512577f23e7e05b21aff2d295eeb"
   },
   {
    "path": "tests/m3a/test_mac_provision_host.py",
-   "sha256": "10ea80da77ce4d8221d9c63189fe884c71f6dd36de9588975fc7b8c35ef1adfe"
+   "sha256": "b568e52f58b3f91ab5374a8e7b1049192f651569442c07b28ca2e41b1f7331c6"
   },
   {
    "path": "tests/m3a/test_mac_rollback_host.py",
@@ -797,6 +865,10 @@
   {
    "path": "tests/m3a/test_provisioning_artifacts.py",
    "sha256": "009e4051b7e3f3c96935ea2ac2f24c16c62c4c1657dbcb335aa80aeda1f8d535"
+  },
+  {
+   "path": "tests/m3a/test_qemu_pin.py",
+   "sha256": "221ae927ec6070280fea01e485c2927cf1d7eeb52c41da69e17ab82eccd115cf"
   },
   {
    "path": "tests/m3a/test_security.py",
