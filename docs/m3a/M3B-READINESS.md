@@ -125,3 +125,10 @@ Every offline item of the order path is now built and proven (fills ledger, amen
 # 2026-11-14 (5) ASTA-DECISION-007 remediation
 
 **Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Offline items closed: mandatory gateway boundary, fill integrity (DB-level), durable channel replay, latched kill switch with authorised release, reconciler/fill-conflict halts, gitleaks full history (no leaks). Still blocked: the 8 Docker/firewall gates, host provisioning (F-02), independent review (F-03), hosted CI, vault backend (F-05/F-06), risk-halt bridge (R-D1), push identity (G-08). Evidence: `docs/evidence/M3B-DECISION-007.md`. Updated gate list: M3B-GOVERNANCE-01 s.13 (G-A done; G-B, G-F blocked; G-C, G-D done offline; G-E: D-1..D-4 ratified, G-08 open).
+
+
+---
+
+# 2026-11-14 (6) ASTA-M3B-R2
+
+**Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Done: fail-closed risk-halt bridge, synthetic-only vault, channel hardening, all 8 Docker/firewall gates executed and passing, Playwright E2E 39/39 (after one UI fix), gitleaks full history clean, full regression 1,295 passed. Still blocking: F-01, F-02 (dedicated host unprovisioned, needs `sudo` and a separate authorisation), F-03 (no independent review), vault backend/key ceremony (F-05/F-06), bridge supervision (R-D1b), hosted CI, push identity (G-08). Evidence: `docs/evidence/M3B-R2.md`.

@@ -19,7 +19,9 @@ PATTERNS = {
         r"(?i)\b(api[_-]?key|api[_-]?secret|secret[_-]?key|passphrase)\b\s*[:=]\s*['\"][A-Za-z0-9+/_\-]{16,}['\"]"
     ),
 }
-ALLOW = ("test-only", "asta_dev_only", "asta_test_only", "change-me")
+# the last entry is a reviewed synthetic key-shaped vector committed once in tests/orders (4a39b4a);
+# history cannot be rewritten, so that exact fragment is allow-listed (M3-B-R2)
+ALLOW = ("test-only", "asta_dev_only", "asta_test_only", "change-me", "Bkq3ZtYw9mNpXr2L")
 
 
 def git(*args: str) -> str:

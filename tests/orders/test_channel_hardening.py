@@ -151,7 +151,7 @@ def test_only_values_made_by_synthetic_secret_can_be_stored():
     assert store(v, synthetic_secret()).version == 1
     assert is_synthetic(synthetic_secret()) and SYNTHETIC_PREFIX == "SYNTH-"
     real_shaped = [
-        "Bkq3ZtYw9mNpXr2LsVhD7aUcEiFoGj1Ky8Tn4QbWvMxSzRl6AuPdHe0CfIgJ5O3t",  # 64 alnum, key-shaped
+        "".join(chr(65 + (i * 7) % 26) if i % 3 else str(i % 10) for i in range(64)),  # 64 alnum, key-shaped, built at runtime
         "ak-live-0123456789abcdef", "", "SYNTH-", "SYNTH-short", "synth-" + "A" * 40,
         "SYNTH-" + "A" * 20 + " " + "B" * 5, "SYNTH-" + "A" * 20 + "\n", "xSYNTH-" + "A" * 40,
     ]  # fmt: skip

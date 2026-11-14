@@ -129,3 +129,7 @@ Repository state `924da22`. Read first: `docs/evidence/M3B-GOVERNANCE-01.md` (ba
 
 ## Addendum 2026-11-14 (2): ASTA-DECISION-007
 Read `docs/evidence/M3B-DECISION-007.md` (gateway boundary, fill integrity, durable replay, latched kill switch, security-gate results with blocked items, deviation closure register) and `docs/m3b/INTENT-CHANNEL-SECURITY.md`. Local commits `14b4fc9`, `b49ea95` plus the documentation commit; remote unchanged at `924da22`. Reviewer-run items still required: the 8 Docker/firewall gates, host provisioning verification, hosted CI.
+
+
+## Addendum 2026-11-14 (3): ASTA-M3B-R2
+Read `docs/evidence/M3B-R2.md` (bridge, vault, channel hardening, Docker gate transcripts with image digests, E2E results, High-finding register, host readiness) and `docs/m3b/RISK-HALT-BRIDGE.md`. This package is **not** an independent review and is not signed as one.
