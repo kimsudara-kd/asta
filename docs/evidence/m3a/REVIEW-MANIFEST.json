@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "78f7d7390ac1ce139b08a579460661502d45f798",
+ "generated_from_commit": "dc0c1b5b99dd35045a205c107629872862e9f7d4",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -8,15 +8,35 @@
   },
   {
    "path": ".gitleaksignore",
-   "sha256": "ed7b0e8e6011c78c50663ebf9d20e5ae4e7bf55921039ccfb98d7fb2b4435654"
+   "sha256": "0b5005143709046b3457bb7457da9cd7ed689f7a63df6585ddf175346967dfe6"
   },
   {
    "path": "docs/decisions/ceo-approval-register.md",
-   "sha256": "748627ea8e1681e4c317c7026d6c077d34f08595d35474343fec1a6dae37d17f"
+   "sha256": "a6ea3e5ec543721d0dd733e42ed213295462e0b3e8a3955775132243d5fc14b1"
   },
   {
    "path": "docs/evidence/FROZEN-EVIDENCE.json",
    "sha256": "7a7f45e634a1cb185c84d698101ce57c52d3e1054cb84b7f6ac9b0632ba4caa4"
+  },
+  {
+   "path": "docs/evidence/M3A-acceptance.md",
+   "sha256": "b20bd6bd4120792312172e5383258304411d6cc4b9d6471c0ee8a9cb81db9ecf"
+  },
+  {
+   "path": "docs/evidence/M3B-DECISION-007.md",
+   "sha256": "a60c626a687a320d12fe2322ce9e8b6753e42b3b6f106dc5c618cc46ba2c1dda"
+  },
+  {
+   "path": "docs/evidence/M3B-GOVERNANCE-01.md",
+   "sha256": "05efebcb88e132d152c04b1463a2e30adc5db5e429d43f2e72c2efba5c956bf8"
+  },
+  {
+   "path": "docs/evidence/M3B-R2.md",
+   "sha256": "ed5ec6779658f11078f52d52711df0fe44c99acfbd26f1e9191b9b6db5153c74"
+  },
+  {
+   "path": "docs/evidence/M3B-R3.md",
+   "sha256": "759d66b43f1d0335aaba28b6ffd7f5caff4c66e885a6cdba43e8f8b2f34800c2"
   },
   {
    "path": "docs/evidence/m3a/capability-probe.json",
@@ -55,6 +75,10 @@
    "sha256": "ca71fdcd1fb76b37ae0e4127d42347e2444c1499598fe65ba7638890460f8c7f"
   },
   {
+   "path": "docs/evidence/m3a/mac-netns-lab-aarch64.json",
+   "sha256": "3273d81a850c6abdaf0278234ed6d4440e2e093ffb50638630a2fa1875f70ac4"
+  },
+  {
    "path": "docs/evidence/m3a/mac-paper-integrity.json",
    "sha256": "7b2ebab90af69b11e3632eba8826e85e414dc649b3158107486855c331ec127e"
   },
@@ -65,6 +89,14 @@
   {
    "path": "docs/evidence/m3a/mac-real-clients-via-proxy.json",
    "sha256": "b166bf48a154def85f5133437a847257487720913dd099e9ee25224b86b42e7d"
+  },
+  {
+   "path": "docs/evidence/m3a/mac-xarch-integrity-linux-aarch64.json",
+   "sha256": "2ee7e20616ccc28a50e71afb32eed56e4344630ebec4a64f6bebabae319e5b5b"
+  },
+  {
+   "path": "docs/evidence/m3a/mac-xarch-integrity-macos-arm64.json",
+   "sha256": "2ee7e20616ccc28a50e71afb32eed56e4344630ebec4a64f6bebabae319e5b5b"
   },
   {
    "path": "docs/evidence/m3a/negative-tests-run1.err",
@@ -147,6 +179,10 @@
    "sha256": "29d631bc11d95f2ead92ec94b9e07b58b1f4a860a5bd75546ecfd1474ce45c84"
   },
   {
+   "path": "docs/evidence/m3a/r2-boundary-verification-macos.json",
+   "sha256": "04c4e88b22b70403fd9fb8845a48a8e5cd8f81e00855bcca6adc709d582a97f2"
+  },
+  {
    "path": "docs/evidence/m3a/r2-capability-probe-runtime-profile.json",
    "sha256": "77c093d795ed8c7a1f719d9767cf899e4b29b2d4842977b26bdc20606356e018"
   },
@@ -173,6 +209,10 @@
   {
    "path": "docs/evidence/m3a/r2-pytest-full.log",
    "sha256": "977a09b09d97e1672c069a453ac08b1ea72054dd1e7277f0fd93b63f67a9408e"
+  },
+  {
+   "path": "docs/evidence/m3a/r3-backup-key-rehearsal-macos.json",
+   "sha256": "4130a9c470dce36bd936dd27378b4fc05120068d894d07f73db610be1671b0f5"
   },
   {
    "path": "docs/evidence/m3a/r3-e2e-full-run.log",
@@ -203,12 +243,8 @@
    "sha256": "a8604e165e92e26b548bd6db14808a7a992c87720a13096307431e53f79fd41d"
   },
   {
-   "path": "docs/evidence/M3A-acceptance.md",
-   "sha256": "6be1c7cb33afa2e5c9e3aab93d45947d53f0a83a51132f587552fe424dd36b87"
-  },
-  {
    "path": "docs/m3a/CREDENTIAL-HYGIENE.md",
-   "sha256": "300e0d718222c0fd6f008edc9c0484547c49c70682654ea35e007f01e880a9ac"
+   "sha256": "046976197b93e5e52889063c88472adfe13dedbc22a72bef45a536ddc971d886"
   },
   {
    "path": "docs/m3a/CREDENTIAL-ISOLATION.md",
@@ -228,23 +264,23 @@
   },
   {
    "path": "docs/m3a/INDEPENDENT-REVIEW-PACKAGE.md",
-   "sha256": "88118995cc02799915616dc0fb19bc86af353ff96e86a5806227829b94192c5f"
+   "sha256": "6230acb1b89623bb2c6afd97ad84af33e865b97965320dbfa00aa4150fdb80e8"
   },
   {
    "path": "docs/m3a/M3B-READINESS.md",
-   "sha256": "57b086e46d796bd9a8944a3c750cd140ede94a5c2ad33f5a7803ad36e7a75d1d"
+   "sha256": "c43939a5ddcba6f137b9649fd341a186716ecfdba094faa78d7d8ed6369be246"
   },
   {
    "path": "docs/m3a/MAC-MINI-DEPLOYMENT-DESIGN.md",
-   "sha256": "ee6bbf45c68f3f33a7ff4e8beb8ef78745cb32e70365e0edc7782fd82814b3e4"
+   "sha256": "78fcaad97495adb350ed38017c4f22f99911fda845b3e5419b5ee96705b9748d"
   },
   {
    "path": "docs/m3a/PAPER-REJECTION-ANALYSIS.md",
-   "sha256": "080dc6fa70da858bf9db45bc2922742985c14788bd9f1dc58983f208e4adddce"
+   "sha256": "5592212d4ef43a23ba140e10b45c1f90f31b550a837fb3606b5953c79da37384"
   },
   {
    "path": "docs/m3a/RESIDUAL-RISK-REGISTER.md",
-   "sha256": "6df540b1222cd5ab3a8517563e8a5dd51a34d85394da5a48c900df736bb1e9b5"
+   "sha256": "dc7877c3eb6be048193697786cecebb39463a7d2c9fe8ab70e2aa2094c9a1bc7"
   },
   {
    "path": "docs/m3a/REVIEW-INDEX.md",
@@ -260,7 +296,7 @@
   },
   {
    "path": "docs/m3a/THREAT-MODEL.md",
-   "sha256": "7c473bfcb45df1321adc8befec72465a86a39af0539fd127386b907ff1d72b0f"
+   "sha256": "7204c02b5d8d5c785a11c866d8b40b5e22d1ad280a3fdefa32a83884cfdb9af5"
   },
   {
    "path": "docs/m3a/TRUST-BOUNDARIES-AND-LIFECYCLE.md",
@@ -269,6 +305,38 @@
   {
    "path": "docs/m3a/VM-BOUNDARY-DESIGN.md",
    "sha256": "257cbcdb9836f2a90701f36cb4c829b928e0f0849564714dd572a6da3d40d4ca"
+  },
+  {
+   "path": "docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md",
+   "sha256": "f091c4fd73c530726e3553c3879c7a0ffe7629f86404530f45b4128a8f4f12a2"
+  },
+  {
+   "path": "docs/m3b/INTENT-CHANNEL-SECURITY.md",
+   "sha256": "b6818e5ba832e406dcc4fc4b2e8fb8a0c6378554a452ff9bb132e461e02c8730"
+  },
+  {
+   "path": "docs/m3b/M3B-GATE-CHECKLIST.md",
+   "sha256": "a070a574675407743d00c7c18dffc73812d6420151247d1b3a3fe2e4c68adb04"
+  },
+  {
+   "path": "docs/m3b/MAC-READINESS-AUDIT.md",
+   "sha256": "eef6238492a1fa447ce8244fc6741f39b8dee9e9bfd9146a31a0402d280e3e29"
+  },
+  {
+   "path": "docs/m3b/ORDER-PATH-DESIGN.md",
+   "sha256": "08db1df27189406502a6392d4cd48c6d1b5c8b8e344064d96e28531f71c41353"
+  },
+  {
+   "path": "docs/m3b/RISK-HALT-BRIDGE.md",
+   "sha256": "69604b8f39c4384045d1b2390826679f974f464433606d0501874550c5acaefb"
+  },
+  {
+   "path": "docs/m3b/SECURITY-TOPOLOGY.md",
+   "sha256": "f14db36f538914113e6c516530e09bc780e7fce1f5a05f550733cc2ced587a63"
+  },
+  {
+   "path": "docs/m3b/VAULT-AND-BACKUP.md",
+   "sha256": "46c2bb2f73a313803f928bc2a9b95c19074c0f09a21652b7f256c48364c8b289"
   },
   {
    "path": "infra/egress/allowlist.json",
@@ -319,6 +387,10 @@
    "sha256": "9c17c1e6fcb23f54a0e6dfd1ac2033d0e46dee7033a646b6f6f2d97c3b3f2a2f"
   },
   {
+   "path": "infra/security-host/acceptance/netns_lab.py",
+   "sha256": "cc6f00ad8c635c20219dc94e638238850b8b2f776688ff2e6460b0ad32832c62"
+  },
+  {
    "path": "infra/security-host/acceptance/vault_validation.py",
    "sha256": "1802c982436fe555c39d109f461481d921642a8b81127d60dc972d464543f430"
   },
@@ -367,6 +439,22 @@
    "sha256": "ca87f8001aed5d389b25434dfdfcf5850cf0d5faf606f1898692eac801962bd2"
   },
   {
+   "path": "infra/security-host/mac/app-vm/asta-risk-bridge.service",
+   "sha256": "2780a7e6e52faf5c0af4d0ba15839a830f9d59b3a52be9ae65e5ace64ad371a0"
+  },
+  {
+   "path": "infra/security-host/mac/app-vm/asta-security-alert@.service",
+   "sha256": "9f016a6ed43dd60ccdd115621f536e99a73fd3af3541a82b537ded66cca32198"
+  },
+  {
+   "path": "infra/security-host/mac/app-vm/asta-security-monitor.service",
+   "sha256": "b040833bd8cf9eb743c46ea19e836bd9cbd74f24c8f42b4b48188e2192e85528"
+  },
+  {
+   "path": "infra/security-host/mac/app-vm/asta-security-monitor.timer",
+   "sha256": "45cf71ae37ca164f988ec709dccfa765c9b92a35cbb9ce2c10b6535352df534d"
+  },
+  {
    "path": "infra/security-host/mac/app-vm/db_backup.sh",
    "sha256": "d2886a33a2aa10b437d0ab312647ade07db514aefd4331a2386ce84ff7465b66"
   },
@@ -384,15 +472,31 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_hba.conf.asta",
-   "sha256": "b4fe828f8652238c2513eb1ffaf18a06c44f3623698da1da02824f31c8d54e67"
+   "sha256": "10a34f76a8cae3bec4514cc350a273183e50897e5f5e4b0177050f1c106cbf52"
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_ident.conf.asta",
-   "sha256": "3b5180780dac5ad1b1025790d3fd9ad37bb49d71f9905d799904a53aed9dad24"
+   "sha256": "d91300dac6cb0f8b1b1f0a7546ba5d541c181cfbf5d62215f2bee4f6fd50b842"
+  },
+  {
+   "path": "infra/security-host/mac/app-vm/pg_roles_m3b.sql",
+   "sha256": "9fd09f907388907c12081d909a483ab92522f7061dd37c932707e32031e43cfd"
   },
   {
    "path": "infra/security-host/mac/app-vm/postgresql-hardening.conf",
    "sha256": "058c128573c765faced4541bb735888f5ffa301bdfbcdc2f619f8a9053a2713f"
+  },
+  {
+   "path": "infra/security-host/mac/backup-image-to-external.sh",
+   "sha256": "f95b90e8df15f288a308354b20a12ceed50e86fde274d7dd1358c19a491d3ba1"
+  },
+  {
+   "path": "infra/security-host/mac/backup-key-rehearsal.sh",
+   "sha256": "76cce14e48b686b334ebc6e2e1cfa252e35ffe44d35bb31faa6d7e8de3e61a5b"
+  },
+  {
+   "path": "infra/security-host/mac/backup-recipient.pub",
+   "sha256": "eb179517ee6952a84cce7301b96bf6aafa939d7bee237029c7cc9d55d5190277"
   },
   {
    "path": "infra/security-host/mac/cred-vm/netplan-50-asta.yaml",
@@ -447,8 +551,16 @@
    "sha256": "c734b9bef40b4e3046f9e358114743bc6b8493abf0221b19e7e1ba19be9b657f"
   },
   {
+   "path": "infra/security-host/mac/provision-host.sh",
+   "sha256": "ea474f030587daca04770581b63bb0336adce2281b655393373f6ff84ea75bf3"
+  },
+  {
    "path": "infra/security-host/mac/qemu-vms.sh",
    "sha256": "441f5ab6d65c1322e81eab55289caca6ed03a5f54b6c23c19aca6c1b854a1435"
+  },
+  {
+   "path": "infra/security-host/mac/rollback-host.sh",
+   "sha256": "ee798688b9c15ec42ac30f4a17d192ccd837784d6b4f431313ac33e7a2db4a16"
   },
   {
    "path": "infra/security-host/provision/build_seed.py",
@@ -495,12 +607,128 @@
    "sha256": "b76fe9250c666cc69a2dc75e4f969d82091fb3324b2cae213dcad8050d3ba174"
   },
   {
+   "path": "migrations/versions/0001_m0_foundation.py",
+   "sha256": "5a9b2c5446875dbe4b8d5115654ba274e37f6398858bffa0133b45e125fa80c2"
+  },
+  {
+   "path": "migrations/versions/0002_m1_research.py",
+   "sha256": "56c532f43d2f1b2586e820233fa3ce1e55a953d766285b748c358b656a9be150"
+  },
+  {
+   "path": "migrations/versions/0003_m1_study_provenance.py",
+   "sha256": "95debfaf2b12105d3e213203d3e29b9c7295e2e066de7e6623ccdaa455c3761b"
+  },
+  {
+   "path": "migrations/versions/0004_m2_paper_trading.py",
+   "sha256": "8b821488268527fb2125555c2d851b2cc5b0f169dc23e80b6c03c7f7bb02e06c"
+  },
+  {
+   "path": "migrations/versions/0005_report_revisions.py",
+   "sha256": "1a2712fa8aaa8975c72f66ebabcc4725d2b2d1cccc5e2736645f5d758dfe345e"
+  },
+  {
+   "path": "migrations/versions/0006_m3b_order_intents.py",
+   "sha256": "c43bc1071495b32fb4f457a99b17dd22c1c3d80b51dc49b0629e7ba4904e0710"
+  },
+  {
+   "path": "migrations/versions/0007_m3b_order_fills.py",
+   "sha256": "a542995631d93ca877f6b3c1aa49bbf507668777d8a32976953bb6852726fe4b"
+  },
+  {
+   "path": "migrations/versions/0008_m3b_integrity_and_halt.py",
+   "sha256": "a183497af82c19f46ec42c6492bb23a06095d97082be1cdc5c7076f244f6bd04"
+  },
+  {
+   "path": "migrations/versions/0009_m3b_risk_halt_bridge.py",
+   "sha256": "5355da78583a60425a9b87fc45fe12ff3b71a0040d63759bd9482779d0f820c8"
+  },
+  {
+   "path": "migrations/versions/0010_m3b_bridge_heartbeat_and_function_hardening.py",
+   "sha256": "af2dd3e9ea38b9ed6e8cec283c6f0c1f494ff258616972d308e25047e1b53084"
+  },
+  {
    "path": "scripts/review_manifest.py",
-   "sha256": "442cb21622185415837400044cdf81a6903d200d9ce88f6c818afdbe09622335"
+   "sha256": "e779cf4c561a7e25bcf9247d82117306ecfd2dfa8088ef898aded8fcff8f36a0"
+  },
+  {
+   "path": "scripts/secret_scan.py",
+   "sha256": "7aff6fd0f29f182d44da6a7f983d7ea9787eddbada5f9583ee5dc31f90e88d9e"
   },
   {
    "path": "scripts/verify_frozen_evidence.py",
    "sha256": "223e3e10932a0de9fc7ed320a11ad3a1974c41cf751c178314fdf10465b01404"
+  },
+  {
+   "path": "src/asta/core/order_gate.py",
+   "sha256": "458c527e68926de68b0fb0f18ff9066d464d264dd2508daa547bfdb4dc3ae1bd"
+  },
+  {
+   "path": "src/asta/orders/__init__.py",
+   "sha256": "644afb0b38f9104ed6f7993111621a05d23ed55674d21a061c6b18627f2566e9"
+  },
+  {
+   "path": "src/asta/orders/boundary.py",
+   "sha256": "9cc613b4a9a686aa411c48343acafad8889efa9956a3362edb888b9729039460"
+  },
+  {
+   "path": "src/asta/orders/channel.py",
+   "sha256": "92935ede740941167d7455d1420d5d521dcb79f762097e47d872fb808a2499e2"
+  },
+  {
+   "path": "src/asta/orders/clockguard.py",
+   "sha256": "b29d9c376b2865a39cc1a98c9ea59c7bd972d4a20b9679becc75a4afe7d6c825"
+  },
+  {
+   "path": "src/asta/orders/dispatch.py",
+   "sha256": "98f98f79bff36e201fbd33e990f0643d9f63eae2a0ac0410afbc03c1fe45bb7e"
+  },
+  {
+   "path": "src/asta/orders/fills.py",
+   "sha256": "2f78bc4a530cc6f00a9924cf64bb80745c55ebc085869db24501958da0e90460"
+  },
+  {
+   "path": "src/asta/orders/halts.py",
+   "sha256": "424547eafd08ea883ee3dfe9599801963ff541154856d9f0fb89c2af30b5d8eb"
+  },
+  {
+   "path": "src/asta/orders/lifecycle.py",
+   "sha256": "1df2a8ae9a3cc9ed77f793ea75bf28ff87939da1efefa267273cf525a2b13fca"
+  },
+  {
+   "path": "src/asta/orders/monitor.py",
+   "sha256": "4f280079a226e7a840008e004a5c9bba805c22982deb0c4debcefdc4c3098b9b"
+  },
+  {
+   "path": "src/asta/orders/ports.py",
+   "sha256": "64dd2f786f6e79150143a3cf3948f2a4c0ea3d5497945ef6b6cedc0d70c74bd4"
+  },
+  {
+   "path": "src/asta/orders/pretrade.py",
+   "sha256": "33cef38b551ad2a86bdfdd15bbbcd554b228c659f0408b60f9453efd97e0fe7b"
+  },
+  {
+   "path": "src/asta/orders/ratelimit.py",
+   "sha256": "4622ebc58e6d09d8a1ce59bb5bbb2e87b96e0b4449787afa77eedcdc8b1bbdc0"
+  },
+  {
+   "path": "src/asta/orders/reconcile.py",
+   "sha256": "c03207044bc132e2ed0c08e62e107d141e26bc09f41c5b70236c617aff82a534"
+  },
+  {
+   "path": "src/asta/orders/replace.py",
+   "sha256": "4e9591ead15f1cb44e03d186fdad775e560e2f0bf465fe6a743cacd87c54bb60"
+  },
+  {
+   "path": "src/asta/orders/risk_bridge.py",
+   "sha256": "5606d0770eff9954089dd9ac759d637c9b0120d0d4e571e1e2a86c1beda911b4"
+  },
+  {
+   "path": "src/asta/orders/sql_store.py",
+   "sha256": "019bd25ef3eadd7bfb19cc349a2190815aa599b445cbd0e1dff2a3fe50e5e685"
+  },
+  {
+   "path": "src/asta/orders/supervisor.py",
+   "sha256": "65bcabd7d4c2d5c0d9e5aadc826290cf1d0a92a5d050ff855027fd0a4cd594f8"
   },
   {
    "path": "src/asta/security/__init__.py",
@@ -516,11 +744,27 @@
   },
   {
    "path": "src/asta/security/vault.py",
-   "sha256": "7a3d2f503f27a4417f3334d72a7591c0779101595cfd416456dc15789b078b99"
+   "sha256": "637dae5e4a121753d2ca90d672b969f5f1c9278a9ed11a822536bb5ef7398414"
+  },
+  {
+   "path": "tests/integration/test_bridge_supervision.py",
+   "sha256": "10d5ac5d5d2c17c835f1b816e747638feb812c9833bb0f7c0727fe7d2db2781e"
+  },
+  {
+   "path": "tests/integration/test_m3b_integrity.py",
+   "sha256": "0c91d62693a9bdfae02005bd309fcb045c629c0b084b032a0484ed87e160b43a"
+  },
+  {
+   "path": "tests/integration/test_risk_bridge.py",
+   "sha256": "691031628988f09736699288769a7c92d5df7b219cfad2f3e8998235f35d307b"
+  },
+  {
+   "path": "tests/m3a/test_backup_key_rehearsal.py",
+   "sha256": "b5636326b1d04c41a4d0d6f46e71937207f585772939aeb18e59b20bea4ffd86"
   },
   {
    "path": "tests/m3a/test_credential_hygiene.py",
-   "sha256": "bd3262301d2a1793bc6cc1163e2b6d3bfe2e7335833f6ed2c3ccc5842ce7bfbc"
+   "sha256": "15b07ca1522f2f0dec13b7a74b6579fbaf499d93ecd8f125f594540d1917000d"
   },
   {
    "path": "tests/m3a/test_egress.py",
@@ -535,8 +779,20 @@
    "sha256": "3641b25b6bdbf3c75116c23666c793539ec2e02ffc9c212f5a608dee7940aee3"
   },
   {
+   "path": "tests/m3a/test_mac_backup_copy.py",
+   "sha256": "40e99ace058775689e56f398290deeef1213c8667b49a077a370819f65a48ad9"
+  },
+  {
    "path": "tests/m3a/test_mac_deployment.py",
-   "sha256": "c6f7a6d76eef0b4e9994bb76a328d238ae124d80175bd9bf9c039da15b244b6f"
+   "sha256": "b1fa1517cb28fcbbdff2364f6c52972f513c16bb021eb60c92e4e115ff70518b"
+  },
+  {
+   "path": "tests/m3a/test_mac_provision_host.py",
+   "sha256": "10ea80da77ce4d8221d9c63189fe884c71f6dd36de9588975fc7b8c35ef1adfe"
+  },
+  {
+   "path": "tests/m3a/test_mac_rollback_host.py",
+   "sha256": "cd13ee4506a23a5ad9acc7d784eeab565e759023040f153948bf83438937256c"
   },
   {
    "path": "tests/m3a/test_provisioning_artifacts.py",
@@ -549,6 +805,34 @@
   {
    "path": "tests/m3a/test_security_host_config.py",
    "sha256": "e924ad9cd619a8bec719829c2d4925acf2292765680f6128a3f0997e5efb566a"
+  },
+  {
+   "path": "tests/orders/__init__.py",
+   "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+   "path": "tests/orders/fakes.py",
+   "sha256": "2116ab7e71b464e2d1682b4050b1d716b01eef54768d987aeba1d4688aae200a"
+  },
+  {
+   "path": "tests/orders/test_cancel_and_kill.py",
+   "sha256": "8e65d66b5701b319e55b43c80b8e4f42d00760fc32a3d05c77ad6385f373e6a2"
+  },
+  {
+   "path": "tests/orders/test_channel_hardening.py",
+   "sha256": "26feaf88ef10052f67a06a1456719d8d7687133674a32de923946ff011148610"
+  },
+  {
+   "path": "tests/orders/test_gateway_boundary.py",
+   "sha256": "6b8020d32456a5fa1626d67d9279fcfb5353585db4c7fac6a740bfef1fbf3d0c"
+  },
+  {
+   "path": "tests/orders/test_m3b_offline.py",
+   "sha256": "adfde5e5b5e510e869185ed240794b3634242b88c1af7185ec83ff3db1b82841"
+  },
+  {
+   "path": "tests/orders/test_order_path.py",
+   "sha256": "313cdcd4a9d605e60efc6e139c3e2f7a8c73e1b6e1c0d934cba89954a72f5ade"
   }
  ]
 }
