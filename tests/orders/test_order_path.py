@@ -2,6 +2,7 @@
 
 import random
 from decimal import Decimal as D
+from typing import Any
 
 import pytest
 
@@ -248,7 +249,9 @@ def test_an_exchange_report_that_contradicts_our_state_is_an_anomaly_not_a_crash
 
 
 # ----------------------------------------------------- chaos: exactly-once under crashes
-def chaos(seed: int) -> tuple[FakeExchange, MemoryStore, dict[str, int]]:
+def chaos(
+    seed: int, store: Any = None, session: str = "s" * 64
+) -> tuple[FakeExchange, Any, dict[str, int]]:
     rng = random.Random(seed)
     ex = FakeExchange(
         rng,
@@ -258,9 +261,9 @@ def chaos(seed: int) -> tuple[FakeExchange, MemoryStore, dict[str, int]]:
         p_crash_after_send=0.1,
         visible_delay=rng.randrange(0, 4),
     )
-    st = MemoryStore()
+    st = store if store is not None else MemoryStore()
     n = 25
-    intents = [make_intent(i) for i in range(n)]
+    intents = [make_intent(i, session) for i in range(n)]
     deliveries = [i for i in range(n) for _ in range(rng.randrange(1, 4))]  # repeated delivery
     rng.shuffle(deliveries)
     d = make_dispatcher(ex, st, policy=Policy(max_attempts=50, max_age_seconds=10**9))

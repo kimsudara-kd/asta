@@ -9,7 +9,14 @@ from typing import Any
 
 from asta.core.environment import Environment
 from asta.orders.lifecycle import Intent, State
-from asta.orders.ports import ExchangeView, QueryKind, QueryResult, SendOutcome
+from asta.orders.ports import (
+    CancelOutcome,
+    CancelResult,
+    ExchangeView,
+    QueryKind,
+    QueryResult,
+    SendOutcome,
+)
 from asta.paper.order_identity import DecisionKey, decision_id
 
 T0 = datetime(2026, 11, 14, 9, 0, tzinfo=UTC)
@@ -19,8 +26,8 @@ class Crash(Exception):
     """Injected process death at any point (memory lost; durable store and exchange survive)."""
 
 
-def make_intent(i: int, **kw: Any) -> Intent:
-    key = DecisionKey("s" * 64, "DEMO:sma_cross", "BTC-USDT", "BUY", "MARKET", f"t{i}", T0)
+def make_intent(i: int, session: str = "s" * 64, **kw: Any) -> Intent:
+    key = DecisionKey(session, "DEMO:sma_cross", "BTC-USDT", "BUY", "MARKET", f"t{i}", T0)
     base = {
         "decision_id": decision_id(key),
         "environment": Environment.EXCHANGE_DEMO,
@@ -96,6 +103,8 @@ class FakeExchange:
         #: models an exchange that re-accepts a client id once the previous order is FILLED
         self.reuse_after_fill = reuse_after_fill
         self.double_orders = 0
+        self.cancel_effects = 0
+        self.created_at_tick: dict[str, int] = {}
 
     def healthy(self) -> None:
         self.p_drop_request = self.p_drop_response = self.p_unavailable = 0.0
@@ -121,6 +130,7 @@ class FakeExchange:
             self.duplicates_refused += 1
             return SendOutcome.DUPLICATE_ID
         self.orders[intent.decision_id] = State.ACCEPTED
+        self.created_at_tick[intent.decision_id] = self.tick
         self.visible_at[intent.decision_id] = self.tick + self.visible_delay
         if self.rng.random() < self.p_crash_after_send:
             raise Crash("after send, before the reply was processed")
@@ -130,6 +140,20 @@ class FakeExchange:
             self.tick
         )  # an acknowledged order is queryable at once
         return SendOutcome.ACCEPTED
+
+    def cancel(self, client_id: str) -> CancelResult:
+        if self.rng.random() < self.p_drop_request:
+            return CancelResult(CancelOutcome.UNKNOWN)  # never arrived
+        if client_id not in self.orders:
+            return CancelResult(CancelOutcome.UNKNOWN_ORDER)
+        state = self.orders[client_id]
+        if state not in (State.ACCEPTED, State.PARTIALLY_FILLED):
+            return CancelResult(CancelOutcome.FINAL, state)  # too late
+        self.orders[client_id] = State.CANCELED
+        self.cancel_effects += 1
+        if self.rng.random() < self.p_drop_response:
+            return CancelResult(CancelOutcome.UNKNOWN)  # cancelled, but we never heard
+        return CancelResult(CancelOutcome.CANCELED)
 
     def query(self, client_id: str) -> QueryResult:
         if self.rng.random() < self.p_unavailable:

@@ -1,6 +1,6 @@
 # M3-B order path: design (specification and offline proof only)
 
-**This document authorizes nothing.** M3-B is NO-GO (`docs/m3a/M3B-READINESS.md`; F-01, F-02, F-03 open). No connector, credential, signing code, network call or order exists in this repository, and `tests/live_lock` still proves it. What exists is **pure logic with a fake exchange** (`src/asta/orders/`, 328 tests) so that readiness blocker **B-6 / finding F-12 (duplicate or runaway orders)** is specified and proven *before* any order path is built.
+**This document authorizes nothing.** M3-B is NO-GO (`docs/m3a/M3B-READINESS.md`; F-01, F-02, F-03 open). No connector, credential, signing code, network call or order exists in this repository, and `tests/live_lock` still proves it. What exists is **offline logic with a fake exchange and a durable store** (`src/asta/orders/`, `migrations/versions/0006_m3b_order_intents.py`, 580+ tests) so that readiness blocker **B-6 / finding F-12 (duplicate or runaway orders)** is specified and proven *before* any order path is built.
 
 ## 1. Scope proposed for a future authorization
 Binance Spot **Testnet** only; spot BUY/SELL, MARKET and LIMIT; one connector instance bound to `EXCHANGE_DEMO`; OKX excluded until B-5. Cancel/amend are a later increment (see s.7). Limits below are **proposals**, not decisions.
@@ -38,8 +38,14 @@ It **rests on assumptions about the real exchange that the fake cannot prove** (
 ## 6. Kill switch and automatic halts
 Kill switch (manual, or automatically on: `RISK_HALT`, reconciliation anomaly, an order found at the exchange that is not in the store, repeated auth failures, daily caps hit) means: no new dispatch, recovery keeps adopting, pending/unknown work is abandoned (and adopted if it appears later). It is a pure input of the guard (`DayState.kill_switch`) so it is testable offline.
 
+## 6a. Cancel flow (implemented offline)
+`CANCEL_REQUESTED` is a write-ahead state like `DISPATCHED`. A cancel is sent once per attempt; a lost reply is resolved by **asking by client id**, never by assuming; a cancel that races a fill adopts the fill; a cancel that never takes effect is retried up to `max_cancel_attempts` and then reported as an anomaly (never hidden). With the kill switch on, `recover()` cancels every resting order. Proven by 200 seeded chaos runs in which a kill switch trips at a random moment amid request/reply loss and crashes: **no order is created at the exchange after the kill, nothing is left resting, nothing is unresolved, local = exchange**; mutation checks confirm the tests fail without the flush, without the kill check in the send step (a race test pins it) or without cancel recovery.
+
+## 6b. Durable store (implemented, migration 0006, tested on real PostgreSQL)
+`order_intents`: `decision_id` PRIMARY KEY = the atomic claim (`INSERT ... ON CONFLICT DO NOTHING`; 8 racing threads produce exactly one claim); `environment` CHECK = `EXCHANGE_DEMO` only (a database-level lock: no value can mean a real-money venue); sizing/side/type CHECKs; a BEFORE UPDATE trigger makes identity and sizing immutable and allows a state change only if `(old, new)` is in the seeded `order_intent_transitions` table (a test fails if it ever differs from the Python state machine); no DELETE/TRUNCATE; every insert and change is appended by TRIGGER to the append-only `order_intent_events`. `SqlIntentStore` commits before every return (the write-ahead guarantee). The exactly-once chaos proof also passes through this real store.
+
 ## 7. Not designed yet (explicit gaps)
-Cancel and amend flow and kill-switch cancellation of resting orders; partial-fill handling beyond state adoption; the durable store schema (UNIQUE `decision_id`, same-transaction write-ahead) and migration; the intent-channel wire format and its authentication; reconciliation of balances vs ledger and the paper-vs-demo report; rate-limit budgeting (testnet 50 / 10 s); clock-skew handling; the real vault backend (B-4).
+Partial-fill quantities/fees (only state is adopted), amend/replace; the intent-channel wire format and its authentication; reconciliation of balances vs ledger and the paper-vs-demo report; rate-limit budgeting (testnet 50 / 10 s); clock-skew handling; the real vault backend (B-4).
 
 ## 8. Failure-mode table
 | Failure | Handling | Evidence |

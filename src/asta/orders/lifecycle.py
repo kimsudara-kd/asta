@@ -16,6 +16,7 @@ class State(StrEnum):
     UNKNOWN = "UNKNOWN"  # transport timeout / ambiguous reply: outcome must be learned by query
     ACCEPTED = "ACCEPTED"  # resting at the exchange
     PARTIALLY_FILLED = "PARTIALLY_FILLED"
+    CANCEL_REQUESTED = "CANCEL_REQUESTED"  # write-ahead mark: a cancel MAY be on the wire
     FILLED = "FILLED"
     CANCELED = "CANCELED"
     REJECTED = "REJECTED"  # explicit refusal by the exchange (nothing exists there)
@@ -33,8 +34,10 @@ ALLOWED: dict[State, frozenset[State]] = {
     State.PENDING: frozenset({State.DISPATCHED, State.REJECTED, State.ABANDONED}),
     State.DISPATCHED: frozenset({State.UNKNOWN, State.ABANDONED} | _EXCHANGE_OUTCOMES),
     State.UNKNOWN: frozenset({State.DISPATCHED, State.ABANDONED} | _EXCHANGE_OUTCOMES),
-    State.ACCEPTED: frozenset({State.PARTIALLY_FILLED} | TERMINAL),
-    State.PARTIALLY_FILLED: frozenset({State.PARTIALLY_FILLED} | TERMINAL),
+    State.ACCEPTED: frozenset({State.PARTIALLY_FILLED, State.CANCEL_REQUESTED} | TERMINAL),
+    State.PARTIALLY_FILLED: frozenset({State.PARTIALLY_FILLED, State.CANCEL_REQUESTED} | TERMINAL),
+    # the cancel may race a fill; a cancel that did not take effect returns to the resting state
+    State.CANCEL_REQUESTED: frozenset({State.CANCEL_REQUESTED} | _EXCHANGE_OUTCOMES),
     # a request we gave up on may still have reached the exchange: adopt whatever is found there
     State.ABANDONED: _EXCHANGE_OUTCOMES,
     State.FILLED: frozenset(),
@@ -69,6 +72,7 @@ class Intent:
     state: State = State.PENDING
     attempts: int = 0
     misses: int = 0  # consecutive NOT_FOUND answers while UNKNOWN (re-send needs several)
+    cancel_attempts: int = 0
     created_ts: int = (
         0  # integer seconds of the decision bar (deterministic, supplied by the caller)
     )
@@ -92,12 +96,19 @@ class Intent:
             if v is not None and v <= 0:
                 raise ValueError("size must be positive")
 
-    def moved(self, to: State, note: str = "", attempts: int | None = None) -> Intent:
+    def moved(
+        self,
+        to: State,
+        note: str = "",
+        attempts: int | None = None,
+        cancel_attempts: int | None = None,
+    ) -> Intent:
         check_transition(self.state, to)
         return replace(
             self,
             state=to,
             note=note or self.note,
             attempts=self.attempts if attempts is None else attempts,
+            cancel_attempts=(self.cancel_attempts if cancel_attempts is None else cancel_attempts),
             misses=0,  # every state change restarts the NOT_FOUND count
         )

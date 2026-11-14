@@ -159,5 +159,6 @@ class AuditEvent(Base):
 
 
 # register the M1 research tables on the same metadata (import at the end: they import Base above)
+from asta.db import order_models as _order_models  # noqa: E402,F401
 from asta.db import paper_models as _paper_models  # noqa: E402,F401
 from asta.db import research_models as _research_models  # noqa: E402,F401

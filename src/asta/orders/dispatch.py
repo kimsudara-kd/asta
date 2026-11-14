@@ -23,7 +23,7 @@ from decimal import Decimal
 from enum import StrEnum
 
 from asta.orders.lifecycle import ALLOWED, TERMINAL, UNRESOLVED, Intent, State
-from asta.orders.ports import ExchangePort, IntentStore, QueryKind, SendOutcome
+from asta.orders.ports import CancelOutcome, ExchangePort, IntentStore, QueryKind, SendOutcome
 from asta.orders.pretrade import DayState, PreTradeLimits, refusals
 
 
@@ -48,6 +48,7 @@ class Policy:
     #: exchange may re-accept a client id once its previous order is filled, and a fast fill can be
     #: invisible to a query for a moment: one NOT_FOUND must never trigger a re-send.
     not_found_confirmations: int = 2
+    max_cancel_attempts: int = 5
 
 
 @dataclass
@@ -57,6 +58,7 @@ class RecoveryReport:
     abandoned: int = 0
     unavailable: int = 0
     waiting: int = 0  # NOT_FOUND seen, more confirmations needed before any re-send
+    cancels: int = 0  # cancel requests sent by recovery (kill switch flush / retries)
     anomalies: list[str] = field(default_factory=list)
 
 
@@ -148,7 +150,55 @@ class Dispatcher:
             q = self.exchange.query(rec.decision_id)
             if q.kind == QueryKind.FOUND and q.view is not None and q.view.state != rec.state:
                 self._adopt(rec, q.view.state, rep)
+        self._recover_cancels(rep)
+        if self.day_state().kill_switch:  # kill switch: nothing may keep resting at the exchange
+            for rec in sorted(self.store.by_state(resting), key=lambda r: r.decision_id):
+                self._request_cancel(rec, rep)
         return rep
+
+    # ------------------------------------------------------------------ cancel
+    def cancel(self, decision_id: str) -> State | None:
+        """Ask to cancel a resting order. Returns the resulting state, or None when it cannot be
+        cancelled (unknown decision, or not at the exchange yet: resolve UNKNOWN/PENDING first)."""
+        rec = self.store.get(decision_id)
+        if rec is None or rec.state not in (
+            State.ACCEPTED,
+            State.PARTIALLY_FILLED,
+            State.CANCEL_REQUESTED,
+        ):
+            return None
+        return self._request_cancel(rec, RecoveryReport()).state
+
+    def _request_cancel(self, rec: Intent, rep: RecoveryReport) -> Intent:
+        if rec.cancel_attempts >= self.policy.max_cancel_attempts:
+            rep.anomalies.append(f"{rec.decision_id}: cancel not taking effect")
+            return rec
+        rec = self._save(rec.moved(State.CANCEL_REQUESTED, cancel_attempts=rec.cancel_attempts + 1))
+        rep.cancels += 1
+        res = self.exchange.cancel(rec.decision_id)  # write-ahead is already durable
+        if res.outcome == CancelOutcome.CANCELED:
+            return self._save(rec.moved(State.CANCELED))
+        if res.outcome == CancelOutcome.FINAL and res.state in ALLOWED[State.CANCEL_REQUESTED]:
+            return self._save(rec.moved(res.state, "final before the cancel arrived"))
+        if res.outcome == CancelOutcome.UNKNOWN_ORDER:
+            rep.anomalies.append(f"{rec.decision_id}: exchange has no such order")
+        return rec  # ambiguous: stays CANCEL_REQUESTED; recovery asks by client id
+
+    def _recover_cancels(self, rep: RecoveryReport) -> None:
+        resting_states = (State.ACCEPTED, State.PARTIALLY_FILLED)
+        for rec in sorted(
+            self.store.by_state(frozenset({State.CANCEL_REQUESTED})), key=lambda r: r.decision_id
+        ):
+            q = self.exchange.query(rec.decision_id)
+            if q.kind == QueryKind.UNAVAILABLE:
+                rep.unavailable += 1
+            elif q.kind == QueryKind.FOUND and q.view is not None:
+                if q.view.state in resting_states:  # still resting: the cancel did not take effect
+                    self._request_cancel(rec, rep)
+                else:
+                    self._adopt(rec, q.view.state, rep)
+            else:
+                rep.anomalies.append(f"{rec.decision_id}: cancel requested but order not found")
 
     def _retry(self, rec: Intent, rep: RecoveryReport) -> None:
         too_old = self.now() - rec.created_ts > self.policy.max_age_seconds
