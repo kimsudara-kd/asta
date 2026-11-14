@@ -622,3 +622,54 @@ def test_deadman_is_disabled_until_configured_https_only_and_never_prints_the_ur
     assert r.returncode == 0 and "not configured" in r.stdout  # nothing sent without configuration
     assert "OnUnitActiveSec=60" in read(MAC / "firewall-vm" / "asta-deadman.timer")
     assert "asta-deadman.sh" in read(MAC / "firewall-vm" / "asta-deadman.service")
+
+
+# ---------------------------------------------------------------- M3-B-R6: real resolver and NTP in the firewall rules
+def _render(*args: str, out: str | None = None):
+    import subprocess
+
+    return subprocess.run(
+        ["/bin/sh", str(MAC / "firewall-vm" / "render-rules.sh"), *args],
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )  # noqa: S603
+
+
+def test_the_default_rules_no_longer_assume_a_router_resolver_and_ntp_has_its_own_set():
+    text = read(MAC / "firewall-vm" / "nftables.conf")
+    assert "192.168.1.1" not in text
+    assert "define UPSTREAM_DNS = { 8.8.8.8, 1.1.1.1 }" in text and "define NTP_SERVERS = {" in text
+    ntp = [ln for ln in text.splitlines() if "dport 123" in ln]
+    assert ntp and all(
+        "$NTP_SERVERS" in ln and "meta skuid 0" in ln for ln in ntp
+    )  # explicit servers, root only
+
+
+def test_render_rules_substitutes_public_addresses_and_refuses_everything_else(tmp_path):
+    out = tmp_path / "fw.nft"
+    r = _render("--dns", "9.9.9.9,149.112.112.112", "--ntp", "162.159.200.1", "--out", str(out))
+    assert (
+        r.returncode == 0
+        and "define UPSTREAM_DNS = { 9.9.9.9, 149.112.112.112 }" in out.read_text()
+    )
+    assert "define NTP_SERVERS = { 162.159.200.1 }" in out.read_text()
+    for bad in (
+        "192.168.1.1",
+        "10.0.0.1",
+        "127.0.0.1",
+        "169.254.1.1",
+        "172.16.0.1",
+        "100.64.0.1",
+        "224.0.0.1",
+        "8.8.8",
+        "dns.example",
+        "300.1.1.1",
+        "",
+    ):
+        for flag in ("--dns", "--ntp"):
+            args = ["--dns", "8.8.8.8", "--ntp", "162.159.200.1"]
+            args[args.index(flag) + 1] = bad
+            r = _render(*args)
+            assert r.returncode == 1 and "REFUSING" in r.stderr, (flag, bad)
+    assert _render("--dns", "8.8.8.8").returncode == 1  # both lists are required

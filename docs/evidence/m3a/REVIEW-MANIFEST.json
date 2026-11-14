@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "294b754159c6d605272dcb4f75aed6467ecde259",
+ "generated_from_commit": "c4b40ddde0d43f59fedd781cbde1358e17b762fd",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -275,6 +275,10 @@
    "sha256": "3ce9af6503de69f405ec80ff4fa8a6a418703df455e4142f8c27b65ae37d37fe"
   },
   {
+   "path": "docs/evidence/m3a/r6-cleanup-candidates.json",
+   "sha256": "bccd321448951a09a9dc7ea7e4086a019253d22ab656252aea024de40d41c97f"
+  },
+  {
    "path": "docs/m3a/CREDENTIAL-HYGIENE.md",
    "sha256": "046976197b93e5e52889063c88472adfe13dedbc22a72bef45a536ddc971d886"
   },
@@ -456,7 +460,7 @@
   },
   {
    "path": "infra/security-host/acceptance/netns_lab.py",
-   "sha256": "1c9e5dd49370b38381f7d2775613154e015d75e9dbfc1a7f50a6698c37c1aa09"
+   "sha256": "82e607c8386e58f9b5243db30cd30fb1120b1e6a1f33706708e3e86e4f9d0747"
   },
   {
    "path": "infra/security-host/acceptance/vault_recovery_rehearsal.py",
@@ -620,7 +624,11 @@
   },
   {
    "path": "infra/security-host/mac/firewall-vm/nftables.conf",
-   "sha256": "8cd4dc3a273f573f5805edd9ce219889aa0acd17a911ffc843728519f3341bec"
+   "sha256": "968a0dc42cbf0eeec120e6da6b61bff5b21a3c455e4ce968a2a2a0860057817f"
+  },
+  {
+   "path": "infra/security-host/mac/firewall-vm/render-rules.sh",
+   "sha256": "d7ac580a977e6c4db8e77d1fc3bd71369b1048f81bf717e754c9cc200dc2aefc"
   },
   {
    "path": "infra/security-host/mac/host-separation-check.sh",
@@ -876,11 +884,11 @@
   },
   {
    "path": "tests/integration/test_m3b_integrity.py",
-   "sha256": "11ef701ec6e8851f628e861b99c808db6d94b5a419d94bc27a76a209bb27ca11"
+   "sha256": "b64894f96b6df8bb66ecd3f8f49354d58840015828230d42327571d776728bfc"
   },
   {
    "path": "tests/integration/test_risk_bridge.py",
-   "sha256": "aceb6460dd6966ac2cb6c5fed498d8033a860221425cb8087c8c93f15c18eb53"
+   "sha256": "0de392e1522dff1be1b78ce40ab6bbc5e602e36f57c747c3aeae8b35b25c277d"
   },
   {
    "path": "tests/m3a/test_backup_key_rehearsal.py",
@@ -896,7 +904,7 @@
   },
   {
    "path": "tests/m3a/test_credential_hygiene.py",
-   "sha256": "15b07ca1522f2f0dec13b7a74b6579fbaf499d93ecd8f125f594540d1917000d"
+   "sha256": "cae76322b8536a11cda345b21b89390a29e9bf2ba8fca80f80da96981cb38ac8"
   },
   {
    "path": "tests/m3a/test_egress.py",
@@ -916,7 +924,7 @@
   },
   {
    "path": "tests/m3a/test_mac_deployment.py",
-   "sha256": "4d15fb9d52eb04c1b8dd7544426ceb2484aaba11cb888639034b1673cd1b5f34"
+   "sha256": "51ccf93e8b1efcab42152f2724849b6265a97fd071b2a9ad5d857fccbda857ee"
   },
   {
    "path": "tests/m3a/test_mac_provision_host.py",
@@ -960,15 +968,15 @@
   },
   {
    "path": "tests/orders/test_channel_hardening.py",
-   "sha256": "26feaf88ef10052f67a06a1456719d8d7687133674a32de923946ff011148610"
+   "sha256": "2216b04afeed0b05667d67302841f0b9ff2e09c45d9dad369489e457c28cb8b7"
   },
   {
    "path": "tests/orders/test_gateway_boundary.py",
-   "sha256": "6b8020d32456a5fa1626d67d9279fcfb5353585db4c7fac6a740bfef1fbf3d0c"
+   "sha256": "404bfea5640b7d8f66a9871e4710fdb11eac15d243e48f4cb9c5de4c1ca6bbf2"
   },
   {
    "path": "tests/orders/test_m3b_offline.py",
-   "sha256": "adfde5e5b5e510e869185ed240794b3634242b88c1af7185ec83ff3db1b82841"
+   "sha256": "442d117a2044a3ba881011aebe708c355d853bed2d471d9ca4bf97fbb20e31c2"
   },
   {
    "path": "tests/orders/test_order_path.py",

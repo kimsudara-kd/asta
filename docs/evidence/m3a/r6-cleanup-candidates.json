@@ -1,0 +1,155 @@
+{
+ "generated": "2026-11-14",
+ "directories": [
+  {
+   "path": "~/<container-dir>",
+   "is_dir": true,
+   "birth": "Nov 14 18:11:48 2026",
+   "entries": 1,
+   "files_below": 0,
+   "open_handles": 5
+  },
+  {
+   "path": "~/<container-dir>/<P1 dir>",
+   "is_dir": true,
+   "birth": "Nov 14 18:11:48 2026",
+   "entries": 1,
+   "files_below": 0,
+   "open_handles": 4
+  },
+  {
+   "path": "~/<container-dir>/<P1 dir>/infrastructure",
+   "is_dir": true,
+   "birth": "Nov 14 18:11:48 2026",
+   "entries": 1,
+   "files_below": 0,
+   "open_handles": 3
+  },
+  {
+   "path": "~/<container-dir>/<P1 dir>/infrastructure/cloudflared",
+   "is_dir": true,
+   "birth": "Nov 14 18:11:48 2026",
+   "entries": 1,
+   "files_below": 0,
+   "open_handles": 2
+  },
+  {
+   "path": "~/<container-dir>/<P1 dir>/infrastructure/cloudflared/config.yml",
+   "is_dir": true,
+   "birth": "Nov 14 18:11:48 2026",
+   "entries": 0,
+   "files_below": 0,
+   "open_handles": 1
+  }
+ ],
+ "bind_mount_references": [
+  {
+   "container": "P1-cloudflared-1",
+   "source": "~/<container-dir>/<P1 dir>/infrastructure/cloudflared/config.yml",
+   "state": "exited",
+   "exit": 127
+  }
+ ],
+ "volumes": [
+  {
+   "name": "7f2d467184fd3c1571be49a3189776608ccc45e14c6d4a4391ea163ab4381d82",
+   "created": "2026-11-14T14:09:35Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "16",
+   "files": 971,
+   "size_kb": 39420,
+   "tree_sha256_prefix": "177613f11b82946f"
+  },
+  {
+   "name": "7f6a6aa43f1fdfa7571498f086e16f6ce727cf69fc189f4386a98db7525c0079",
+   "created": "2026-11-14T14:09:24Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "17",
+   "files": 971,
+   "size_kb": 39424,
+   "tree_sha256_prefix": "e83c0c81da98e179"
+  },
+  {
+   "name": "82b29905f0a61d49807b92950716b3d0ab348b7457c43ea020cb208cfa864aa2",
+   "created": "2026-11-14T14:09:19Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "16",
+   "files": 971,
+   "size_kb": 39420,
+   "tree_sha256_prefix": "177613f11b82946f"
+  },
+  {
+   "name": "514a5efef026b53e97ad140bbe8eb8e8ca3bf5c721d09aefd8bfe269415cd6ab",
+   "created": "2026-11-14T14:09:40Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "16",
+   "files": 971,
+   "size_kb": 39420,
+   "tree_sha256_prefix": "13b40a7b7d14d135"
+  },
+  {
+   "name": "ccfcca95452797eaaa3070172078c7b79acf0274fdf7287c9ed97416b9c2427f",
+   "created": "2026-11-14T14:09:14Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "16",
+   "files": 971,
+   "size_kb": 39420,
+   "tree_sha256_prefix": "177613f11b82946f"
+  },
+  {
+   "name": "d503c0291f309abdfcb58dcf5c5251c0743aeef0a1c76aa0ebadb4afdbebb830",
+   "created": "2026-11-14T14:09:30Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "17",
+   "files": 971,
+   "size_kb": 39400,
+   "tree_sha256_prefix": "7ec402a488201461"
+  },
+  {
+   "name": "e8f756ca1043b7252340e3623c159a9557cae38d1b8fe529895601707df00fcd",
+   "created": "2026-11-14T14:09:45Z",
+   "driver": "local",
+   "labels": {
+    "com.docker.volume.anonymous": ""
+   },
+   "scope": "local",
+   "used_by_any_container": [],
+   "pg_version": "17",
+   "files": 972,
+   "size_kb": 55688,
+   "tree_sha256_prefix": "683e5d773870c0ed"
+  }
+ ],
+ "other_dangling_volumes_not_candidates": 73,
+ "candidate_ids_in_use_by_any_container": []
+}

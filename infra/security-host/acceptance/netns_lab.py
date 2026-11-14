@@ -234,7 +234,7 @@ def build(mac_dir: Path) -> None:
     for ns, name in (("asta-fw", "firewall"), ("asta-app", "app"), ("asta-cred", "cred")):
         text = (mac_dir / f"{name}-vm" / "nftables.conf").read_text()
         text = text.replace(
-            "define UPSTREAM_DNS = { 192.168.1.1 }", f"define UPSTREAM_DNS = {{ {LAB_GW} }}"
+            "define UPSTREAM_DNS = { 8.8.8.8, 1.1.1.1 }", f"define UPSTREAM_DNS = {{ {LAB_GW} }}"
         )
         (Path(tempfile.gettempdir()) / f"lab-{name}.nft").write_text(text)
         nsx(ns, f"nft -f {Path(tempfile.gettempdir()) / f'lab-{name}.nft'}")
