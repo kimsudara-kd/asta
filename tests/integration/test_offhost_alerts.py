@@ -113,7 +113,9 @@ def _deadman(tmp: Path, stamp: str | None, key: bytes = KEY) -> tuple[int, str]:
 @pytest.mark.skipif(shutil.which("openssl") is None, reason="openssl not installed")
 def test_deadman_pings_only_for_a_fresh_authentic_healthy_app_stamp(tmp_path: Path):
     good = alerting.make_stamp(KEY, [])
-    rc, url = _deadman(tmp_path / "a", good) if (tmp_path / "a").mkdir() is None else (0, "")
+    first = tmp_path / "a"
+    first.mkdir()
+    rc, url = _deadman(first, good)
     assert (rc, url) == (0, "https://hc.example/ping/abc")  # healthy: plain heartbeat
 
     def run(name: str, stamp: str | None, key: bytes = KEY) -> tuple[int, str]:
