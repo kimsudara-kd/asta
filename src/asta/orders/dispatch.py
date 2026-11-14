@@ -22,8 +22,9 @@ from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from enum import StrEnum
 
+from asta.orders.boundary import ExecutionDenied, ExposureBlocked, GatedExchange
 from asta.orders.lifecycle import ALLOWED, TERMINAL, UNRESOLVED, Intent, State
-from asta.orders.ports import CancelOutcome, ExchangePort, IntentStore, QueryKind, SendOutcome
+from asta.orders.ports import CancelOutcome, IntentStore, QueryKind, SendOutcome
 from asta.orders.pretrade import DayState, PreTradeLimits, refusals
 
 
@@ -65,7 +66,7 @@ class RecoveryReport:
 class Dispatcher:
     def __init__(
         self,
-        exchange: ExchangePort,
+        exchange: GatedExchange,
         store: IntentStore,
         limits: PreTradeLimits | None,
         day_state: Callable[[], DayState],
@@ -73,6 +74,12 @@ class Dispatcher:
         now: Callable[[], int],
         policy: Policy = Policy(),  # noqa: B008  (frozen dataclass: safe shared default)
     ) -> None:
+        if not isinstance(
+            exchange, GatedExchange
+        ):  # no bypass: only the gated boundary is accepted
+            raise TypeError(
+                "Dispatcher needs a GatedExchange (asta.orders.boundary), not a raw port"
+            )
         self.exchange, self.store, self.limits = exchange, store, limits
         self.day_state, self.reference_price, self.now, self.policy = (
             day_state,
@@ -80,6 +87,11 @@ class Dispatcher:
             now,
             policy,
         )
+
+    def _day(self) -> DayState:
+        """Day counters from the caller, with the durable kill switch always merged in."""
+        d = self.day_state()
+        return replace(d, kill_switch=d.kill_switch or self.exchange.gate.killed())
 
     # ------------------------------------------------------------------ intake
     def handle(self, intent: Intent) -> HandleResult:
@@ -90,7 +102,7 @@ class Dispatcher:
         if not self.store.insert_if_absent(intent):  # 1. CLAIM
             return HandleResult(Handled.DUPLICATE_DECISION, None, ())
         why = refusals(  # 2. GUARD
-            intent, self.limits, self.day_state(), self.reference_price(intent.symbol)
+            intent, self.limits, self._day(), self.reference_price(intent.symbol)
         )
         if why:
             self.store.save(intent.moved(State.REJECTED, "refused locally: " + ",".join(why)))
@@ -100,13 +112,26 @@ class Dispatcher:
 
     # ------------------------------------------------------------------ dispatch (steps 3-4)
     def _dispatch(self, rec: Intent) -> Intent:
-        day = self.day_state()
-        if day.kill_switch:
+        if self._day().kill_switch:
             return self._save(rec.moved(State.ABANDONED, "kill switch before dispatch"))
         if rec.attempts >= self.policy.max_attempts:
             return self._save(rec.moved(State.ABANDONED, "max attempts"))
-        rec = self._save(rec.moved(State.DISPATCHED, attempts=rec.attempts + 1))  # 3. WRITE-AHEAD
-        out = self.exchange.send(rec)  # 4. SEND
+        auth = self.exchange.permit(rec)  # the mandatory gate, BEFORE any state advancement
+        if not auth.allowed:
+            why = "gate denied: " + ",".join(auth.reasons)
+            return self._save(
+                rec.moved(State.REJECTED if rec.state == State.PENDING else State.ABANDONED, why)
+            )
+        try:
+            rec = self._save(
+                rec.moved(State.DISPATCHED, attempts=rec.attempts + 1)
+            )  # 3. WRITE-AHEAD
+        except ExposureBlocked:  # the switch latched between the check above and the write
+            return self._save(rec.moved(State.ABANDONED, "kill switch raced the write-ahead"))
+        try:
+            out = self.exchange.send(rec)  # 4. SEND
+        except ExecutionDenied:  # defence in depth: the gate said no at the last moment
+            return self._save(rec.moved(State.ABANDONED, "gate denied at send"))
         if out == SendOutcome.ACCEPTED:
             return self._save(rec.moved(State.ACCEPTED))
         if out == SendOutcome.REJECTED:
@@ -132,7 +157,7 @@ class Dispatcher:
             else:  # NOT_FOUND now: count it; re-send the SAME id only after enough confirmations
                 rec = self._save(replace(rec, misses=rec.misses + 1))
                 stale = self.now() - rec.created_ts > self.policy.max_age_seconds
-                killed = self.day_state().kill_switch
+                killed = self._day().kill_switch
                 if rec.misses >= self.policy.not_found_confirmations or stale or killed:
                     self._retry(rec, rep)
                 else:
@@ -151,7 +176,7 @@ class Dispatcher:
             if q.kind == QueryKind.FOUND and q.view is not None and q.view.state != rec.state:
                 self._adopt(rec, q.view.state, rep)
         self._recover_cancels(rep)
-        if self.day_state().kill_switch:  # kill switch: nothing may keep resting at the exchange
+        if self._day().kill_switch:  # kill switch: nothing may keep resting at the exchange
             for rec in sorted(self.store.by_state(resting), key=lambda r: r.decision_id):
                 self._request_cancel(rec, rep)
         return rep
@@ -202,7 +227,7 @@ class Dispatcher:
 
     def _retry(self, rec: Intent, rep: RecoveryReport) -> None:
         too_old = self.now() - rec.created_ts > self.policy.max_age_seconds
-        if too_old or self.day_state().kill_switch or rec.attempts >= self.policy.max_attempts:
+        if too_old or self._day().kill_switch or rec.attempts >= self.policy.max_attempts:
             reason = "stale" if too_old else "kill switch / max attempts"
             self._save(rec.moved(State.ABANDONED, f"recovery gave up: {reason}"))
             rep.abandoned += 1
@@ -228,6 +253,8 @@ class Dispatcher:
         return None
 
     def _save(self, rec: Intent) -> Intent:
+        if rec.state == State.DISPATCHED and self.exchange.gate.killed():
+            raise ExposureBlocked("kill switch latched: no state may advance towards the exchange")
         self.store.save(rec)
         return rec
 

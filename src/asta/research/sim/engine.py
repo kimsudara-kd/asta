@@ -16,6 +16,7 @@ from decimal import Decimal
 from typing import Protocol
 
 from asta.core.money import QUANTUM, floor_to_step, round_down, round_up
+from asta.core.order_gate import Surface, authorize
 from asta.research.data.models import Bar
 from asta.research.data.profiles import FeeAssetPolicy, FeeSchedule, RuleProfile
 from asta.research.sim.context import (
@@ -255,6 +256,9 @@ class Engine:
         )
 
     def _submit(self, intent: OrderIntent, decision_close: datetime, is_warmup: bool) -> None:
+        if not authorize(Surface.SIMULATION).allowed:  # the single order-authorization contract
+            self.counters["gate_denied"] = self.counters.get("gate_denied", 0) + 1  # never in M3
+            return
         led = self._led()
         if intent.client_id is not None and intent.client_id in self.clients:
             self.counters["duplicate_ignored"] += 1  # idempotent: same key, no second order

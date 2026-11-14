@@ -17,7 +17,7 @@ from asta.orders.lifecycle import (
     check_transition,
 )
 from asta.orders.pretrade import DayState, PreTradeLimits, refusals
-from tests.orders.fakes import Crash, FakeExchange, MemoryStore, make_intent
+from tests.orders.fakes import Crash, FakeExchange, MemoryStore, gated, make_intent
 
 LIMITS = PreTradeLimits(
     allowed_venues=frozenset({"BINANCE_TESTNET"}),
@@ -33,7 +33,7 @@ DAY = DayState(orders_today=0, notional_today=D("0"), kill_switch=False)
 def make_dispatcher(exchange, store, day=DAY, now=1_000, policy=Policy(), limits=LIMITS):  # noqa: B008
     clock = {"t": now}
     d = Dispatcher(
-        exchange, store, limits, lambda: day, lambda s: D("100"), lambda: clock["t"], policy
+        gated(exchange), store, limits, lambda: day, lambda s: D("100"), lambda: clock["t"], policy
     )
     d.clock = clock  # type: ignore[attr-defined]
     return d

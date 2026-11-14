@@ -161,3 +161,19 @@ class FakeExchange:
         if client_id not in self.orders or self.tick < self.visible_at[client_id]:
             return QueryResult(QueryKind.NOT_FOUND)
         return QueryResult(QueryKind.FOUND, ExchangeView(client_id, self.orders[client_id]))
+
+
+class FlagKill:
+    """Test kill state: ``flag`` is flipped by the test (the real one is durable, see sql_store)."""
+
+    def __init__(self, active: bool = False) -> None:
+        self.flag = active
+
+    def active(self) -> bool:
+        return self.flag
+
+
+def gated(ex: Any, kill: Any = None) -> Any:
+    from asta.orders.boundary import GatedExchange, InternalGate, PortKind
+
+    return GatedExchange(ex, PortKind.SIMULATED, InternalGate(kill or FlagKill()))

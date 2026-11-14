@@ -8,7 +8,7 @@ import pytest
 from asta.orders.dispatch import Dispatcher, Policy
 from asta.orders.lifecycle import TERMINAL, UNRESOLVED, State
 from asta.orders.pretrade import DayState
-from tests.orders.fakes import Crash, FakeExchange, MemoryStore, make_intent
+from tests.orders.fakes import Crash, FakeExchange, MemoryStore, gated, make_intent
 from tests.orders.test_order_path import LIMITS
 
 OK = DayState(0, D("0"), False)
@@ -17,7 +17,9 @@ KILL = DayState(0, D("0"), True)
 
 def build(ex, st, day=None, policy=Policy()):  # noqa: B008
     holder = {"day": day or OK}
-    d = Dispatcher(ex, st, LIMITS, lambda: holder["day"], lambda s: D("100"), lambda: 1_000, policy)
+    d = Dispatcher(
+        gated(ex), st, LIMITS, lambda: holder["day"], lambda s: D("100"), lambda: 1_000, policy
+    )
     return d, holder
 
 
@@ -175,7 +177,7 @@ def test_a_kill_switch_that_trips_between_the_guard_and_the_send_still_stops_the
     ex, st = FakeExchange(random.Random(1)), MemoryStore()
     answers = iter([OK, KILL, KILL, KILL])
     d = Dispatcher(
-        ex, st, LIMITS, lambda: next(answers), lambda s: D("100"), lambda: 1_000, Policy()
+        gated(ex), st, LIMITS, lambda: next(answers), lambda s: D("100"), lambda: 1_000, Policy()
     )
     d.handle(make_intent(1))
     assert ex.send_calls == 0 and not ex.orders
