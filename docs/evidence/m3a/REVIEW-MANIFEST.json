@@ -1,7 +1,11 @@
 {
- "generated_from_commit": "b6b3ecea2c0a397769ebfbea541e89f9c3ae9350",
+ "generated_from_commit": "3b2a6317b6d0f449a9262e41182bb8d08d924208",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
+  {
+   "path": ".github/workflows/ci.yml",
+   "sha256": "e270fb8cbeb96a1ff58b785385d40127923ead014216aff3e5e721eba433e494"
+  },
   {
    "path": ".gitleaks.toml",
    "sha256": "fcfd7e2c216ab72850f47623b4f21d015f59e5367263d72c1387803ca273a389"
@@ -37,6 +41,14 @@
   {
    "path": "docs/evidence/M3B-R3.md",
    "sha256": "759d66b43f1d0335aaba28b6ffd7f5caff4c66e885a6cdba43e8f8b2f34800c2"
+  },
+  {
+   "path": "docs/evidence/M3B-R4.md",
+   "sha256": "a0cb60b0496ed4abd6880861bf5805077986d2597f9d7182319896b8ce011513"
+  },
+  {
+   "path": "docs/evidence/M3B-R5.md",
+   "sha256": "3704bb8715c44b35a6a520ff2069c5cafe64cbc5945e92e26a8dd301894e3156"
   },
   {
    "path": "docs/evidence/m3a/capability-probe.json",
@@ -244,7 +256,7 @@
   },
   {
    "path": "docs/evidence/m3a/r4-host-separation-baseline-macos.json",
-   "sha256": "f7e91eeb7aa5f6b90f8d1ff28a24f3bb059f406b90c2c2a474543ec9a5f604f3"
+   "sha256": "9a6c6ba9ba1100cd2cb77b8a79379a994ae05d7c55dfc7d45b889d8d3b77e8e6"
   },
   {
    "path": "docs/evidence/m3a/r4-netns-lab-aarch64.json",
@@ -253,6 +265,14 @@
   {
    "path": "docs/evidence/m3a/r4-two-vm-load-test-macos.json",
    "sha256": "d902dce56097f68453b30550493f5ce909abe88d461d75dae0c2cecd8ca6b13c"
+  },
+  {
+   "path": "docs/evidence/m3a/r5-firewall-persistence-guest-reboot.json",
+   "sha256": "36da5dc82f016171ba5f1c3f83d5541ad2cbda1ba27c02e377395286803d34b2"
+  },
+  {
+   "path": "docs/evidence/m3a/r5-vault-recovery-rehearsal.json",
+   "sha256": "3ce9af6503de69f405ec80ff4fa8a6a418703df455e4142f8c27b65ae37d37fe"
   },
   {
    "path": "docs/m3a/CREDENTIAL-HYGIENE.md",
@@ -276,11 +296,11 @@
   },
   {
    "path": "docs/m3a/INDEPENDENT-REVIEW-PACKAGE.md",
-   "sha256": "fc5deb909f13a5c2f923c74afe37276eb4e4e63b04dcb6d90904eb4a4eac1912"
+   "sha256": "ba8bee5a14dc705b0c3a51924ce21af79ff5233b1ace0bf0e10ec405752288f1"
   },
   {
    "path": "docs/m3a/M3B-READINESS.md",
-   "sha256": "35b4d83bd41686e8a60a97b3866343bb90b9eda755bf71f5fff5b5041644ead4"
+   "sha256": "057d12b9110bb3ca066ba6d02f568f531b5a02b389231389ed776feb345202e6"
   },
   {
    "path": "docs/m3a/MAC-MINI-DEPLOYMENT-DESIGN.md",
@@ -292,7 +312,7 @@
   },
   {
    "path": "docs/m3a/RESIDUAL-RISK-REGISTER.md",
-   "sha256": "dd704c565a2daffb42c1532ae2fa0bb86095c1725454dff9293a30522ecd3fb5"
+   "sha256": "d108816bd4fa3532000851247b65f116204ba7226297384cbbfc4b7afe8fc76f"
   },
   {
    "path": "docs/m3a/REVIEW-INDEX.md",
@@ -323,12 +343,24 @@
    "sha256": "96dbe9f24f2a7359eb104ff37c5e530463259eb0135ca59ed36cbf7996378107"
   },
   {
+   "path": "docs/m3b/D0-EXPOSURE-AND-MIGRATION-REGISTER.md",
+   "sha256": "bd045a68b800bfca9122d5cb5f2807cd83a585b3072f0b9883711ab1eb47f9a4"
+  },
+  {
+   "path": "docs/m3b/GITLEAKS-EXCEPTIONS-REVIEW.md",
+   "sha256": "f9dc6ed6881cf33f0d3471d7cef20ecd12b67d249d443fd0c018d3bb93afd342"
+  },
+  {
    "path": "docs/m3b/HOST-DEDICATION-INVENTORY.md",
-   "sha256": "3af7ef666cdfd6f7e31dfb0ee5fc7f2576fbf2d9851d37effc4334d93ead8059"
+   "sha256": "9ced0f1c31f94c2b6c16ebd507988c459cb283454e6894b44c1ed272788cd5bd"
+  },
+  {
+   "path": "docs/m3b/HOST-HARDENING-RUNBOOK.md",
+   "sha256": "37957d9e0c3f57d6414bc89bd497bc29893c997934d488dbd9305c5f54075a44"
   },
   {
    "path": "docs/m3b/HOST-SECURITY-CHECKLIST.md",
-   "sha256": "811dda9f98644ca1480263d4af1f02bc928ed51729b71566ae1d6a02f616f7ae"
+   "sha256": "85379529955ecfb53d1a8fb434a19e0663e3d0e0b929c3d1cd8024e410e91a4f"
   },
   {
    "path": "docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md",
@@ -344,7 +376,7 @@
   },
   {
    "path": "docs/m3b/MAC-READINESS-AUDIT.md",
-   "sha256": "eef6238492a1fa447ce8244fc6741f39b8dee9e9bfd9146a31a0402d280e3e29"
+   "sha256": "39f477c92c1c9e7f7b293c11253ee31e6745a5937af581aa9ab86d8409de5b6f"
   },
   {
    "path": "docs/m3b/ORDER-PATH-DESIGN.md",
@@ -356,7 +388,7 @@
   },
   {
    "path": "docs/m3b/SECURITY-EVENTS-AND-ALERTS.md",
-   "sha256": "419a44f4e686a20b18ae3f004e30d9df2a8da293159b597a6168307d7df876ec"
+   "sha256": "14e1499f18359cd21ea28d0c78f635346281da3d55afff7e9d688f346c236f31"
   },
   {
    "path": "docs/m3b/SECURITY-TOPOLOGY.md",
@@ -369,6 +401,10 @@
   {
    "path": "docs/m3b/VAULT-FEASIBILITY.md",
    "sha256": "6633b29e3d24ed33520bf6e965e886e6221d583b7bb630a1eb17eeddb98260f2"
+  },
+  {
+   "path": "docs/m3b/VM-READINESS-REPORT.md",
+   "sha256": "ac69a94dfb718764e102fe87fd3db62fa33b2705c1bb2ba18e89bcc9732b3c81"
   },
   {
    "path": "infra/egress/allowlist.json",
@@ -421,6 +457,10 @@
   {
    "path": "infra/security-host/acceptance/netns_lab.py",
    "sha256": "1c9e5dd49370b38381f7d2775613154e015d75e9dbfc1a7f50a6698c37c1aa09"
+  },
+  {
+   "path": "infra/security-host/acceptance/vault_recovery_rehearsal.py",
+   "sha256": "c1173f400e17f22d8cc8172d5f2ea30f0930f4fedd4d80cbf51a78637bc1df95"
   },
   {
    "path": "infra/security-host/acceptance/vault_validation.py",
@@ -557,6 +597,18 @@
   {
    "path": "infra/security-host/mac/firewall-vm/asta-allowlist-refresh.timer",
    "sha256": "1cc54688bea7b233a979db2e9ab0f7ee381e3cdcb9fe09e3584fa633c0d1f2ca"
+  },
+  {
+   "path": "infra/security-host/mac/firewall-vm/asta-deadman.service",
+   "sha256": "c4155fc8bef0fb1f2574a68720e711d48ea73c27a9fe783aeb298925bf65bca8"
+  },
+  {
+   "path": "infra/security-host/mac/firewall-vm/asta-deadman.sh",
+   "sha256": "d857f3225fd86d15c38c4a473afa81545c5b7390b7448c3a6a3eba99fa6a17f4"
+  },
+  {
+   "path": "infra/security-host/mac/firewall-vm/asta-deadman.timer",
+   "sha256": "ae19f31022a382b2b562b15f697cee3d2378fdf8b877b3c342a98a9a64236d09"
   },
   {
    "path": "infra/security-host/mac/firewall-vm/asta-egress-proxy.service",
@@ -711,8 +763,16 @@
    "sha256": "1eb071bc2e394dbfbcdafc4b4ef0c4ae97b233ff2838fd0b2987fcd2531ff60c"
   },
   {
+   "path": "scripts/ci_skip_guard.py",
+   "sha256": "d8b22d8147b10799aa42cb87391423debf21434fbdb106675c97073ce87b6beb"
+  },
+  {
+   "path": "scripts/docker_pg_volume_verify.py",
+   "sha256": "a10ba2d12173bc4fe175245cbd31f7eebb16c157d5ecd06637da83862afd90ac"
+  },
+  {
    "path": "scripts/review_manifest.py",
-   "sha256": "e779cf4c561a7e25bcf9247d82117306ecfd2dfa8088ef898aded8fcff8f36a0"
+   "sha256": "178602c07e017ce30c8ea46fa841317f907aeb8177d9101e9ff2263eab557d89"
   },
   {
    "path": "scripts/secret_scan.py",
@@ -831,6 +891,10 @@
    "sha256": "f926bc8de564e7c39cf1ad3d2114129188dfa89a49eef58ec603ffa2acba3a3c"
   },
   {
+   "path": "tests/m3a/test_ci_security_gates.py",
+   "sha256": "3c6ff4907dd7846516dc62c0445f0ce715ea314b7ec6152c4373137ee2ba8206"
+  },
+  {
    "path": "tests/m3a/test_credential_hygiene.py",
    "sha256": "15b07ca1522f2f0dec13b7a74b6579fbaf499d93ecd8f125f594540d1917000d"
   },
@@ -852,7 +916,7 @@
   },
   {
    "path": "tests/m3a/test_mac_deployment.py",
-   "sha256": "b08aab5e30a1f9926bd575c45a5a7a5c231f512577f23e7e05b21aff2d295eeb"
+   "sha256": "4d15fb9d52eb04c1b8dd7544426ceb2484aaba11cb888639034b1673cd1b5f34"
   },
   {
    "path": "tests/m3a/test_mac_provision_host.py",
@@ -877,6 +941,10 @@
   {
    "path": "tests/m3a/test_security_host_config.py",
    "sha256": "e924ad9cd619a8bec719829c2d4925acf2292765680f6128a3f0997e5efb566a"
+  },
+  {
+   "path": "tests/m3a/test_vault_recovery_rehearsal.py",
+   "sha256": "cf47459e55d74c67ab1b8bc541076ae3a966d718bc01a76aac6596f7d5e65456"
   },
   {
    "path": "tests/orders/__init__.py",
