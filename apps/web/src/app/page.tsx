@@ -9,6 +9,7 @@ export default function OverviewPage() {
   return (
     <Shell>
       <h1>Overview</h1>
+      <p className="muted">System status, data feeds and the hard execution lock at a glance.</p>
       {error && <p className="err">{error}</p>}
       {!data ? (
         <p className="muted">Loading…</p>
@@ -29,7 +30,11 @@ export default function OverviewPage() {
             </div>
             <div className="card">
               <div className="muted">Execution</div>
-              <strong>{data.risk.execution_enabled ? "ENABLED" : "DISABLED"}</strong>
+              <strong>
+                <span className={`pill ${data.risk.execution_enabled ? "bad" : "ok"}`}>
+                  {data.risk.execution_enabled ? "ENABLED" : "DISABLED"}
+                </span>
+              </strong>
               <div className="muted">Gateway probe: {data.risk.gateway_probe.decision}</div>
             </div>
             <div className="card">
@@ -48,8 +53,10 @@ export default function OverviewPage() {
           <div className="grid">
             {data.venues.map((v) => (
               <div className="card" key={v.venue} data-testid="venue-card">
-                <strong>{v.venue}</strong>{" "}
-                <span className={`pill ${stateTone(v.state)}`}>{stateLabel(v.state)}</span>
+                <div className="card-head">
+                  <strong>{v.venue}</strong>
+                  <span className={`pill ${stateTone(v.state)}`}>{stateLabel(v.state)}</span>
+                </div>
                 <div className="muted">
                   {v.state === "FIXTURE"
                     ? "clock: n/a (fixture data)"
