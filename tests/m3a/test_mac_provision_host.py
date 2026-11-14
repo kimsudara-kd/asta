@@ -49,7 +49,7 @@ def test_nothing_is_world_writable_and_the_service_cannot_modify_its_own_launche
         assert bad not in CODE, bad
     # the launcher run by the _astavm daemons is installed root-owned, not writable by that user
     assert "install -o root -g wheel -m 0755" in CODE and "qemu-vms.sh" in CODE
-    assert 'chmod 700 "$BASE" "$BASE/run"' in CODE
+    assert 'chmod 700 "$REAL" "$REAL/run"' in CODE
 
 
 def test_launch_daemons_reference_exactly_what_the_script_installs():
@@ -85,3 +85,25 @@ def test_default_run_on_a_mac_changes_nothing_and_refuses_apply_without_root():
             check=False,
         )
         assert ap.returncode != 0 and "needs root" in ap.stderr
+
+
+def test_vm_base_must_be_on_a_volume_that_enforces_ownership():
+    # VM-disk isolation is file permissions: exFAT/NTFS/FAT and noowners mounts are refused
+    assert "--vm-base" in CODE and 'case "$FSTYPE" in apfs|hfs' in CODE
+    assert "noowners" in CODE and "diskutil enableOwnership" in TEXT
+    assert "cannot enforce file ownership" in CODE
+    # the fixed path the LaunchDaemons use stays a symlink to the real location, never a copy
+    assert 'ln -s "$REAL" "$BASE"' in CODE and "is not the expected symlink" in CODE
+
+
+@pytest.mark.skipif(sys.platform != "darwin", reason="uses mount/df")
+def test_vm_base_on_the_internal_apfs_volume_is_accepted_in_a_dry_run():
+    out = subprocess.run(  # noqa: S603  (fixed argv: repo-owned script, dry-run)
+        ["/bin/sh", str(SCRIPT), "--vm-base", "/Users/Shared/asta-vm-dryrun"],
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert out.returncode == 0, out.stdout + out.stderr
+    assert "ownership enforced" in out.stdout and "nothing was changed" in out.stdout

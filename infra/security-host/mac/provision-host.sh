@@ -2,11 +2,14 @@
 # ASTA security host - PRIVILEGED host provisioning for the Mac mini (design: docs/m3a/MAC-MINI-DEPLOYMENT-DESIGN.md s.10).
 #
 # DRY RUN BY DEFAULT: prints what it would do and changes nothing. Review the output, then run with sudo:
-#     sudo sh provision-host.sh --apply [--socket-vmnet-tarball F --socket-vmnet-sha256 H] [--load] [--firewall]
+#     sudo sh provision-host.sh --apply [--vm-base DIR] [--socket-vmnet-tarball F --socket-vmnet-sha256 H] [--load] [--firewall]
 #
 # What --apply does (each step is idempotent):
 #   1. service user/group `_astavm` (no login shell, hidden, no home)
-#   2. /var/lib/asta-vm (+ run, images, vars, disks, seeds) 0700 _astavm; /var/log/asta; root-owned launcher dir
+#   2. /var/lib/asta-vm (+ run, images, vars, disks, seeds) 0700 _astavm; /var/log/asta; root-owned launcher dir.
+#      --vm-base DIR puts the data on another volume (symlink /var/lib/asta-vm -> DIR). The volume must be APFS/HFS+
+#      with OWNERSHIP ENABLED (file permissions are the VM-disk isolation): exFAT/NTFS/FAT and `noowners` mounts are
+#      refused. For an external APFS/HFS+ volume: `sudo diskutil enableOwnership /Volumes/NAME` first.
 #   3. socket_vmnet into /opt/socket_vmnet, ROOT-OWNED, only from a tarball whose SHA-256 you pass in
 #      (never from a user-writable Homebrew path: that would let an unprivileged user run code as root)
 #   4. the four LaunchDaemons (validated with plutil) - INSTALLED, loaded only with --load
@@ -16,22 +19,24 @@
 # building/starting the VMs (that needs seeds + the Ubuntu image: see `qemu-vms.sh prepare`, Phase C).
 set -eu
 
-APPLY=0; LOAD=0; FIREWALL=0; TARBALL=""; SHA=""
+APPLY=0; LOAD=0; FIREWALL=0; TARBALL=""; SHA=""; VMBASE=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --apply) APPLY=1 ;;
     --load) LOAD=1 ;;
     --firewall) FIREWALL=1 ;;
+    --vm-base) VMBASE="${2:?dir}"; shift ;;
     --socket-vmnet-tarball) TARBALL="${2:?path}"; shift ;;
     --socket-vmnet-sha256) SHA="${2:?hex}"; shift ;;
-    -h|--help) sed -n 2,19p "$0"; exit 0 ;;
+    -h|--help) sed -n 2,23p "$0"; exit 0 ;;
     *) echo "unknown option $1" >&2; exit 2 ;;
   esac
   shift
 done
 
 HERE="$(cd "$(dirname "$0")" && pwd)"
-BASE=/var/lib/asta-vm
+BASE=/var/lib/asta-vm      # fixed path the LaunchDaemons and qemu-vms.sh use
+REAL="${VMBASE:-$BASE}"      # where the data really lives (a symlink at $BASE when --vm-base is used)
 SVC=_astavm
 LIBEXEC=/usr/local/libexec/asta
 LOGDIR=/var/log/asta
@@ -55,6 +60,17 @@ for d in $DAEMONS; do plutil -lint "$HERE/launchd/$d.plist" >/dev/null || die "i
 AVAIL_GB=$(df -g / | awk 'NR==2{print $4}')
 say "free space on /: ${AVAIL_GB} GB (design disks are sparse qcow2: fw 8 + app 60 + cred 10 + backup 20 GB maximum)"
 [ "${AVAIL_GB:-0}" -ge 40 ] || say "WARNING: less than 40 GB free; consider ASTA_VM_BASE on another volume"
+if [ -n "$VMBASE" ]; then
+  case "$VMBASE" in /*) ;; *) die "--vm-base must be an absolute path" ;; esac
+  P="$VMBASE"; while [ ! -e "$P" ]; do P="$(dirname "$P")"; done
+  MP="$(df -P "$P" | awk 'NR==2{for(i=6;i<=NF;i++) printf "%s%s",$i,(i<NF?" ":"")}')"
+  MLINE="$(mount | grep -F " on $MP (" | head -1)"
+  [ -n "$MLINE" ] || die "cannot determine the mount of $VMBASE"
+  FSTYPE="$(printf '%s' "$MLINE" | sed 's/.*(\([A-Za-z0-9]*\),.*/\1/')"
+  case "$FSTYPE" in apfs|hfs) ;; *) die "$VMBASE is on a '$FSTYPE' volume ($MP): it cannot enforce file ownership/permissions, which are the VM-disk isolation. Use an APFS/HFS+ volume (age-encrypted BACKUPS may go on exFAT, VM disks may not)" ;; esac
+  case "$MLINE" in *noowners*) die "$MP is mounted with ownership ignored (noowners). For an external APFS/HFS+ volume run: sudo diskutil enableOwnership $MP" ;; esac
+  say "vm-base volume OK: $MP ($FSTYPE, ownership enforced)"
+fi
 if [ -n "$TARBALL" ] || [ -n "$SHA" ]; then
   [ -f "$TARBALL" ] || die "tarball not found: $TARBALL"
   [ -n "$SHA" ] || die "--socket-vmnet-sha256 is required with a tarball"
@@ -87,9 +103,14 @@ fi
 
 # ---------------------------------------------------------------- 2 directories
 say; say "== 2 directories"
-run mkdir -p "$BASE" "$BASE/run" "$BASE/images" "$BASE/vars" "$BASE/disks" "$BASE/seeds" "$LOGDIR" "$LIBEXEC"
-run chown -R "$SVC:$SVC" "$BASE"
-run chmod 700 "$BASE" "$BASE/run"
+run mkdir -p "$REAL" "$REAL/run" "$REAL/images" "$REAL/vars" "$REAL/disks" "$REAL/seeds" "$LOGDIR" "$LIBEXEC"
+run chown -R "$SVC:$SVC" "$REAL"
+run chmod 700 "$REAL" "$REAL/run"
+if [ "$REAL" != "$BASE" ]; then
+  if [ -L "$BASE" ] && [ "$(readlink "$BASE")" = "$REAL" ]; then say "symlink present: $BASE -> $REAL"
+  elif [ -e "$BASE" ] || [ -L "$BASE" ]; then die "$BASE already exists and is not the expected symlink; resolve by hand"
+  else run ln -s "$REAL" "$BASE"; fi
+fi
 run chown root:wheel "$LIBEXEC"
 run chmod 755 "$LIBEXEC"
 run chown "root:$SVC" "$LOGDIR"
