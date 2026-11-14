@@ -1,0 +1,138 @@
+{
+ "checks": [
+  {
+   "check": "app -> fw proxy 10.77.1.1:3128",
+   "expected": "allowed",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app -> fw other port 8080 (listener exists)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app -> Internet 1.1.1.1:443 (default route via fw, fw forwarding ON)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app -> asta-cred 10.77.2.2:7443 (L3 link not attached)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app -> DNS udp/53 to the lab gateway",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw -> app inbound 10.77.1.2:5432 (listener exists)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "cred -> fw proxy 10.77.2.1:3128",
+   "expected": "allowed",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "cred -> app 10.77.1.2:5432",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "cred -> Internet 1.1.1.1:443 (default route via fw)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw -> cred inbound 10.77.2.2:7443 (listener exists)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw -> 1.1.1.1:443 with an EMPTY allowlist",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw -> 1.1.1.1:443 after allowlisting 1.1.1.1",
+   "expected": "allowed (needs real Internet)",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw -> 1.1.1.1:80 (allowlisted IP, wrong port)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app -> allowlisted IP via fw is still not forwarded",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw DNS udp/53 to upstream as root",
+   "expected": "allowed",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "fw DNS udp/53 to upstream as an unprivileged user (proxy user)",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app with ITS firewall flushed -> Internet 1.1.1.1:443 through asta-fw (forwarding ON)",
+   "expected": "blocked by asta-fw",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app with its firewall flushed -> fw port 8080 (listener exists)",
+   "expected": "blocked by asta-fw",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "app with its firewall flushed -> asta-cred 10.77.2.2:7443 via fw",
+   "expected": "blocked by asta-fw",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "asta-fw forward chain dropped packets (counter > 0: the RULE blocked them)",
+   "expected": "> 0",
+   "result": "PASS",
+   "detail": "table inet asta_fw { \tchain forward { \t\ttype filter hook forward priority filter; policy drop; \t\tcounter packe"
+  },
+  {
+   "check": "gate stopped (asta-fw gone): app -> 10.77.1.1:3128",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  },
+  {
+   "check": "gate stopped: app -> Internet 1.1.1.1:443",
+   "expected": "blocked",
+   "result": "PASS",
+   "detail": ""
+  }
+ ],
+ "passed": 22,
+ "failed": 0
+}
