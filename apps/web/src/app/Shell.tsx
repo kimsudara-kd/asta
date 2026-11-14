@@ -144,8 +144,9 @@ export default function Shell({ children }: { children: ReactNode }) {
                 {me.data.username.slice(0, 2)}
               </span>
               <span className="user-meta">
-                <span className="user-name">{me.data.username}</span>
-                <span className="user-role">{me.data.role}</span>
+                <span className="user-name">
+                  {me.data.username} <span className="user-role">({me.data.role})</span>
+                </span>
               </span>
             </div>
           )}
