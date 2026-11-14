@@ -85,3 +85,5 @@ Closed in R3: P-1..P-4 (provisioning script), S-1 (scanner exception scope). R-D
 | H-3 | Med | SSH/SMB/88 on the LAN, auto-login on, firewall off, FileVault off: runbook H1-H12 prepared | CEO | OPEN |
 | CI | Med | hosted CI never run; workflow now has mandatory security jobs, a skip guard and a pinned gitleaks | CEO | OPEN (needs a push, not authorised) |
 **F-01, F-02, F-03 and H-1 remain OPEN (High).**
+
+| G-14 | Med | my commit `3b2a631` quoted a synthetic test string in a document: gitleaks (full history) reports 1 finding although it is not a secret; tip text fixed | CEO | OPEN: approve a sixth exact fingerprint or a rewrite of the unpushed commit |

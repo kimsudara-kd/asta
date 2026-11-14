@@ -57,7 +57,7 @@ Seven anonymous **scratch Docker volumes** from my restore-target containers rem
 | Python suite (PostgreSQL 16, UTC) | **1,341 passed, 5 skipped, 0 failed** (all 8 Docker/firewall gates ran; the 5 skips are the reviewed non-security ones, confirmed by the new `scripts/ci_skip_guard.py` run on the real log: "only reviewed skips") |
 | ruff check/format; mypy (122 files) | clean |
 | pip-audit; `pnpm audit --prod`; `tsc`; web unit tests (48) | no known vulnerabilities; no known vulnerabilities; clean; pass |
-| gitleaks 8.30.1 full history; `scripts/secret_scan.py` | see the commit check (no leaks / 0 findings expected and re-run after the commits) |
+| gitleaks 8.30.1 full history; `scripts/secret_scan.py` | secret scan: 0 findings. **gitleaks: 1 finding, caused by me:** my new document `GITLEAKS-EXCEPTIONS-REVIEW.md` quoted a synthetic test string from an old test (the generic-api-key rule fired on it) in commit `3b2a631`. The text is fixed at the tip, but the finding stays in history (**G-14**). Two options, both yours to choose: (a) approve one more exact fingerprint in `.gitleaksignore` (the guard test pins five and would change), or (b) approve rewriting my unpushed commit (history rewrite is otherwise forbidden). Until then a hosted gitleaks full-history run would fail |
 | M0-M2 frozen evidence; paper ledger | intact; 900/900 checkpoints, 0 discrepancies, fills digests unchanged |
 | Live-lock paths vs `fb7770b`; ExecutionGateway | unchanged; default-deny |
 | QEMU pin | verified (31 files) |

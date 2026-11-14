@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "3b2a6317b6d0f449a9262e41182bb8d08d924208",
+ "generated_from_commit": "294b754159c6d605272dcb4f75aed6467ecde259",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -48,7 +48,7 @@
   },
   {
    "path": "docs/evidence/M3B-R5.md",
-   "sha256": "3704bb8715c44b35a6a520ff2069c5cafe64cbc5945e92e26a8dd301894e3156"
+   "sha256": "49828ca0e340235c31cdcccb4938e4c1195dc279d6893009dd18e08dd58c4b7f"
   },
   {
    "path": "docs/evidence/m3a/capability-probe.json",
@@ -312,7 +312,7 @@
   },
   {
    "path": "docs/m3a/RESIDUAL-RISK-REGISTER.md",
-   "sha256": "d108816bd4fa3532000851247b65f116204ba7226297384cbbfc4b7afe8fc76f"
+   "sha256": "68e25d3ca0f3cab39f341ca547865c598d5aa5388c26b6306d44032183dbb72d"
   },
   {
    "path": "docs/m3a/REVIEW-INDEX.md",
@@ -348,7 +348,7 @@
   },
   {
    "path": "docs/m3b/GITLEAKS-EXCEPTIONS-REVIEW.md",
-   "sha256": "f9dc6ed6881cf33f0d3471d7cef20ecd12b67d249d443fd0c018d3bb93afd342"
+   "sha256": "c0df0a7183d40649ad9e4626393188b6e0dcf5732e36aa07cd5a70375e09bc2e"
   },
   {
    "path": "docs/m3b/HOST-DEDICATION-INVENTORY.md",

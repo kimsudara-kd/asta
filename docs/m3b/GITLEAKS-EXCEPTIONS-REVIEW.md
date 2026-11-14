@@ -3,7 +3,7 @@
 `.gitleaksignore` holds five exact fingerprints (`commit:file:rule:line`). They are **not** path or rule allow-lists, so they cannot hide a new finding. Evidence gathered 2026-11-14 (gitleaks 8.30.1, repo config `.gitleaks.toml`):
 | Fingerprint | Historical justification (read from the commit) | Still needed? |
 |---|---|---|
-| `23cc022...:tests/m3a/test_security.py:generic-api-key:248` | a synthetic scrubber test string `password=<synthetic>` in the M3A-1..3 commit | not flagged by 8.30.1 |
+| `23cc022...:tests/m3a/test_security.py:generic-api-key:248` | a synthetic scrubber test string (a short `password` assignment) in the M3A-1..3 commit | not flagged by 8.30.1 |
 | `968252f...:tests/m3a/test_credential_hygiene.py:generic-api-key:19` | a file-integrity pin: a 64-hex SHA-256 next to the file name `data/manual/creds.json` | not flagged |
 | `e71706f...:docs/evidence/m3a/REVIEW-MANIFEST.json:generic-api-key:43, :44, :82` | three SHA-256 digests of review files whose paths contain "CREDENTIAL" | not flagged |
 Method: (a) all five resolved to their commit and line and read (digests/synthetic string only, no secret); (b) a full-history scan of 101+ commits with the repo config reports **no leaks**, also with the ignore file emptied; (c) **detection is intact**: a throw-away repository with a planted fake AWS key pair is flagged (2 findings) with the same config; (d) the hosted action may run another gitleaks version, so CI now pins `GITLEAKS_VERSION: "8.30.1"`.
