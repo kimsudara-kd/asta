@@ -11,6 +11,14 @@ export default {
   async headers() {
     return [
       {
+        // the worker script must never be served from a stale HTTP cache, or updates would not arrive
+        source: "/sw.js",
+        headers: [
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
+          { key: "Content-Type", value: "text/javascript; charset=utf-8" },
+        ],
+      },
+      {
         source: "/(.*)",
         headers: [
           { key: "X-Frame-Options", value: "DENY" },

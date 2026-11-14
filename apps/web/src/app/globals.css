@@ -289,26 +289,36 @@ figcaption { margin-bottom: 8px; font-size: 12px; font-weight: 600; letter-spaci
 
 /* ---------------------------------------------------------------- responsive */
 @media (max-width: 960px) {
-  .app { grid-template-columns: minmax(0, 1fr); }
+  /* phone / small tablet: compact top bar (brand + Sign out) and a bottom tab bar for the main sections */
+  .app { grid-template-columns: minmax(0, 1fr); padding-bottom: calc(68px + env(safe-area-inset-bottom)); }
   .sidebar {
-    position: sticky; top: 0; z-index: 6; height: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center; gap: 8px 10px; padding: 10px 14px 8px; border-right: 0; border-bottom: 1px solid var(--line);
+    position: sticky; top: 0; z-index: 6; height: auto; flex-direction: row; align-items: center; justify-content: space-between;
+    gap: 10px; border-right: 0; border-bottom: 1px solid var(--line); background: var(--bg-elev);
+    padding: calc(10px + env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) 10px max(14px, env(safe-area-inset-left));
   }
-  .brand { padding: 0; grid-column: 1; grid-row: 1; }
-  .sidebar-foot { grid-column: 2; grid-row: 1; }
-  .nav {
-    grid-column: 1 / -1; grid-row: 2; flex-direction: row; overflow-x: auto; scrollbar-width: none; gap: 4px;
-    -webkit-mask-image: linear-gradient(to right, #000 88%, transparent); mask-image: linear-gradient(to right, #000 88%, transparent);
-    padding-right: 24px;
-  }
-  .nav::-webkit-scrollbar { display: none; }
-  .nav-label { display: none; }
-  .nav a { padding: 8px 12px; }
-  .nav a[aria-current="page"]::before { display: none; }
+  .brand { padding: 0; }
   .sidebar-foot { margin-top: 0; display: flex; align-items: center; gap: 8px; flex: none; }
   .user-chip { display: none; }
+  .sidebar button { min-height: 38px; padding: 6px 14px; }
+  .nav-label { display: none; }
+  .nav {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+    display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 2px;
+    padding: 6px max(6px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+    background: color-mix(in srgb, var(--bg-elev) 90%, transparent);
+    -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+    border-top: 1px solid var(--line);
+  }
+  .nav a {
+    flex-direction: column; justify-content: center; gap: 3px; min-height: 54px; padding: 6px 2px;
+    font-size: 11px; font-weight: 600; line-height: 1.15; text-align: center; white-space: normal;
+  }
+  .nav a svg { width: 22px; height: 22px; }
+  .nav a[aria-current="page"]::before { display: none; }
   .banner { position: static; padding: 8px 14px; font-size: 11.5px; letter-spacing: 0.02em; }
-  main { padding: 20px 16px 48px; }
+  main {
+    padding: 20px max(16px, env(safe-area-inset-right)) 32px max(16px, env(safe-area-inset-left));
+  }
 }
 @media (max-width: 560px) {
   main > h1 { font-size: 22px; }
@@ -316,4 +326,16 @@ figcaption { margin-bottom: 8px; font-size: 12px; font-weight: 600; letter-spaci
   th, td { padding: 10px 12px; }
   .kv { grid-template-columns: 1fr; gap: 2px 0; }
   .kv > div:nth-child(even) { margin-bottom: 8px; }
+}
+
+/* touch devices: comfortable targets, no double-tap zoom delay, no grey tap flash */
+html { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+@media (pointer: coarse) {
+  button, input, select, textarea { min-height: 44px; }
+  .tab { padding: 11px 14px; }
+}
+/* installed (standalone) app: no pull-to-refresh bounce on the shell, text not selectable chrome */
+@media (display-mode: standalone) {
+  body { overscroll-behavior-y: none; }
+  .nav a, .tab, .brand, button { -webkit-user-select: none; user-select: none; }
 }

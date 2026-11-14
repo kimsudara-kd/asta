@@ -42,6 +42,22 @@ cd apps/web && pnpm install && pnpm build && pnpm start
 Windows App Control note: if `alembic.exe` / `pytest.exe` are blocked, use `python -m alembic|pytest`;
 mypy and gitleaks run in containers (see Checks).
 
+## Install as an app (PWA)
+The dashboard is an installable Progressive Web App (manifest, icons, service worker, offline page; bottom tab bar
+on phones). Build and run it in production mode (`cd apps/web && pnpm build && pnpm start`), open it in Chrome/Edge
+and use the install button in the address bar, or on a phone use **Add to Home Screen** (iOS Safari: Share ->
+Add to Home Screen; Android Chrome: menu -> Install app). `pnpm run pwa:check` verifies the whole PWA in real Chrome.
+
+* **Secure context required.** Browsers only register service workers (and offer installation) on `https://` or
+  `http://localhost`. The dashboard deliberately listens on **127.0.0.1 only**, so a phone cannot reach it, and a LAN
+  `http://` address would not be installable anyway. To use it from a phone, put it behind a TLS reverse proxy on a
+  *private* network (for example Tailscale Serve); do not expose it publicly. That is a deployment/security decision
+  (the API has auth + MFA but the boundary review in `docs/m3a` assumes local-only access).
+* **What is cached:** only public, content-hashed static files (`/_next/static/*`, icons) and the offline page. The
+  worker **never** touches `/api/*`, writes, third parties, or page HTML, stores no credentials and has no push/sync
+  (`apps/web/public/sw.js`; policy covered by `src/lib/sw.test.ts`). Offline you see a static "You're offline" page.
+* No extra buttons or prompts are added to any page: installation uses the browser's own UI.
+
 ## Checks
 ```bash
 uv run ruff check . && uv run ruff format --check .
