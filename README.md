@@ -53,6 +53,14 @@ cd apps/web && pnpm run typecheck && pnpm run test && pnpm run build
 Compose-backed run (PostgreSQL 16.4): `docker compose -f infra/docker-compose.yml --profile test up -d --wait db db_test`,
 then `ASTA_TEST_DATABASE_URL=postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5641/asta_test` for pytest.
 
+**macOS / Linux test database (verified on macOS 26 arm64):** use a TCP PostgreSQL 16 running in **UTC**, not the embedded
+`pgserver` unix-socket default (large multi-row INSERTs hang on its unix socket; a non-UTC server timezone fails ~14 tests):
+```bash
+docker compose -f infra/docker-compose.yml --profile test up -d --wait db_test   # or any PG16 started with -c timezone=UTC
+export ASTA_TEST_DATABASE_URL=postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5641/asta_test
+uv run python -m pytest tests -q          # expected clone-only failure: test_frozen_evidence (needs the local m0/m1/m2 tags)
+```
+
 **mypy / gitleaks (native binaries may be blocked on Windows App Control — run them in containers):**
 ```bash
 docker run --rm -v "$PWD:/src:ro" -w /src -e UV_PROJECT_ENVIRONMENT=/opt/venv -e UV_LINK_MODE=copy python:3.12-slim   sh -c "pip install -q uv && uv sync --frozen --no-install-project -q && /opt/venv/bin/python -m mypy"
