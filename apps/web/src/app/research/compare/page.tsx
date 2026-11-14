@@ -1,6 +1,8 @@
 "use client";
 import { Suspense, useEffect, useState } from "react";
-import LineChart from "../../../components/LineChart";
+import { AreaChart, COLOR, type Line } from "../../../components/Charts";
+import { Signed } from "../../../components/paper/ui";
+import { RunStatus, Verdict } from "../../../components/research/ui";
 import ResearchShell, { usePrincipal } from "../../../components/ResearchShell";
 import { api } from "../../../lib/api";
 import { metricText, pctText, trimDecimal } from "../../../lib/format";
@@ -8,7 +10,7 @@ import { canWriteResearch, download, explain, post, toCsv, type EquityPoint, typ
 import { usePoll } from "../../../lib/usePoll";
 import { useQueryParam } from "../../../lib/useQuery";
 
-const COLORS = ["#58a6ff", "#3fb950", "#d29922", "#f85149", "#a371f7", "#ff7b72"];
+const TONES: Line["tone"][] = ["accent", "ok", "warn", "violet", "bad", "muted"];
 
 type Loaded = { run: RunRow; perf: Performance | null; eq: EquityPoint[] };
 
@@ -36,9 +38,9 @@ function Validation({ v }: { v: ValidationRow }) {
   const scenarios = (r.scenarios as { scenario: string; value: string; summary: { net_return_pct: string; max_drawdown_pct: string; risk_verdict: string; net_pnl: string } }[] | undefined) ?? [];
   const warnings = (v.warnings ?? (r.warnings as string[] | undefined) ?? []) as string[];
   return (
-    <div className="card" data-testid="validation-detail">
-      <h3>{v.title} <span className="muted">({v.kind}, cycle {v.cycle})</span></h3>
-      <div className={v.sample_type === "IN_SAMPLE" ? "warnbox" : "card"} data-testid="sample-type">{sampleLabel(v.sample_type)}</div>
+    <section className="card" data-testid="validation-detail">
+      <h3 className="card-title">{v.title} <span className="muted">({v.kind}, cycle {v.cycle})</span></h3>
+      <div className={`sample-note${v.sample_type === "IN_SAMPLE" ? " warn" : ""}`} data-testid="sample-type">{sampleLabel(v.sample_type)}</div>
       <p className="muted" data-testid="study-provenance">
         Strategy {v.strategy_id}{v.strategy_version ? ` v${v.strategy_version}` : ""} · generated {v.generated_at ? v.generated_at.slice(0, 19).replace("T", " ") + " UTC" : "n/a"} · artifact {v.source_artifact ?? "n/a"}
       </p>
@@ -100,7 +102,7 @@ function Validation({ v }: { v: ValidationRow }) {
       })()}
       {v.pooled && <p className="muted">Pooled: {JSON.stringify(v.pooled)}</p>}
       {v.advisory && <p className="muted">Advisory (rule-based, not a claim of profitability): {JSON.stringify(v.advisory)}</p>}
-    </div>
+    </section>
   );
 }
 
@@ -112,7 +114,7 @@ function ImportStudies({ onDone }: { onDone?: () => void }) {
   if (!canWriteResearch(me?.role)) return null;
   return (
     <div className="card">
-      <h3>Import completed studies</h3>
+      <h3 className="card-title">Import completed studies</h3>
       <p className="muted">Reads study files from the server&apos;s local studies folder. Repeating an import never creates duplicates.</p>
       <div className="row">
         <label>Study folder<input value={dir} onChange={(e) => setDir(e.target.value)} data-testid="studies-dir" /></label>
@@ -182,7 +184,7 @@ function CompareInner() {
       <h1>Research comparison</h1>
       {ids.length === 0 && (
         <div className="card">
-          <h3>Choose runs to compare</h3>
+          <h2 className="card-title">Choose runs to compare</h2>
           {(runs.data?.runs ?? []).filter((r) => r.status === "COMPLETED").map((r) => (
             <label key={r.id} style={{ display: "block" }}>
               <input type="checkbox" checked={pick.includes(r.id)} onChange={(e) => setPick(e.target.checked ? [...pick, r.id] : pick.filter((x) => x !== r.id))} /> {r.label} — {r.summary?.net_return_pct ? pctText(r.summary.net_return_pct) : ""}
@@ -194,42 +196,52 @@ function CompareInner() {
 
       {loaded.length > 0 && (
         <>
-          <div className="card scroll">
+          <section className="card">
+            <h2 className="card-title">Side-by-side results</h2>
+            <div className="scroll">
             <table data-testid="compare-table">
-              <thead><tr><th>Run</th><th>Strategy</th><th>Status</th><th>Simulated net P&amp;L</th><th>Return</th><th>Max drawdown</th><th>Sharpe</th><th>Round trips</th><th>Risk budget</th><th>Flags</th></tr></thead>
-              <tbody>{loaded.map((l) => {
+              <thead><tr><th>Run</th><th>Strategy</th><th>Status</th><th className="num">Simulated net P&amp;L</th><th className="num">Return</th><th className="num">Max drawdown</th><th className="num">Sharpe</th><th className="num">Round trips</th><th>Risk budget</th><th>Flags</th></tr></thead>
+              <tbody>{loaded.map((l, i) => {
                 const fl = flagsFor(l, passive);
                 return (
                   <tr key={l.run.id} data-testid="compare-row">
-                    <td>{l.run.label}</td><td>{l.run.strategy_id}</td><td>{l.run.status}</td>
-                    <td>{l.run.summary?.net_pnl ? trimDecimal(l.run.summary.net_pnl) : "—"}</td>
-                    <td>{l.run.summary?.net_return_pct ? pctText(l.run.summary.net_return_pct) : "—"}</td>
-                    <td>{l.run.summary?.max_drawdown_pct ? pctText(l.run.summary.max_drawdown_pct) : "—"}</td>
-                    <td>{l.perf ? metricText(l.perf.risk.sharpe) : "—"}</td>
-                    <td>{l.run.summary?.round_trips ?? "—"}</td>
-                    <td>{l.run.risk_verdict ? (l.run.risk_verdict === "PASSED" ? "within" : "FAILED") : "—"}</td>
-                    <td>{fl.map((f) => <span key={f} className="pill bad" style={{ marginRight: 4 }}>{f}</span>)}</td>
+                    <td><span className="stack-dot" style={{ display: "inline-block", marginRight: 8, background: COLOR[TONES[i % TONES.length]] }} />{l.run.label}</td><td>{l.run.strategy_id}</td><td><RunStatus status={l.run.status} /></td>
+                    <td className="num">{l.run.summary?.net_pnl ? <Signed value={l.run.summary.net_pnl}>{trimDecimal(l.run.summary.net_pnl)}</Signed> : "—"}</td>
+                    <td className="num">{l.run.summary?.net_return_pct ? <Signed value={l.run.summary.net_return_pct}>{pctText(l.run.summary.net_return_pct)}</Signed> : "—"}</td>
+                    <td className="num">{l.run.summary?.max_drawdown_pct ? pctText(l.run.summary.max_drawdown_pct) : "—"}</td>
+                    <td className="num">{l.perf ? metricText(l.perf.risk.sharpe) : "—"}</td>
+                    <td className="num">{l.run.summary?.round_trips ?? "—"}</td>
+                    <td><Verdict verdict={l.run.risk_verdict} /></td>
+                    <td><div className="flags">{fl.map((f) => <span key={f} className="pill bad">{f}</span>)}</div></td>
                   </tr>
                 );
               })}</tbody>
             </table>
-            <p className="muted">All runs use the identical engine, data and cost model; a flat all-cash result is not a success, and a risk-budget failure is reported whatever the P&amp;L.</p>
-          </div>
-          <div className="card">
-            <LineChart testId="compare-chart" title="Simulated equity — overlay (USDT)"
-              series={loaded.filter((l) => l.eq.length > 1).map((l, i) => ({ name: l.run.label, color: COLORS[i % COLORS.length], points: l.eq.map((p) => ({ t: Date.parse(p.ts), y: Number(p.equity) })) }))} />
-          </div>
-          <div className="row">
-            <button data-testid="export-compare-json" onClick={() => download("comparison.json", "application/json", JSON.stringify({ labels: ["SIMULATED", "HISTORICAL DATA", "ESTIMATED FILLS", "NOT LIVE TRADING"], rows }, null, 1))}>Export comparison JSON</button>
-            <button data-testid="export-compare-csv" onClick={() => download("comparison.csv", "text/csv", toCsv(rows))}>Export comparison CSV</button>
+            </div>
+            <p className="muted footnote">All runs use the identical engine, data and cost model; a flat all-cash result is not a success, and a risk-budget failure is reported whatever the P&amp;L.</p>
+          </section>
+          <section className="card">
+            <h2 className="card-title">Simulated equity — overlay (USDT)</h2>
+            <div data-testid="compare-chart">
+              <AreaChart label="Simulated equity overlay"
+                lines={loaded.filter((l) => l.eq.length > 1).map((l, i) => ({ name: l.run.label, tone: TONES[i % TONES.length], area: i === 0, points: l.eq.map((p) => ({ t: Date.parse(p.ts), y: Number(p.equity) })) }))} />
+            </div>
+            <div className="legend">
+              {loaded.map((l, i) => <span key={l.run.id} className="legend-item"><i className={`swatch ${TONES[i % TONES.length]}`} />{l.run.label}</span>)}
+            </div>
+          </section>
+          <div className="btn-row" style={{ marginBottom: 16 }}>
+            <button className="ghost" data-testid="export-compare-json" onClick={() => download("comparison.json", "application/json", JSON.stringify({ labels: ["SIMULATED", "HISTORICAL DATA", "ESTIMATED FILLS", "NOT LIVE TRADING"], rows }, null, 1))}>Export comparison JSON</button>
+            <button className="ghost" data-testid="export-compare-csv" onClick={() => download("comparison.csv", "text/csv", toCsv(rows))}>Export comparison CSV</button>
           </div>
         </>
       )}
 
-      <h2>Stored research validations</h2>
+      <h2 className="card-title">Stored research validations</h2>
       <p className="muted">Walk-forward, sensitivity and out-of-sample studies. In-sample and out-of-sample results are shown side by side; overfitting warnings are mechanical checks.</p>
       <ImportStudies onDone={() => setRev((n) => n + 1)} />
-      <div className="card scroll">
+      <section className="card">
+        <div className="scroll">
         <table data-testid="validation-table">
           <thead><tr><th>Study</th><th>Kind</th><th>Sample</th><th>Strategy</th><th>Cycle</th><th>Warnings</th><th /></tr></thead>
           <tbody>
@@ -237,13 +249,14 @@ function CompareInner() {
               <tr key={v.id} data-testid="validation-row">
                 <td>{v.title}</td><td>{v.kind}</td><td data-testid="sample-cell">{v.sample_type ?? "UNSPECIFIED"}</td><td>{v.strategy_id}</td><td>{v.cycle}{v.oos_reused ? " (OOS reused)" : ""}</td>
                 <td>{(v.warnings ?? []).length}</td>
-                <td><button onClick={async () => setOpenV(await api<ValidationRow>(`/v1/validations/${v.id}`))}>Open study</button></td>
+                <td><button className="ghost" onClick={async () => setOpenV(await api<ValidationRow>(`/v1/validations/${v.id}`))}>Open study</button></td>
               </tr>
             ))}
             {validations.data && validations.data.validations.length === 0 && <tr><td colSpan={7} className="muted">No stored studies yet. An operator can import completed study files below.</td></tr>}
           </tbody>
         </table>
-      </div>
+        </div>
+      </section>
       {openV && <Validation v={openV} />}
     </ResearchShell>
   );

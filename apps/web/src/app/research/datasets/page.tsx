@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import ResearchShell, { usePrincipal } from "../../../components/ResearchShell";
+import { Skeleton, Tile } from "../../../components/paper/ui";
 import { api } from "../../../lib/api";
 import {
   canWriteResearch,
@@ -26,6 +27,10 @@ export default function DatasetsPage() {
   const [detail, setDetail] = useState<{ ds: DatasetRow; reports: { status: string; report: QualityReport; created_at: string }[] } | null>(null);
   const [tf, setTf] = useState<Record<string, string>>({});
   const canWrite = canWriteResearch(me?.role);
+  const all = list.data?.datasets ?? [];
+  const grade = all.filter((d) => d.accepted_for_research).length;
+  const rows = all.reduce((n, d) => n + d.row_count, 0);
+  const issues = all.filter((d) => d.validation_status !== "PASS").length;
 
   async function act(label: string, fn: () => Promise<unknown>) {
     if (!me) return;
@@ -53,13 +58,26 @@ export default function DatasetsPage() {
         Datasets are imported from LOCAL files only and are content-addressed (checksum). Synthetic or fixture
         data is always labelled and is never treated as real exchange history.
       </p>
-      {msg && <p role="status" data-testid="dataset-msg">{msg}</p>}
+      {msg && <p role="status" data-testid="dataset-msg" className="card status-line">{msg}</p>}
 
-      <div className="card scroll">
+      {list.data ? (
+        <div className="grid kpis">
+          <Tile label="Datasets" sub="stored versions, content-addressed">{all.length}</Tile>
+          <Tile label="Research-grade" sub={all.length ? `${all.length - grade} labelled synthetic / not accepted` : "—"}><span className={grade ? "pos" : ""}>{grade}</span> <span className="unit">of {all.length}</span></Tile>
+          <Tile label="Candles stored" sub={`${new Set(all.map((d) => d.symbol)).size} markets · ${new Set(all.map((d) => d.timeframe)).size} timeframes`}>{rows.toLocaleString("en-US")}</Tile>
+          <Tile label="Quality issues" sub="warnings or rejected files"><span className={issues ? "neg" : "pos"}>{issues}</span></Tile>
+        </div>
+      ) : (
+        <div className="grid kpis"><Skeleton h={110} /><Skeleton h={110} /><Skeleton h={110} /><Skeleton h={110} /></div>
+      )}
+
+      <section className="card">
+        <h2 className="card-title">Stored datasets</h2>
+        <div className="scroll">
         <table data-testid="dataset-table">
           <thead>
             <tr>
-              <th>Venue</th><th>Market</th><th>TF</th><th>Source type</th><th>Period (UTC)</th><th>Rows</th>
+              <th>Venue</th><th>Market</th><th>TF</th><th>Source type</th><th>Period (UTC)</th><th className="num">Rows</th>
               <th>Quality</th><th>Research-grade</th><th>Checksum</th><th>Actions</th>
             </tr>
           </thead>
@@ -72,26 +90,28 @@ export default function DatasetsPage() {
                 <td>
                   <span className={`pill ${d.accepted_for_research ? "ok" : "warn"}`} data-testid="dataset-label">{d.label}</span>
                 </td>
-                <td>{d.period_start.slice(0, 10)} → {d.period_end.slice(0, 10)}</td>
-                <td>{d.row_count}</td>
+                <td className="nowrap">{d.period_start.slice(0, 10)} → {d.period_end.slice(0, 10)}</td>
+                <td className="num">{d.row_count.toLocaleString("en-US")}</td>
                 <td><Pill status={d.validation_status} /></td>
                 <td>{d.accepted_for_research ? "yes" : "no"}</td>
-                <td className="mono">{d.checksum.slice(0, 12)}</td>
+                <td className="mono nowrap">{d.checksum.slice(0, 12)}</td>
                 <td>
-                  <button onClick={() => open(d)}>View quality</button>{" "}
+                  <div className="table-actions">
+                  <button className="ghost" onClick={() => open(d)}>View quality</button>
                   {canWrite && (
                     <>
-                      <button disabled={busy} onClick={() => act("Validate", () => post(`/v1/datasets/${d.version_id}/validate`, {}, me!.csrf_token))}>
+                      <button className="ghost" disabled={busy} onClick={() => act("Validate", () => post(`/v1/datasets/${d.version_id}/validate`, {}, me!.csrf_token))}>
                         Validate
-                      </button>{" "}
+                      </button>
                       <select aria-label="Derived timeframe" value={tf[d.version_id] ?? "1h"} onChange={(e) => setTf({ ...tf, [d.version_id]: e.target.value })}>
                         {["15m", "1h", "4h", "1d"].map((x) => <option key={x}>{x}</option>)}
-                      </select>{" "}
+                      </select>
                       <button disabled={busy} onClick={() => act("Derive", () => post(`/v1/datasets/${d.version_id}/derive`, { timeframe: tf[d.version_id] ?? "1h" }, me!.csrf_token))}>
                         Derive timeframe
                       </button>
                     </>
                   )}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -100,11 +120,13 @@ export default function DatasetsPage() {
             )}
           </tbody>
         </table>
-      </div>
+        </div>
+      </section>
 
-      <h2>Import from local files</h2>
+      <section className="card">
+      <h2 className="card-title">Import from local files</h2>
       <p className="muted" data-testid="import-note">{files.data?.note ?? ""} {!canWrite && "Your role can view datasets but not import them."}</p>
-      <div className="card scroll">
+      <div className="scroll">
         <table>
           <thead><tr><th>File</th><th>Market</th><th>TF</th><th>Declared source type</th><th>Size</th><th /></tr></thead>
           <tbody>
@@ -130,10 +152,11 @@ export default function DatasetsPage() {
           </tbody>
         </table>
       </div>
+      </section>
 
       {detail && (
         <div className="card" data-testid="quality-detail">
-          <h2>Quality report — {detail.ds.symbol} {detail.ds.timeframe}</h2>
+          <h2 className="card-title">Quality report — {detail.ds.symbol} {detail.ds.timeframe}</h2>
           <div className="kv">
             <div>Status</div><div><Pill status={detail.ds.validation_status} /></div>
             <div>Source</div><div>{detail.ds.source}</div>
@@ -155,7 +178,7 @@ export default function DatasetsPage() {
             </div>
           ))}
           <p className="muted">Missing candles are reported, never filled. A REJECTED dataset is retained for diagnosis and cannot be used for results.</p>
-          <button onClick={() => setDetail(null)}>Close</button>
+          <button className="ghost" onClick={() => setDetail(null)}>Close</button>
         </div>
       )}
     </ResearchShell>

@@ -25,6 +25,7 @@ export default function ResearchShell({ active, children }: { active: string; ch
         Results below are simulated from stored historical candles. Fills are estimated, nothing here
         reaches an exchange, and no figure is a realised cash profit.
       </p>
+      <div className="p-nav">
       <div className="tabs" role="tablist">
         {TABS.map((t) => (
           <Link key={t.href} href={t.href} className={t.href === active ? "tab active" : "tab"} role="tab" aria-selected={t.href === active}>
@@ -33,6 +34,7 @@ export default function ResearchShell({ active, children }: { active: string; ch
         ))}
         <span className="sp" />
         {me.data && <span className="muted">role: {me.data.role}</span>}
+      </div>
       </div>
       {children}
     </Shell>
