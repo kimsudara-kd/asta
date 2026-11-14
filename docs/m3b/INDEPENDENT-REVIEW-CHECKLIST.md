@@ -1,4 +1,4 @@
-# Independent review checklist, baseline `a6623a2` + R3 (ASTA-M3B-R3, workstream D)
+# Independent review checklist, baseline `a6623a2` + R3 + R4 (ASTA-M3B-R3/R4)
 
 **This is a preparation document, not an independent review, and it is not signed as one.** F-01, F-02, F-03 are OPEN. Entry points: `docs/m3a/INDEPENDENT-REVIEW-PACKAGE.md` (updated), `docs/m3a/REVIEW-INDEX.md`, `docs/evidence/M3B-R3.md`.
 
@@ -47,3 +47,27 @@ Order-path controls (offline, already in the suite; the reviewer re-runs `pytest
 3. The reviewer's **own** execution transcripts of: the 8 Docker/firewall gates, H1-H8, C1-C10, R1-R10, the key-ceremony rehearsal, an unseal/rotation/revocation drill (when a real backend exists), and a full-history gitleaks run.
 4. A review of: `provision-host.sh` + `rollback-host.sh` (diff against the audited versions), the launchd plists, `qemu-vms.sh`, the three nftables files, the proxy, the migrations 0006-0010 and the role SQL, `core/order_gate.py`, `orders/boundary.py`, `orders/channel.py`, `orders/risk_bridge.py`, `security/vault.py`.
 5. A written opinion: credential readiness "ready" / "ready with conditions" / "not ready", every Critical/High closed or formally accepted by the CEO, signed and dated by the reviewer. **Sign-off block: to be completed only by the designated independent reviewer.**
+
+
+## 7. R4 additions: baseline, unresolved findings, and the network + host-hardening acceptance matrix
+**Baseline for the reviewer:** local commits after `c10da4a` carry the R4 work (remote head still `924da22`). Still **unresolved: H-1 (the Mac is a shared workstation), F-01, F-02, F-03.** Newly relevant facts: the unrelated Docker projects were restarted by Docker Desktop when I started it for the gates (`HOST-DEDICATION-INVENTORY.md` s.0, decision D-0); LAN-reachable SSH (22), SMB (445) and 88 with the application firewall off; automatic login on; FileVault off.
+Closed in R4 (verify, do not trust): G-10 (release identity = `session_user`, migration 0011, tests), S-2 analysis (stale gitleaks fingerprints: kept, CI version pinned), P-5 partly (QEMU pin + pre-boot refusal; owner regenerates the pin at provisioning).
+**Matrix (each row: control, how the reviewer verifies, status today).** Status: NOT RUN = needs the provisioned host; DONE-SCRATCH = executed in a scratch VM/namespace (design evidence only); DONE = executed on this repository.
+| # | Control | Verification | Status |
+|---|---|---|---|
+| N1 | app VM has exactly one NIC (unix-socket link to fw), no host-network device | `qemu-vms.sh run app` command line; `ip -o link` in the VM | DONE (static), NOT RUN (deployed) |
+| N2 | no global IPv6 on app; IPv6 to public resolvers and link-local blocked | `ip -6 addr`; netns lab + real VM probes | DONE-SCRATCH |
+| N3 | direct-IP egress blocked (default route via fw, forwarding on) | lab + 78-check suite through the proxy | DONE-SCRATCH + Docker gate |
+| N4 | DNS (UDP/TCP 53, DoT 853) blocked from app; only fw may resolve, as root | lab | DONE-SCRATCH |
+| N5 | metadata, RFC1918, CGNAT, QUIC blocked | lab | DONE-SCRATCH |
+| N6 | alternate routes (on-link /32, lower-metric default, policy rule) open nothing | lab | DONE-SCRATCH |
+| N7 | compromised app (own firewall flushed) still blocked by fw; fw down = no connectivity | lab + C8 | DONE-SCRATCH |
+| N8 | uplink only through root `socket_vmnet` on the fw VM; capture on `en0` shows only allowlisted flows | H5, H7 | NOT RUN |
+| N9 | credential VM cannot start and the fw VM has no cred link in the two-VM phase | `qemu-vms.sh run cred` / fw dry run | DONE (tests) |
+| N10 | host-level: H1-H8, B1-B10 of `HOST-SECURITY-CHECKLIST.md`, C1-C10, R1-R10 | transcripts | NOT RUN |
+| S1 | `host-separation-check.sh` exits 0 | run after migration | baseline FAIL (10/14) |
+| S2 | FileVault on with a tested recovery key; firewall on; no auto-login; remote access as approved | B1, B4, B8 | NOT RUN |
+| S3 | QEMU pin verifies; a modified library blocks VM start | `qemu_pin.py verify`, B6 | DONE (pin), NOT RUN (B6 on host) |
+| S4 | order-path guards: gateway, durable replay, fills, latched kill switch, heartbeat, role matrix, `session_user` release | `pytest` set in s.5 | DONE |
+| S5 | alert path survives host loss (dead-man's switch) | kill-each-component drill | NOT RUN (not built) |
+**Leave unsigned:** independent approval requires a qualified reviewer to execute the NOT RUN rows and write the opinion; nothing in this repository is signed on their behalf.

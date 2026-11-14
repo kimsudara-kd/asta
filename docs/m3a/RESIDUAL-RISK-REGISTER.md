@@ -60,3 +60,15 @@ G-02 **closed** (vault refuses non-synthetic values). G-04 Low items **closed** 
 | S-2 | Low | five stale `.gitleaksignore` fingerprints | CEO | OPEN |
 | D-F | decision | FileVault vs unattended reboot | CEO | OPEN |
 Closed in R3: P-1..P-4 (provisioning script), S-1 (scanner exception scope). R-D1b: units written, process not deployed, **now fail closed** (dead bridge closes the gate). **F-01, F-02, F-03 remain OPEN (High).**
+
+## ASTA-M3B-R4 additions (2026-11-14; detail `docs/evidence/M3B-R4.md`)
+| ID | Sev | Risk | Owner | Status |
+|---|---|---|---|---|
+| D-0 | Med, urgent | unrelated containers restarted by my R2 Docker start; `P3` (`0.0.0.0:3000`) and `P2-db` (`0.0.0.0:5442`) on all interfaces; P1 tunnel not running | CEO | OPEN |
+| H-1 | High-adjacent | the Mac is a shared workstation (inventory, restorability verified for 2 DBs + 1 SQLite, plan and read-only check prepared; baseline check 10/14 FAIL) | CEO | OPEN |
+| H-3 | Med | SSH (22), SMB (445), 88 reachable on the LAN; automatic login on; firewall off; FileVault off | CEO | OPEN |
+| G-10 | Med | release identity was a parameter | Eng | **CLOSED** (0011: `session_user`) |
+| P-5 | Med | QEMU binary/libraries writable by the admin | CEO/Eng | partly closed: pin + pre-boot refusal; regenerate at provisioning |
+| S-2 | Low | five stale gitleaks fingerprints | CEO | analysed, kept until the pinned CI version confirms |
+| F-07 | Med | alert-state changes now in the audit chain; shipper and off-host alerts not built | Eng | OPEN (designed) |
+**F-01, F-02, F-03 remain OPEN (High).**

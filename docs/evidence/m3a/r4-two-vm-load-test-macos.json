@@ -1,0 +1,106 @@
+{
+ "vm_load_outputs": [
+  "app load done",
+  "fw load done"
+ ],
+ "guest_mem_after(total,used,swap_used)": {
+  "app": [
+   "2956",
+   "279",
+   "0"
+  ],
+  "fw": [
+   "700",
+   "243",
+   "0"
+  ]
+ },
+ "baseline_vms_idle": {
+  "swap_used_mb": [
+   97.0,
+   97.0
+  ],
+  "pageouts": [
+   816107,
+   816274
+  ],
+  "swapouts": [
+   13472,
+   13472
+  ],
+  "compressor_gib": [
+   6.43,
+   6.51
+  ],
+  "free_pct": [
+   45,
+   45
+  ],
+  "dash_ms": [
+   1,
+   2
+  ],
+  "samples": 10
+ },
+ "under_load": {
+  "swap_used_mb": [
+   97.0,
+   97.0
+  ],
+  "pageouts": [
+   816278,
+   816733
+  ],
+  "swapouts": [
+   13472,
+   13472
+  ],
+  "compressor_gib": [
+   6.54,
+   7.99
+  ],
+  "free_pct": [
+   35,
+   45
+  ],
+  "dash_ms": [
+   1,
+   4
+  ],
+  "samples": 22
+ },
+ "after": {
+  "swap_used_mb": [
+   97.0,
+   97.0
+  ],
+  "pageouts": [
+   816733,
+   816832
+  ],
+  "swapouts": [
+   13472,
+   13472
+  ],
+  "compressor_gib": [
+   7.02,
+   7.09
+  ],
+  "free_pct": [
+   41,
+   42
+  ],
+  "dash_ms": [
+   1,
+   2
+  ],
+  "samples": 8
+ },
+ "delta": {
+  "pageouts_during_load": 459,
+  "swapouts_during_load": 0,
+  "max_swap_used_mb": 97.0,
+  "max_dashboard_ms": 4,
+  "baseline_dashboard_ms_max": 2
+ }
+}

@@ -137,3 +137,7 @@ Read `docs/evidence/M3B-R2.md` (bridge, vault, channel hardening, Docker gate tr
 
 ## Addendum 2026-11-14 (4): ASTA-M3B-R3
 Baseline `a6623a2` plus the R3 commits (local only; remote head `924da22`). Read `docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md` first (High findings, skipped-test classification, scanner-exception review, H1-H8 / C1-C10 / R1-R10 acceptance tests, exact evidence required), then `docs/evidence/M3B-R3.md`, `docs/m3b/MAC-READINESS-AUDIT.md`, `docs/m3b/SECURITY-TOPOLOGY.md`, `docs/m3b/VAULT-AND-BACKUP.md`. Not an independent review; not signed.
+
+
+## Addendum 2026-11-14 (5): ASTA-M3B-R4
+Read `docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md` s.7 (R4 baseline, unresolved findings H-1/F-01/F-02/F-03, the network + host-hardening acceptance matrix N1-N10/S1-S5), `docs/evidence/M3B-R4.md`, `docs/m3b/HOST-DEDICATION-INVENTORY.md`, `HOST-SECURITY-CHECKLIST.md`, `CAPACITY-ASSESSMENT.md`, `VAULT-FEASIBILITY.md`, `SECURITY-EVENTS-AND-ALERTS.md`. Independent approval is **unsigned**.

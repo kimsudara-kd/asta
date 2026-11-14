@@ -139,3 +139,10 @@ Every offline item of the order path is now built and proven (fills ledger, amen
 # 2026-11-14 (7) ASTA-M3B-R3
 
 **Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Mac mini readiness audited (read-only), provisioning script reviewed line by line and hardened (not run), rollback prepared, 2-VM-now topology proposed for the 16 GiB host, bridge supervision made fail closed (heartbeat + monitor + units), least-privilege DB roles tested, OpenBao-transit recommended (unverified artifacts), key ceremony written and rehearsed with synthetic keys, review checklist prepared. Blocking: F-01/F-02/F-03, shared-host H-1, vault backend and ceremony, hosted CI, a separate authorisation. Evidence: `docs/evidence/M3B-R3.md`.
+
+
+---
+
+# 2026-11-14 (8) ASTA-M3B-R4
+
+**Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Dedication of the Mac prepared (inventory with verified restorability, plan, read-only separation check; baseline FAIL 10/14), host security plan (FileVault + escrow, firewall activation, accounts, SSH, QEMU pin), two-VM capacity and load measured, bypass checks 38/38 in a scratch aarch64 kernel, vault feasibility verified against Binance/OKX/OpenBao docs (Ed25519 non-exportable only for Binance; OKX secrets can only be stored), key-replacement helper, G-10 closed, monitor events in the audit chain, off-host alert design. Urgent owner item D-0 (unrelated containers running since my R2 Docker start). Blocking: F-01/F-02/F-03, H-1, FileVault/remote-access decisions, vault rehearsals, off-host alerts, hosted CI, authorisation. Evidence: `docs/evidence/M3B-R4.md`.
