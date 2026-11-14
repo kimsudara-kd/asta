@@ -4,10 +4,11 @@ import { api, ApiError } from "./api";
 
 /** Poll an API path. The payload is keyed by its path, so a changed path never shows the previous
  *  path's data (that would be a different shape and could crash a page during the switch). */
-export function usePoll<T>(path: string, everyMs = 5000): { data: T | null; error: string | null } {
+export function usePoll<T>(path: string | null, everyMs = 5000): { data: T | null; error: string | null } {
   const [state, setState] = useState<{ path: string; data: T } | null>(null);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
+    if (path === null) return; // conditional polling: nothing to fetch yet
     let alive = true;
     const tick = async () => {
       try {
