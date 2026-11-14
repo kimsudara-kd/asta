@@ -57,6 +57,8 @@ Add to Home Screen; Android Chrome: menu -> Install app). `pnpm run pwa:check` v
      configuration is not overwritten (`tailscale serve status` first), and **never** `tailscale funnel` (public).
      Remove with `tailscale serve --https=8443 off`.
   3. Install the Tailscale app on the phone (same tailnet), open that URL, then Add to Home Screen / Install.
+  4. Optional, start everything at login (per-user launch agent, no sudo): `sh scripts/install_launch_agent.sh install`
+     (`status` / `uninstall` also available). The Tailscale Serve mapping itself persists across reboots.
   The stack script sets `ASTA_COOKIE_SECURE=true` (session cookie is `Secure`, `HttpOnly`, `SameSite=Strict`). Chrome
   still accepts it on `http://127.0.0.1`; Safari does not, so use the HTTPS address there.
 * **What is cached:** only public, content-hashed static files (`/_next/static/*`, icons) and the offline page. The
