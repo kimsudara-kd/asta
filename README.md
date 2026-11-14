@@ -60,6 +60,9 @@ docker compose -f infra/docker-compose.yml --profile test up -d --wait db_test  
 export ASTA_TEST_DATABASE_URL=postgresql+pg8000://asta_test:asta_test_only@127.0.0.1:5641/asta_test
 uv run python -m pytest tests -q          # expected clone-only failure: test_frozen_evidence (needs the local m0/m1/m2 tags)
 ```
+No Docker? `sh scripts/dev_pg_tcp.sh start|stop|status` runs a local TCP PostgreSQL 16 in UTC on 127.0.0.1:5640 (dev DB `asta`, test DB
+`asta_test`, compose credentials) and prints the URLs; data lives in the git-ignored `infra/data/`. On macOS get pnpm with
+`npm install -g pnpm@10 --prefix ~/.local` (Node 26 has no corepack).
 
 **mypy / gitleaks (native binaries may be blocked on Windows App Control — run them in containers):**
 ```bash
