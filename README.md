@@ -49,10 +49,16 @@ and use the install button in the address bar, or on a phone use **Add to Home S
 Add to Home Screen; Android Chrome: menu -> Install app). `pnpm run pwa:check` verifies the whole PWA in real Chrome.
 
 * **Secure context required.** Browsers only register service workers (and offer installation) on `https://` or
-  `http://localhost`. The dashboard deliberately listens on **127.0.0.1 only**, so a phone cannot reach it, and a LAN
-  `http://` address would not be installable anyway. To use it from a phone, put it behind a TLS reverse proxy on a
-  *private* network (for example Tailscale Serve); do not expose it publicly. That is a deployment/security decision
-  (the API has auth + MFA but the boundary review in `docs/m3a` assumes local-only access).
+  `http://localhost`. The dashboard deliberately listens on **127.0.0.1 only**, so a phone cannot reach it directly.
+  Private phone access via Tailscale (tailnet-only, never public):
+  1. `sh scripts/dev_stack.sh start` (database + API + dashboard; `status` / `stop` also available).
+  2. `tailscale serve --bg --https=8443 http://127.0.0.1:3640` publishes it at
+     `https://<machine>.<tailnet>.ts.net:8443`. Use a **separate port** (443, 8443 or 10000) so an existing Serve
+     configuration is not overwritten (`tailscale serve status` first), and **never** `tailscale funnel` (public).
+     Remove with `tailscale serve --https=8443 off`.
+  3. Install the Tailscale app on the phone (same tailnet), open that URL, then Add to Home Screen / Install.
+  The stack script sets `ASTA_COOKIE_SECURE=true` (session cookie is `Secure`, `HttpOnly`, `SameSite=Strict`). Chrome
+  still accepts it on `http://127.0.0.1`; Safari does not, so use the HTTPS address there.
 * **What is cached:** only public, content-hashed static files (`/_next/static/*`, icons) and the offline page. The
   worker **never** touches `/api/*`, writes, third parties, or page HTML, stores no credentials and has no push/sync
   (`apps/web/public/sw.js`; policy covered by `src/lib/sw.test.ts`). Offline you see a static "You're offline" page.
