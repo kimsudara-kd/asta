@@ -104,3 +104,10 @@ Binance Spot Testnet only; one connector instance bound to `EXCHANGE_DEMO`/Binan
 # MAC-01 update: host decision
 
 The dedicated host is the existing Apple Mac mini M4 (16 GB / 256 GB) with Linux ARM64 VMs (`MAC-MINI-DEPLOYMENT-DESIGN.md`); the x86 procurement option is withdrawn. Gates are unchanged: F-01, F-02, F-03 OPEN; **credential readiness NO-GO; M3-B not authorized**. A Binance-only first scope stays proposed (R2) and OKX stays out of it. Prepared: Phase A inventory script (not yet run on the Mac), ARM64 compatibility audit (36 aarch64 runtime wheels fetched, only dev-only `pgserver` lacks one), three-VM design with QEMU+HVF unix-socket links, rule sets, units, launchd daemons, backup/restore, POSIX supervisor, real REST/WS clients verified through the proxy. Not done: any change on the Mac, ARM64 execution of the test suite, cross-architecture replay, reboot matrix.
+
+
+---
+
+# 2026-11-14 (3) offline completion
+
+Every offline item of the order path is now built and proven (fills ledger, amend, channel format, reconciliation, rate budget, clock guard, kill-switch triggers): `ORDER-PATH-DESIGN.md` s.7, MAC-A15. **Decision unchanged: NO-GO.** The remaining blockers need the owner (reviewer, sudo provisioning, vault custody, a testnet key, a signed directive): `docs/m3b/M3B-GATE-CHECKLIST.md`.

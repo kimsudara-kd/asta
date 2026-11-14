@@ -15,6 +15,8 @@ export PATH="$HOME/.local/bin:$PATH"
 export ASTA_DATABASE_URL="${ASTA_DATABASE_URL:-postgresql+pg8000://asta:asta_dev_only@127.0.0.1:5640/asta}"
 export ASTA_SECRET_KEY="$(cat "$RUN/secret.key")"
 export ASTA_FIXTURE_VENUES="${ASTA_FIXTURE_VENUES-BINANCE,OKX}"   # labelled fixture feeds: no network needed
+export ASTA_DATA_DIR="${ASTA_DATA_DIR:-$HOME/.asta-dev/store}"       # research dataset store (outside the repo tree)
+export ASTA_IMPORT_DIR="${ASTA_IMPORT_DIR:-$HOME/.asta-dev/import}"  # local files the importer may read
 export ASTA_COOKIE_SECURE="${ASTA_COOKIE_SECURE-true}"            # session cookie only over HTTPS / localhost
 
 alive() { [ -f "$1" ] && kill -0 "$(cat "$1")" 2>/dev/null; }

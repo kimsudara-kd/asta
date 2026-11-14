@@ -15,6 +15,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from asta.core.environment import Environment
+from asta.orders.fills import Fill, FillBook
 from asta.orders.lifecycle import Intent, State
 
 _COLUMNS = (
@@ -126,3 +127,48 @@ class SqlIntentStore:
                 {"s": sorted(s.value for s in states)},
             ).all()
             return [_row_to_intent(tuple(r)) for r in rows]
+
+
+class SqlFillStore:
+    """Idempotent, append-only trade ledger (migration 0007). Commits before returning."""
+
+    def __init__(self, sessions: sessionmaker[Session]) -> None:
+        self._sessions = sessions
+
+    def record(self, decision_id: str, fill: Fill) -> bool:
+        """True when stored now; False when this (decision, trade) was already stored."""
+        with self._sessions() as db:
+            res = db.execute(
+                text(
+                    "INSERT INTO order_fills (decision_id, trade_id, quantity, price, fee,"
+                    " fee_asset) VALUES (:d, :t, :q, :p, :f, :a)"
+                    " ON CONFLICT (decision_id, trade_id) DO NOTHING"
+                ),
+                {
+                    "d": decision_id,
+                    "t": fill.trade_id,
+                    "q": fill.quantity,
+                    "p": fill.price,
+                    "f": fill.fee,
+                    "a": fill.fee_asset,
+                },
+            )
+            db.commit()
+            return bool(getattr(res, "rowcount", 0) == 1)
+
+    def book(self, decision_id: str, max_quantity: Decimal | None = None) -> FillBook:
+        """Rebuild the in-memory book from the ledger (e.g. after a restart)."""
+        book = FillBook(decision_id, max_quantity)
+        with self._sessions() as db:
+            rows = db.execute(
+                text(
+                    "SELECT trade_id, quantity, price, fee, fee_asset FROM order_fills"
+                    " WHERE decision_id = :d ORDER BY id"
+                ),
+                {"d": decision_id},
+            ).all()
+        for t, q, p, f, a in rows:
+            book.apply(
+                Fill(str(t), decision_id, Decimal(str(q)), Decimal(str(p)), Decimal(str(f)), str(a))
+            )
+        return book

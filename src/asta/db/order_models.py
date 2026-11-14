@@ -19,6 +19,7 @@ from sqlalchemy import (
     PrimaryKeyConstraint,
     String,
     Text,
+    UniqueConstraint,
     func,
 )
 from sqlalchemy.orm import Mapped, mapped_column
@@ -66,3 +67,19 @@ class OrderIntentEvent(Base):
     cancel_attempts: Mapped[int] = mapped_column(Integer)
     note: Mapped[str] = mapped_column(Text)
     at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class OrderFill(Base):
+    __tablename__ = "order_fills"
+    __table_args__ = (
+        UniqueConstraint("decision_id", "trade_id", name="uq_order_fills_trade"),
+        Index("ix_order_fills_decision", "decision_id"),
+    )
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    decision_id: Mapped[str] = mapped_column(ForeignKey("order_intents.decision_id"))
+    trade_id: Mapped[str] = mapped_column(String(64))
+    quantity: Mapped[Decimal] = mapped_column(NUM)
+    price: Mapped[Decimal] = mapped_column(NUM)
+    fee: Mapped[Decimal] = mapped_column(NUM)
+    fee_asset: Mapped[str] = mapped_column(String(16))
+    recorded_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())

@@ -44,8 +44,18 @@ Kill switch (manual, or automatically on: `RISK_HALT`, reconciliation anomaly, a
 ## 6b. Durable store (implemented, migration 0006, tested on real PostgreSQL)
 `order_intents`: `decision_id` PRIMARY KEY = the atomic claim (`INSERT ... ON CONFLICT DO NOTHING`; 8 racing threads produce exactly one claim); `environment` CHECK = `EXCHANGE_DEMO` only (a database-level lock: no value can mean a real-money venue); sizing/side/type CHECKs; a BEFORE UPDATE trigger makes identity and sizing immutable and allows a state change only if `(old, new)` is in the seeded `order_intent_transitions` table (a test fails if it ever differs from the Python state machine); no DELETE/TRUNCATE; every insert and change is appended by TRIGGER to the append-only `order_intent_events`. `SqlIntentStore` commits before every return (the write-ahead guarantee). The exactly-once chaos proof also passes through this real store.
 
-## 7. Not designed yet (explicit gaps)
-Partial-fill quantities/fees (only state is adopted), amend/replace; the intent-channel wire format and its authentication; reconciliation of balances vs ledger and the paper-vs-demo report; rate-limit budgeting (testnet 50 / 10 s); clock-skew handling; the real vault backend (B-4).
+## 7. Offline components added after the first design (2026-11-14, still nothing connected)
+| Gap named earlier | Now | Where |
+|---|---|---|
+| Partial-fill quantities/fees | exact-Decimal `FillBook`: idempotent by trade id, overfill / foreign / nonsense trades are anomalies and never absorbed, state-vs-trades consistency check; durable **append-only** ledger `order_fills` (migration 0007, UNIQUE (decision, trade), FK to the intent, positive-size CHECKs, no update/delete/truncate) | `orders/fills.py`, `orders/sql_store.py` (`SqlFillStore`) |
+| Amend/replace | amend = cancel + a NEW decision with its own deterministic id; allowed only after the old order is confirmed CANCELED; never after a fill (would double exposure) | `orders/replace.py` |
+| Intent-channel wire format and its authentication | canonical encoding (sorted keys, decimals as strings, 2 KiB cap), envelope with sender, key id, strictly increasing sequence, nonce, validity window; receiver authenticates **before** trusting any field, then checks sender allowlist, expiry, future-dating, replay, nonce reuse and re-validates the intent. The authenticator is an abstract PORT: **no implementation exists in the repository** (the live-lock source scans stay green); a reviewed one is M3-B work | `orders/channel.py` |
+| Reconciliation, paper-vs-demo | order-set and state reconciliation (an order we never made = serious), expected-balance reconciliation from fills, testnet-reset classifier (everything gone AND balances blank = reset, anything else = corruption), execution-quality comparison with a mandatory no-profit disclaimer | `orders/reconcile.py` |
+| Rate-limit budgeting | multi-window budget with 80 % headroom, limits read from the exchange (none known = nothing allowed), 429/418 ban that can only be extended | `orders/ratelimit.py` |
+| Clock-skew handling | offset estimate from the round trip with its uncertainty; sending is allowed only with a fresh, certain, small-skew estimate | `orders/clockguard.py` |
+| Kill-switch / RISK_HALT integration | named triggers (RISK_HALT, reconciliation anomaly, unknown exchange order, auth failures, daily cap, clock skew, exchange reset, rate-limit ban) that **latch**; release needs a named human and a reason; history for the audit chain; it feeds `DayState.kill_switch` | `orders/halts.py` |
+
+**Still not designed / not possible offline:** the real vault backend (B-4), the connector and request authentication (forbidden by the live-lock tests until an authorized milestone), the real exchange behaviour assumptions U-1..U-4, balances fetch and the user-data stream, wiring of the kill switch to the paper risk engine's halt event and to the audit chain (the caller's job; `KillSwitch.history` is shaped for it).
 
 ## 8. Failure-mode table
 | Failure | Handling | Evidence |
