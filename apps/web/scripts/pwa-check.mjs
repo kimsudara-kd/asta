@@ -23,8 +23,12 @@ await page.goto(BASE + "/login", { waitUntil: "networkidle" });
 const reg = await page.evaluate(async () => { const r = await navigator.serviceWorker.ready; return { scope: r.scope, state: r.active?.state }; });
 ok(reg.scope === BASE + "/" && reg.state === "activated", `service worker active (scope ${reg.scope})`);
 await page.reload({ waitUntil: "networkidle" });
+await page.waitForFunction(() => !!navigator.serviceWorker.controller, null, { timeout: 8000 }).catch(() => {});
 ok(await page.evaluate(() => !!navigator.serviceWorker.controller), "page is controlled by the worker after reload");
-const cached = await page.evaluate(async () => { const out = []; for (const n of await caches.keys()) { const c = await caches.open(n); for (const r of await c.keys()) out.push(new URL(r.url).pathname); } return out; });
+// the worker stores static assets asynchronously after serving them: wait (up to 8 s) instead of sampling once
+const readCache = () => page.evaluate(async () => { const out = []; for (const n of await caches.keys()) { const c = await caches.open(n); for (const r of await c.keys()) out.push(new URL(r.url).pathname); } return out; });
+let cached = await readCache();
+for (let i = 0; i < 16 && !(cached.includes("/offline.html") && cached.some((p) => p.startsWith("/_next/static/"))); i++) { await page.waitForTimeout(500); cached = await readCache(); }
 ok(cached.includes("/offline.html") && cached.some((p) => p.startsWith("/_next/static/")), `cache holds the offline page + static assets (${cached.length} entries)`);
 ok(!cached.some((p) => p.startsWith("/api/")) && !cached.some((p) => ["/", "/login", "/paper", "/markets"].includes(p)), "no API response and no page HTML in any cache");
 await ctx.setOffline(true);
