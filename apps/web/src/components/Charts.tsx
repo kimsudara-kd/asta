@@ -62,15 +62,17 @@ export function Sparkline({ points, tone = "accent", label, height = 44 }: { poi
 
 /** Multi-line chart with a soft area under the primary series, grid, and date axis. */
 export function AreaChart({
-  lines, height = 260, yFormat = (v: number) => v.toFixed(0), baseline, label,
-}: { lines: Line[]; height?: number; yFormat?: (v: number) => string; baseline?: number; label: string }) {
+  lines, height = 260, yFormat = (v: number) => v.toFixed(0), baseline, label, floor,
+}: { lines: Line[]; height?: number; yFormat?: (v: number) => string; baseline?: number; label: string; floor?: number }) {
   const gid = useId();
   const [wrap, W] = useWidth();
   const all = lines.flatMap((l) => l.points);
   if (all.length < 2) return <div className="muted chart-empty">No data to chart yet.</div>;
   const pad = { l: 46, r: 8, t: 10, b: 24 };
   height = W < 520 ? Math.max(190, Math.round(W * 0.62)) : height;
-  const { x0, x1, y0, y1 } = extent(lines);
+  const ext = extent(lines);
+  const { x0, x1, y1 } = ext;
+  const y0 = floor !== undefined ? Math.max(floor, ext.y0) : ext.y0; // e.g. drawdown can never be below 0
   const sx = (t: number) => pad.l + ((t - x0) / (x1 - x0 || 1)) * (W - pad.l - pad.r);
   const sy = (y: number) => pad.t + (1 - (y - y0) / (y1 - y0)) * (height - pad.t - pad.b);
   const path = (pts: Pt[]) => pts.map((p, i) => `${i ? "L" : "M"}${sx(p.t).toFixed(1)},${sy(p.y).toFixed(1)}`).join(" ");

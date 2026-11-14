@@ -763,3 +763,112 @@ h2.card-title.mk-sym { margin: 0; font-size: 20px; letter-spacing: -0.015em; }
   .layer { grid-template-columns: auto minmax(0, 1fr); }
   .layer .pill { grid-column: 2; justify-self: start; }
 }
+
+/* ================================================================ Paper trading (shared) */
+.sim-banner { display: flex; align-items: center; justify-content: center; gap: 10px; }
+.sim-banner::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: pulse 2.4s infinite; flex: none; }
+.p-nav { margin: 10px 0 14px; }
+.p-nav .tabs { margin: 0; }
+.p-session { display: flex; align-items: center; gap: 14px 28px; flex-wrap: wrap; padding: 12px 18px; margin: 0 0 18px; }
+.p-sel { display: flex; align-items: center; gap: 12px; margin: 0; }
+.p-sel-k, .p-fact-k { font-size: 11px; font-weight: 650; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.p-session select { min-width: 250px; }
+.p-facts { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 26px; font-variant-numeric: tabular-nums; }
+.p-fact { display: inline-flex; align-items: center; gap: 9px; font-size: 13.5px; }
+.side { font-weight: 700; letter-spacing: 0.02em; }
+.side.buy { color: var(--ok); }
+.side.sell { color: var(--bad); }
+.pos { color: var(--ok); }
+.neg { color: var(--bad); }
+.zero { color: var(--muted); }
+.stack-bar { display: flex; height: 12px; border-radius: 999px; overflow: hidden; background: var(--surface-3); gap: 2px; }
+.stack-seg { height: 100%; }
+.stack-seg.accent, .stack-dot.accent { background: var(--accent); }
+.stack-seg.violet, .stack-dot.violet { background: #9b7bff; }
+.stack-seg.ok, .stack-dot.ok { background: var(--ok); }
+.stack-seg.warn, .stack-dot.warn { background: var(--warn); }
+.stack-seg.muted, .stack-dot.muted { background: var(--muted); }
+.stack-legend { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; font-size: 13px; }
+.stack-legend li { display: flex; align-items: center; gap: 9px; }
+.stack-legend b { margin-left: auto; font-variant-numeric: tabular-nums; }
+.stack-dot { width: 9px; height: 9px; border-radius: 3px; flex: none; }
+@media (max-width: 700px) { .p-session select { min-width: 0; width: 100%; } .p-sel { flex-wrap: wrap; width: 100%; } }
+
+/* ================================================================ Paper overview */
+.grid.p-ov { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); margin: 0 0 16px; align-items: stretch; }
+.feeds { display: grid; gap: 10px; }
+.feed { padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); }
+.feed-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.feed-sub { font-size: 12.5px; margin-top: 4px; }
+.session-card p { margin: 0 0 8px; }
+.sess-reason { font-size: 13px; }
+.sess-eq strong { font-size: 19px; letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+.risk-ref { font-size: 12.5px; }
+.ctl-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+.ctl-bar button { min-height: 38px; padding: 6px 14px; font-size: 13.5px; }
+button.warn { color: var(--warn); background: var(--warn-soft); border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+button.warn:hover { filter: brightness(1.12); }
+button.danger { color: var(--bad); background: transparent; border-color: color-mix(in srgb, var(--bad) 55%, transparent); }
+button.danger:hover { background: var(--bad-soft); filter: none; }
+.create-card .row { align-items: end; }
+.chk-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 14px; }
+.chk { display: inline-flex; align-items: center; gap: 9px; padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface-2); font-size: 13.5px; font-weight: 550; cursor: pointer; }
+.chk:has(input:checked) { border-color: color-mix(in srgb, var(--accent) 55%, transparent); background: var(--accent-soft); }
+.chk input { min-height: 0; width: 16px; height: 16px; accent-color: var(--accent); }
+table th.num, table td.num { text-align: right; }
+.card > .scroll table { font-size: 13.5px; }
+
+/* ================================================================ Paper portfolio */
+.grid.pf-top { grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0 0 16px; }
+.pf-eq { margin: 0 0 14px; }
+.pf-eq strong { font-size: 34px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.pnl-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+.pnl { display: inline-flex; align-items: center; gap: 10px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface-2); font-size: 13px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.pnl .muted { font-weight: 550; }
+.pf-plain { font-size: 12px; margin: 12px 0 0; }
+.acct { font-weight: 650; white-space: nowrap; }
+.asset-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.asset-chip { padding: 3px 10px; border-radius: 8px; background: var(--surface-2); border: 1px solid var(--line); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.eqcell { min-width: 150px; }
+.eqcell > span { display: block; font-weight: 650; font-variant-numeric: tabular-nums; }
+.eqbar { height: 5px; margin-top: 5px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.eqbar > div { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), #9b7bff); }
+@media (max-width: 960px) { .grid.pf-top { grid-template-columns: minmax(0, 1fr); } }
+
+/* ================================================================ Paper signals & orders */
+.inline-filter { display: inline-flex; align-items: center; gap: 10px; margin: 0; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.inline-filter select { min-height: 36px; padding: 4px 30px 4px 12px; font-size: 13.5px; font-weight: 550; color: var(--text); }
+.reason-chip { display: inline-block; padding: 2px 9px; border-radius: 7px; background: var(--surface-3); color: var(--text-2); font: 600 11.5px/1.6 var(--mono); white-space: nowrap; }
+
+/* long tables scroll inside their card (sticky header) instead of stretching the page */
+.scroll.tall { max-height: 540px; overflow: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+.scroll.tall table { font-size: 13px; }
+.scroll.tall thead th { z-index: 1; }
+.table-cap { margin: 10px 0 0; font-size: 12.5px; }
+.scroll.tall th, .scroll.tall td { white-space: nowrap; }
+
+/* ================================================================ Paper risk & incidents */
+.grid.p-risk { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 16px 0; align-items: start; }
+.limit-tiles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-bottom: 14px; }
+.ltile { display: grid; gap: 1px; padding: 9px 12px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface-2); font-size: 12px; }
+.ltile b { font-size: 17px; font-variant-numeric: tabular-nums; color: var(--text); }
+.gaps { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 8px; }
+.gaps li { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13px; }
+.gap-id { font-weight: 650; }
+.gaps .pill { margin-left: auto; }
+.scroll.tall td.wrap { white-space: normal; min-width: 240px; }
+@media (max-width: 1180px) { .grid.p-risk { grid-template-columns: minmax(0, 1fr); } }
+
+/* ================================================================ Paper performance & reports */
+.delta.big-delta { font-size: 22px; padding: 3px 14px; letter-spacing: -0.01em; }
+.kpi-value strong { font-weight: 700; }
+.pnlcell { min-width: 130px; font-weight: 650; font-variant-numeric: tabular-nums; }
+.pbar { height: 4px; margin-top: 5px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+.pbar > div { height: 100%; border-radius: 999px; }
+.pbar > div.pos { background: var(--ok); }
+.pbar > div.neg { background: var(--bad); }
+td.actions { white-space: nowrap; text-align: right; }
+td.actions button { min-height: 34px; padding: 4px 12px; font-size: 13px; }
+.report-card { margin-top: 14px; background: var(--surface-2); box-shadow: none; }
+.report-card h3 { margin: 0 0 8px; }
+.mono-line { font-family: var(--mono); font-size: 12px; }

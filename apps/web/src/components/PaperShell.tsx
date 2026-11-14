@@ -3,8 +3,11 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, type ReactNode } from "react";
 import Shell from "../app/Shell";
+import { pctChange } from "../lib/overview";
 import { PAPER_BANNER, type PaperSession } from "../lib/paper";
+import { trimDecimal } from "../lib/format";
 import { usePoll } from "../lib/usePoll";
+import { StatePill } from "./paper/ui";
 import { usePrincipal } from "./ResearchShell";
 
 const TABS = [
@@ -28,30 +31,43 @@ export function usePaperSession(): { sid: string | null; sessions: PaperSession[
 
 function Inner({ active, children, sessionHook }: { active: string; children: ReactNode; sessionHook: ReturnType<typeof usePaperSession> }) {
   const me = usePrincipal();
-  const { sid, sessions, select } = sessionHook;
+  const { sid, sessions, session, select } = sessionHook;
   const suffix = sid ? `?session=${sid}` : "";
+  const chg = session ? pctChange(session.equity, session.starting_equity) : null;
   return (
     <Shell>
       <div className="sim-banner" role="note" data-testid="paper-banner">{PAPER_BANNER}</div>
       <p className="muted" data-testid="paper-note">
         Simulated balances and fills only. Nothing on these pages can reach an exchange, and no figure is a realised cash profit.
       </p>
-      <div className="tabs" role="tablist">
-        {TABS.map((t) => (
-          <Link key={t.href} href={`${t.href}${suffix}`} className={t.href === active ? "tab active" : "tab"} role="tab" aria-selected={t.href === active}>
-            {t.label}
-          </Link>
-        ))}
-        <span className="sp" />
-        {me && <span className="muted">role: {me.role}</span>}
+      <div className="p-nav">
+        <div className="tabs" role="tablist">
+          {TABS.map((t) => (
+            <Link key={t.href} href={`${t.href}${suffix}`} className={t.href === active ? "tab active" : "tab"} role="tab" aria-selected={t.href === active}>
+              {t.label}
+            </Link>
+          ))}
+          <span className="sp" />
+          {me && <span className="muted">role: {me.role}</span>}
+        </div>
       </div>
       {sessions.length > 0 && (
-        <div className="row">
-          <label>Session
+        <div className="p-session card">
+          <label className="p-sel">
+            <span className="p-sel-k">Session</span>
             <select value={sid ?? ""} onChange={(e) => select(e.target.value)} data-testid="session-select">
               {sessions.map((s) => <option key={s.id} value={s.id}>{s.name} · {s.state}</option>)}
             </select>
           </label>
+          {session && (
+            <div className="p-facts">
+              <span className="p-fact"><span className="p-fact-k">State</span><StatePill state={session.state} /></span>
+              <span className="p-fact"><span className="p-fact-k">Equity</span><b>{trimDecimal(session.equity)}</b> <span className="muted">USDT</span></span>
+              {chg && <span className="p-fact"><span className="p-fact-k">vs start</span><span className={`chg ${chg.startsWith("-") && /[1-9]/.test(chg) ? "down" : /[1-9]/.test(chg) ? "up" : "flat"}`}>{chg}</span></span>}
+              <span className="p-fact"><span className="p-fact-k">Timeframe</span><b>{session.timeframe}</b></span>
+              <span className="p-fact"><span className="p-fact-k">Last step</span><span>{session.last_step_ts ? `${session.last_step_ts.slice(0, 16).replace("T", " ")} UTC` : "—"}</span></span>
+            </div>
+          )}
         </div>
       )}
       {children}
