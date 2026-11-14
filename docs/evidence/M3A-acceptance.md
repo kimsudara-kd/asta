@@ -315,3 +315,6 @@ The attached USB SSD (4 TB, 3.4 TB free, 613 GB already in use) is **exFAT mount
 Two lab-tool defects were found and fixed along the way (a receiver that exited before the probe made the unprivileged-DNS "block" vacuous; an expectation that the fw forward counter would move when the app's own output rule drops first); results above are from the fixed tool.
 **Limits (not shown):** namespaces share one kernel, so this does not test the QEMU unix-socket links, the Mac host/hypervisor boundary, `socket_vmnet`, the egress proxy process or macOS firewall; the real deployment on the Mac still needs `sudo` provisioning. The proxy/allowlist-refresh logic and the 78/39 container suites were not re-run here. F-02 stays OPEN (no independent review, no deployed boundary); F-01 and F-03 unchanged; M3-B NO-GO.
 
+## MAC-A12. Production backup key pair (2026-11-14)
+`age-keygen` pair created; recipient (public) key committed as `infra/security-host/mac/backup-recipient.pub`; the private identity is in `~/asta-backup-identity/` (0700/0600) on the Mac mini and has **not yet been moved offline**, so the design property "private key never on the host" is **NOT yet met**. Round trip verified. No credential of any exchange is involved.
+
