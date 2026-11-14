@@ -1,6 +1,7 @@
 [Unit]
 Description=ASTA database backup (pg_dump, age-encrypted to an offline recipient key)
 After=postgresql.service
+OnFailure=asta-security-alert@%n.service
 
 [Service]
 Type=oneshot

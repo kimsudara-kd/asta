@@ -1,0 +1,50 @@
+{
+ "filevault_on": false,
+ "app_firewall_on": false,
+ "stealth_on": false,
+ "auto_login_disabled": false,
+ "ssh_listening": true,
+ "smb_listening": true,
+ "screen_sharing_or_ard": false,
+ "all_interface_listeners": [
+  {
+   "process": "com.docke",
+   "port": "3000",
+   "scope": "ALL-INTERFACES"
+  },
+  {
+   "process": "com.docke",
+   "port": "5442",
+   "scope": "ALL-INTERFACES"
+  },
+  {
+   "process": "exo",
+   "port": "49366",
+   "scope": "ALL-INTERFACES"
+  },
+  {
+   "process": "exo",
+   "port": "52415",
+   "scope": "ALL-INTERFACES"
+  }
+ ],
+ "docker": {
+  "docker_cli": true,
+  "docker_desktop_running": true
+ },
+ "vm_tools": {
+  "qemu-system-aarch64": true,
+  "socket_vmnet": false,
+  "limactl": false
+ },
+ "python": "3.12.8",
+ "dedicated_host_gaps": [
+  "filevault_on",
+  "app_firewall_on",
+  "auto_login_disabled",
+  "ssh_listening",
+  "smb_listening",
+  "all_interface_listeners",
+  "unrelated_docker_workloads_present"
+ ]
+}

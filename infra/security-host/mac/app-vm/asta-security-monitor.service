@@ -1,5 +1,5 @@
 [Unit]
-Description=ASTA security monitor (bridge heartbeat, kill-switch latch, database reachability)
+Description=ASTA security monitor (bridge heartbeat, kill-switch latch, database, reconciliation, feed, backup)
 After=postgresql.service
 # exit 2 (critical) fails the unit; OnFailure routes it to the alert unit (journal + host alert channel)
 OnFailure=asta-security-alert@%n.service
@@ -11,6 +11,9 @@ Group=asta-monitor
 EnvironmentFile=/etc/asta/asta-monitor.env
 ExecStart=/opt/asta/venv/bin/python -m asta.orders.monitor
 SuccessExitStatus=0 1
+# signed status stamp for the firewall VM's dead-man job; backup directory is read-only evidence
+ReadWritePaths=/var/lib/asta-monitor
+ReadOnlyPaths=/var/backups/asta /etc/asta/status.key
 IPAddressDeny=any
 RestrictAddressFamilies=AF_UNIX
 PrivateNetwork=yes

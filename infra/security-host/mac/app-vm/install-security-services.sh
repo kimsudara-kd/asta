@@ -29,7 +29,7 @@ run install -d -o asta-monitor -g asta-monitor -m 0700 /var/lib/asta-monitor
 run install -d -o root -g root -m 0755 /etc/asta
 if [ "$APPLY" = 1 ]; then
   printf 'ASTA_DATABASE_URL=postgresql+pg8000://asta_bridge@/asta?unix_sock=/var/run/postgresql/.s.PGSQL.5432\n' > /etc/asta/asta-bridge.env
-  printf 'ASTA_DATABASE_URL=postgresql+pg8000://asta_monitor@/asta?unix_sock=/var/run/postgresql/.s.PGSQL.5432\n' > /etc/asta/asta-monitor.env
+  printf 'ASTA_DATABASE_URL=postgresql+pg8000://asta_monitor@/asta?unix_sock=/var/run/postgresql/.s.PGSQL.5432\nASTA_BACKUP_DIR=/var/backups/asta\nASTA_STATUS_FILE=/var/lib/asta-monitor/app-status\nASTA_STATUS_KEY_FILE=/etc/asta/status.key\n' > /etc/asta/asta-monitor.env
   chown root:asta-bridge /etc/asta/asta-bridge.env; chown root:asta-monitor /etc/asta/asta-monitor.env
   chmod 0640 /etc/asta/asta-bridge.env /etc/asta/asta-monitor.env
 else

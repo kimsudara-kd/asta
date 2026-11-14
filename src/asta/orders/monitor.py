@@ -90,15 +90,28 @@ def exit_code(alerts: list[Alert]) -> int:
 
 
 def main() -> int:  # pragma: no cover - supervised entry point
+    import os
+    from pathlib import Path
+
     from asta.core.settings import load_settings
     from asta.db.session import make_engine, make_session_factory
+    from asta.orders import alerting
 
     factory = make_session_factory(make_engine(load_settings().database_url))
     alerts = check(factory)
+    backup = os.environ.get("ASTA_BACKUP_DIR")
+    alerts += [
+        a
+        for a in alerting.extended_checks(factory, Path(backup) if backup else None)
+        if a not in alerts
+    ]
     try:
         record_changes(factory, alerts)
     except Exception as exc:  # noqa: BLE001 - the alert exit code must still be returned
         print(json.dumps({"audit_write_failed": type(exc).__name__}), file=sys.stderr)
+    keyfile, stamp = os.environ.get("ASTA_STATUS_KEY_FILE"), os.environ.get("ASTA_STATUS_FILE")
+    if keyfile and stamp:  # the signed status feed read by the firewall VM's dead-man job
+        alerting.write_stamp(Path(stamp), Path(keyfile).read_bytes().strip(), alerts)
     print(json.dumps({"ok": not alerts, "alerts": [a.__dict__ for a in alerts]}))
     return exit_code(alerts)
 

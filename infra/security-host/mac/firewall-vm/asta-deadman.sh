@@ -18,6 +18,25 @@ ok=1
 [ -r "$PIN" ] && [ "$(norm)" = "$(cut -d' ' -f1 "$PIN")" ] || ok=0
 systemctl is-active --quiet asta-egress-proxy.service || ok=0
 [ "$(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null)" = 0 ] || ok=0
+# G-13: the APPLICATION must also be alive. asta-app writes a signed status stamp (asta.orders.alerting) over the
+# one-way status feed; a missing, stale, forged or critical stamp turns the heartbeat into a /fail signal, and a dead
+# app VM stops refreshing it. Key: /etc/asta-egress/status.key (root-only, ASCII, shared with the monitor only).
+STAMP="${STATUS_FILE:-/var/lib/asta-egress/app-status}"
+SKEY="${STATUS_KEY_FILE:-/etc/asta-egress/status.key}"
+app_ok() {
+  [ -r "$STAMP" ] && [ -r "$SKEY" ] || return 1
+  line="$(head -c 400 "$STAMP")"
+  ts="${line#ts=}"; ts="${ts%% *}"
+  okf="${line#* ok=}"; okf="${okf%% *}"
+  codes="${line#* codes=}"; codes="${codes%% mac=*}"
+  mac="${line##* mac=}"
+  case "$ts$okf" in *[!0-9]*|"") return 1 ;; esac
+  want="$(printf 'ts=%s;ok=%s;codes=%s' "$ts" "$okf" "$codes" | openssl dgst -sha256 -hmac "$(tr -d '\n' < "$SKEY")" -r | cut -d' ' -f1)"
+  [ "$want" = "$mac" ] || return 1
+  now="$(date +%s)"
+  [ $((now - ts)) -le 120 ] && [ $((ts - now)) -le 120 ] && [ "$okf" = 1 ]
+}
+app_ok || ok=0
 if [ "$ok" = 1 ]; then URL="$DEADMAN_URL"; else URL="${DEADMAN_URL%/}/fail"; fi
 curl --fail --silent --show-error --max-time 10 --retry 2 --output /dev/null "$URL" 2>/dev/null || { echo "deadman: ping failed (not printing the URL)" >&2; exit 2; }
 [ "$ok" = 1 ] && echo "deadman: heartbeat sent" || { echo "deadman: FAIL signal sent (a local check failed)" >&2; exit 3; }

@@ -18,10 +18,48 @@ from asta.core.settings import load_settings
 from asta.db.session import make_engine, make_session_factory
 from asta.paper import store
 
+FROZEN_DIGESTS = {
+    "f9d8e770d765ee84",
+    "be76eb9ef1a917a5",
+}  # docs/evidence/m3a/mac-xarch-integrity-*.json
+
+
+def verify(out: dict[str, dict[str, object]]) -> list[str]:
+    """Compare a snapshot with the frozen M2 expectations; returns the list of failures (empty = pass)."""
+    bad = []
+    if len(out) != 2:
+        bad.append(f"expected 2 active paper sessions, found {len(out)}")
+    for name, r in out.items():
+        if r.get("replay_steps_verified") != 900:
+            bad.append(f"{name}: replay_steps_verified {r.get('replay_steps_verified')} != 900")
+        if r.get("reconcile_discrepancies") != 0:
+            bad.append(f"{name}: unexplained reconciliation differences")
+        if r.get("fills") != 35:
+            bad.append(f"{name}: fills {r.get('fills')} != 35")
+    if {str(r.get("fills_digest")) for r in out.values()} != FROZEN_DIGESTS:
+        bad.append("fill digests differ from the frozen M2 evidence")
+    return bad
+
 
 def main() -> int:
+    import sys
+
+    from sqlalchemy.exc import InterfaceError, OperationalError
+
+    try:
+        return _run("--verify" in sys.argv[1:])
+    except (OperationalError, InterfaceError) as exc:
+        # classified failure: the dev PostgreSQL is not reachable (scripts/dev_pg_tcp.sh start)
+        print(
+            f"DATABASE UNAVAILABLE ({type(exc).__name__}): start it with scripts/dev_pg_tcp.sh start",
+            file=sys.stderr,
+        )
+        return 3
+
+
+def _run(check: bool) -> int:
     factory = make_session_factory(make_engine(load_settings().database_url))
-    out: dict[str, object] = {}
+    out: dict[str, dict[str, object]] = {}
     with factory() as db:
         rows = db.execute(
             text(
@@ -59,6 +97,12 @@ def main() -> int:
             }
         db.rollback()
     print(json.dumps(out, indent=1, default=str))
+    if check:
+        problems = verify(out)
+        for p in problems:
+            print("FAIL:", p)
+        print("PAPER INTEGRITY:", "FAIL" if problems else "PASS")
+        return 1 if problems else 0
     return 0
 
 
