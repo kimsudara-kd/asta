@@ -129,3 +129,32 @@ export function sourceSummary(rows: Market[]): { title: string; detail: string; 
   if (live === rows.length) return { title: "Real-time public data", detail: "Read-only observation; trading is disabled.", tone: "ok" };
   return { title: "Mixed sources", detail: `${live} real-time, ${fixture} fixture, ${none} without data.`, tone: "warn" };
 }
+
+/** Spread between the best bid and the best ask in bps of their mean, exact to 2 places; negative = crossed. */
+export function crossSpread(bid: string | null, ask: string | null): { text: string; crossed: boolean } | null {
+  const b = scaled(bid);
+  const a = scaled(ask);
+  if (b === null || a === null || a + b === 0n) return null;
+  const q = ((a - b) * 2n * 10000n * 100n) / (a + b);
+  const neg = q < 0n;
+  const abs = neg ? -q : q;
+  return { text: `${neg && abs !== 0n ? "-" : ""}${abs / 100n}.${(abs % 100n).toString().padStart(2, "0")}`, crossed: neg };
+}
+
+export type Level = { venue: string; price: string; source: string };
+export type Ladder = { asks: Level[]; bids: Level[]; bestBid: Level | null; bestAsk: Level | null; spread: { text: string; crossed: boolean } | null };
+
+/** Combined top of book across venues (fresh quotes only): asks high->low, bids high->low, best bid/ask. */
+export function ladderLevels(quotes: Market[]): Ladder {
+  const fresh = quotes.filter((m) => !m.stale && m.bid !== null && m.ask !== null);
+  const byPriceDesc = (a: Level, b: Level) => {
+    const x = scaled(a.price)!;
+    const y = scaled(b.price)!;
+    return x === y ? 0 : x > y ? -1 : 1;
+  };
+  const asks = fresh.map((m) => ({ venue: m.venue, price: m.ask as string, source: m.source })).filter((l) => scaled(l.price) !== null).sort(byPriceDesc);
+  const bids = fresh.map((m) => ({ venue: m.venue, price: m.bid as string, source: m.source })).filter((l) => scaled(l.price) !== null).sort(byPriceDesc);
+  const bestAsk = asks.length ? asks[asks.length - 1] : null; // lowest ask
+  const bestBid = bids.length ? bids[0] : null; // highest bid
+  return { asks, bids, bestBid, bestAsk, spread: crossSpread(bestBid?.price ?? null, bestAsk?.price ?? null) };
+}

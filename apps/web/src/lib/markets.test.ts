@@ -75,3 +75,26 @@ test("ageText", () => {
   assert.equal(ageText(null, now), "—");
   assert.equal(ageText("garbage", now), "—");
 });
+
+import { crossSpread, ladderLevels } from "./markets.ts";
+
+test("crossSpread is exact, and negative when the best bid is above the best ask", () => {
+  assert.deepEqual(crossSpread("100.00", "100.10"), { text: "9.99", crossed: false });
+  assert.deepEqual(crossSpread("100.10", "100.00"), { text: "-9.99", crossed: true });
+  assert.deepEqual(crossSpread("100", "100"), { text: "0.00", crossed: false });
+  assert.equal(crossSpread(null, "1"), null);
+});
+
+test("ladderLevels: asks and bids sorted high to low, best bid = highest bid, best ask = lowest ask, stale ignored", () => {
+  const rows = [
+    q({ venue: "BINANCE", bid: "100.00", ask: "100.10" }),
+    q({ venue: "OKX", bid: "100.05", ask: "100.20" }),
+    q({ venue: "KRAKEN", bid: "999.00", ask: "999.10", stale: true }),
+  ] as never[];
+  const l = ladderLevels(rows);
+  assert.deepEqual(l.asks.map((x) => x.price), ["100.20", "100.10"]);
+  assert.deepEqual(l.bids.map((x) => x.price), ["100.05", "100.00"]);
+  assert.equal(l.bestBid?.venue, "OKX");
+  assert.equal(l.bestAsk?.venue, "BINANCE");
+  assert.deepEqual(l.spread, { text: "4.99", crossed: false }); // (100.10 - 100.05) / 100.075, truncated
+});

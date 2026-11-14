@@ -2,10 +2,11 @@
 import { useEffect, useId, useState } from "react";
 
 export type Pt = { t: number; y: number };
-export type Line = { name: string; points: Pt[]; tone: "accent" | "muted" | "ok" | "warn" | "bad"; area?: boolean; dashed?: boolean };
+export type Tone = "accent" | "muted" | "ok" | "warn" | "bad" | "violet";
+export type Line = { name: string; points: Pt[]; tone: Tone; area?: boolean; dashed?: boolean };
 
-const COLOR: Record<Line["tone"], string> = {
-  accent: "var(--accent)", muted: "var(--muted)", ok: "var(--ok)", warn: "var(--warn)", bad: "var(--bad)",
+export const COLOR: Record<Tone, string> = {
+  accent: "var(--accent)", muted: "var(--muted)", ok: "var(--ok)", warn: "var(--warn)", bad: "var(--bad)", violet: "#9b7bff",
 };
 
 /** Y values drive GEOMETRY only; exact figures are always printed as text elsewhere. */
@@ -19,7 +20,7 @@ function extent(lines: Line[], pad = 0.08) {
 }
 
 /** Width of the element in px (ResizeObserver), so text in the chart keeps its true size on any screen. */
-function useWidth(fallback = 760): [(el: HTMLDivElement | null) => void, number] {
+export function useWidth(fallback = 760): [(el: HTMLDivElement | null) => void, number] {
   // callback ref: the measuring effect re-runs whenever the element (re)mounts, e.g. when data arrives late
   const [el, setEl] = useState<HTMLDivElement | null>(null);
   const [w, setW] = useState(fallback);
