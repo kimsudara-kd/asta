@@ -17,4 +17,4 @@ infra/data/
 *.log
 !docs/evidence/**/*.log
 dist/
-data/
+/data/

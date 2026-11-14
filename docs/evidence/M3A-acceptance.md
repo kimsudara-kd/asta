@@ -238,3 +238,39 @@ Needs separate provisioning authorization; the ten-step plan (build, full suite 
 
 ## MAC-6. Remaining High findings and recommendation
 **F-01** (legacy Windows processes outside any boundary; the three-VM design is the strongest planned form, unverified), **F-02** (no dedicated boundary deployed or tested; the Mac is the chosen host but Phase A is unperformed and the macOS host itself is the trust base - new F-19), **F-03** (no independent review). New items: F-19, R-X. **M3-B: NO-GO.** Next steps are decisions and actions outside this session: run the read-only inventory on the Mac; decide FileVault vs unattended recovery; authorize provisioning (Phase C) with the change list in design section 10; designate the independent reviewer; decide the gitleaks question.
+
+
+---
+
+# ASTA-M3A-MAC-01 — addendum: Phase A performed, native ARM64 test run (2026-11-14)
+
+**Status unchanged: `BUILT — NOT ACCEPTED`; credential readiness `NO-GO`; F-01, F-02, F-03 OPEN.** Nothing was installed or reconfigured on the Mac, no sudo, no credentials, no VM created, no push.
+
+## MAC-A1. Phase A (read-only inventory): PERFORMED
+`mac-inventory.sh` run as the normal user on the Mac mini; output kept locally by the owner, not committed (it contains network and installed-software details).
+| Attribute | Observed |
+|---|---|
+| Model / chip / RAM | Mac mini (Mac16,10), Apple M4, 10 cores, 16 GB; `hw.optional.arm64=1`, `kern.hv_support=1` |
+| macOS | 26.5.2 (arm64) |
+| Internal disk | 251 GB, ~68 GB free on `/`; a 4.0 TB external disk is attached (not examined) |
+| FileVault | **Off**; SIP enabled; Gatekeeper enabled |
+| Power | `autorestart` 0 (does NOT restart after power loss; must be 1 for 24/7), sleep 0 |
+| Backups | Time Machine: no destination configured |
+| Tooling present | brew, uv, git, docker, python 3.12.8, hdiutil |
+| Tooling missing | qemu-system-aarch64, qemu-img, socket_vmnet, age, pg_dump, xorriso |
+| Listening sockets | one process (`exo`) listens on all interfaces (49366, 52415); others on 127.0.0.1 only. Needs an owner explanation before the host can be treated as having no inbound services |
+| Role | general-purpose workstation with unrelated software installed (F-19: the macOS host is the trust base) |
+Consequence for the design: FileVault is currently off, so the FileVault-vs-unattended-recovery trade-off is open as a decision, not a fact. No ASTA process runs on this Mac.
+
+## MAC-A2. Native ARM64 test run (macOS arm64, Python 3.12.8, PostgreSQL 16.2 aarch64): **592 tests, 590 passed, 13 skipped, 2 failed** - not yet a clean pass
+The first run on a fresh clone failed to collect 23 modules: `src/asta/research/data/` had never been committed (`.gitignore` `data/` matched it). The owner supplied the package (8 modules; scanned: no network/subprocess/secret content, `secret_scan.py` 0 findings, `profiles.py` reformatted by ruff, whitespace only) and `.gitignore` is now `/data/`. Findings from the rerun (all environment/test-portability, none in product code):
+1. **Unix-socket PostgreSQL stalls on macOS.** `pgserver` (the default embedded test DB) listens on a unix socket; large multi-row INSERTs (`research_store._bulk_insert`, up to 30000 bind parameters) block in `pg8000` `_write` and the lifecycle backtest test never finishes (thread dump captured). Over TCP the same tests pass (research API: 32 passed in 3.7 s). Also `pgserver` URIs (`?host=/dir`) are not understood by `pg8000` and the long macOS `TMPDIR` raises `UnicodeError: label too long`. **Use a TCP PostgreSQL on macOS** (`ASTA_TEST_DATABASE_URL`; the compose test DB on port 5641 is the documented route).
+2. **Test database timezone must be UTC.** A server in a non-UTC local timezone (here UTC+7) returned `+07:00` timestamps and failed 14 tests; with `timezone=UTC` they pass. Not a product defect for the documented compose setup, but the tests silently depend on it.
+3. **Latent test bug, fixed:** `test_lease_heartbeat_completion_and_ownership` took `t0` before enqueueing the job; with a microsecond clock the job's `run_after` is later than `t0`, so the first `claim` returns nothing. Windows' coarse clock hid it. `t0` is now taken after the enqueue (passes 3/3; no product change).
+4. **Remaining failure, expected in a clone:** `test_frozen_evidence.py::test_the_real_accepted_evidence_is_intact` needs the local tags `m0/m1/m2-accepted-with-residual`, which exist only in the original repository.
+Positive result for R-X: the paper replay, durable-queue crash/restart, reconciliation and checkpoint-digest tests (`tests/paper`) and the research golden/reproducibility tests **pass natively on ARM64**, i.e. no architecture-dependent digest or ledger-arithmetic difference was observed on arm64 macOS. This is **not** yet the aarch64 Linux VM target and does not replace the M2-database replay in Phase C, so R-X is narrowed, not closed. Not run in this pass: browser e2e, container/egress negative suites, gitleaks history, pip-audit/pnpm audit. mypy strict: no issues, 156 files; ruff clean on the recovered package.
+
+## MAC-A3. Follow-up
+1. Commit `src/asta/research/data/` (the `/data/` fix makes it trackable), run `scripts/secret_scan.py`, push.
+2. Document in the README: on macOS use a TCP PostgreSQL with `timezone=UTC` for tests.
+3. Phase C (aarch64 Linux VMs) remains unauthorized; it is where the full suite, the boundary tests and the M2-database replay must be repeated.

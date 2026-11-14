@@ -359,10 +359,10 @@ def test_poison_job_with_spent_retries_is_dead_lettered_not_re_leased(factory):
 
 def test_lease_heartbeat_completion_and_ownership(factory):
     sid = new_session(factory)
-    t0 = utcnow()
     with factory() as db:
         jobs.enqueue(db, "own", jobs.KIND_RECONCILE, sid, {})
         db.commit()
+        t0 = utcnow()  # taken AFTER enqueue: a microsecond clock (macOS/Linux) stamps the job later than an earlier t0
         j = jobs.claim(db, "A", lease_seconds=10, now=t0)
         db.commit()
         assert j is not None and jobs.claim(db, "B", now=t0 + timedelta(seconds=5)) is None
