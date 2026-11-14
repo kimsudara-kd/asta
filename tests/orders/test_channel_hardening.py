@@ -91,7 +91,7 @@ def test_no_json_is_parsed_before_authentication(monkeypatch):
     def boom(*a, **k):
         raise AssertionError("json parsed before the message was authenticated")
 
-    monkeypatch.setattr(channel.json, "loads", boom)
+    monkeypatch.setattr("asta.orders.channel.json.loads", boom)
     hostile = b'{"key_id":"k1",' + b"[" * 500 + b"not json"
     wire = (32).to_bytes(2, "big") + b"t" * 32 + hostile
     assert recv(AUTH).open(wire, 1_005) == (None, "NOT_AUTHENTIC")

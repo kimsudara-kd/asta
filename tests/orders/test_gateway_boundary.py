@@ -61,13 +61,13 @@ def test_the_contract_module_cannot_be_configured():
 def test_the_dispatcher_refuses_a_raw_port():
     with pytest.raises(TypeError):
         Dispatcher(
-            FakeExchange(random.Random(1)),
+            FakeExchange(random.Random(1)),  # type: ignore[arg-type]
             MemoryStore(),
             LIM,
             lambda: DAY,
             lambda s: D("100"),
             lambda: 1,
-        )  # type: ignore[arg-type]
+        )
 
 
 def test_an_external_port_is_never_called_not_for_send_query_or_cancel():

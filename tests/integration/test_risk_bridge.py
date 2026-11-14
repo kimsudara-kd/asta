@@ -12,7 +12,7 @@ from sqlalchemy import text
 from sqlalchemy.orm import Session, sessionmaker
 
 from asta.orders import risk_bridge
-from asta.orders.risk_bridge import KNOWN_SESSION_STATES, RiskHaltBridge
+from asta.orders.risk_bridge import KNOWN_SESSION_STATES, BridgeReport, RiskHaltBridge
 from asta.orders.sql_store import SqlKillSwitch
 from asta.paper.states import SessionState
 
@@ -166,9 +166,11 @@ def test_concurrent_bridge_workers_trip_exactly_once_per_event(sessions):
         out[i] = RiskHaltBridge(sessions).poll()
 
     ts = [threading.Thread(target=work, args=(i,)) for i in range(8)]
-    [t.start() for t in ts]
-    [t.join() for t in ts]
-    total = sum(len(r.tripped) for r in out)  # type: ignore[attr-defined]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+    total = sum(len(r.tripped) for r in out if isinstance(r, BridgeReport))
     with sessions() as db:
         events = int(
             db.execute(

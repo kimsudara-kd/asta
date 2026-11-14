@@ -79,7 +79,9 @@ def test_the_secret_scanner_exception_applies_to_the_matched_text_not_the_whole_
     from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
-    import secret_scan
+    import importlib
+
+    secret_scan = importlib.import_module("secret_scan")  # scripts/ is not a package
 
     found: list[str] = []
     secret_scan.scan("t", 'x = "' + "Ab1" * 21 + 'A" # api key (test-only note)', found)

@@ -450,14 +450,11 @@ def test_after_chaos_and_recovery_the_books_reconcile_with_zero_findings():
             rng, p_drop_request=0.2, p_drop_response=0.25, p_unavailable=0.3, visible_delay=1
         )
         store, k = MemoryStore(), KillSwitch()
-        d = Dispatcher(
-            gated(ex),
-            store,
-            lim,
-            lambda k=k: DayState(0, D(0), k.active),
-            lambda s: D("100"),
-            lambda: 1_000,
-        )
+
+        def day(kill: KillSwitch = k) -> DayState:
+            return DayState(0, D(0), kill.active)
+
+        d = Dispatcher(gated(ex), store, lim, day, lambda s: D("100"), lambda: 1_000)
         for i in range(8):
             d.handle(make_intent(i))
             ex.advance()

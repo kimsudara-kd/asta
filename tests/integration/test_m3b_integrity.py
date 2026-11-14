@@ -509,9 +509,9 @@ def test_worker_recovery_after_a_restart_under_a_latched_halt_abandons_and_flush
     d = disp(sessions, ex, k)
     d.handle(make_intent(1, session=salt))
     d.handle(make_intent(2, session=salt))
-    assert {d.store.get(make_intent(i, session=salt).decision_id).state for i in (1, 2)} == {
-        State.UNKNOWN
-    }  # type: ignore[union-attr]
+    stored = [d.store.get(make_intent(i, session=salt).decision_id) for i in (1, 2)]
+    assert all(x is not None for x in stored)
+    assert {x.state for x in stored if x is not None} == {State.UNKNOWN}
     resting = FakeExchange(rng)
     live = disp(sessions, resting, k)
     live.handle(make_intent(5, session=salt))  # one that rests at a healthy exchange
