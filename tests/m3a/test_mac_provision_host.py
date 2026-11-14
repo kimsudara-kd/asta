@@ -107,3 +107,38 @@ def test_vm_base_on_the_internal_apfs_volume_is_accepted_in_a_dry_run():
     )
     assert out.returncode == 0, out.stdout + out.stderr
     assert "ownership enforced" in out.stdout and "nothing was changed" in out.stdout
+
+
+def test_the_service_account_gets_no_usable_password():
+    assert "Password '*'" in CODE and "UserShell /usr/bin/false" in CODE and "IsHidden 1" in CODE
+
+
+def test_vm_base_refuses_protected_locations_and_foreign_non_empty_directories():
+    for bad in (
+        "/",
+        "/Users/apple",
+        "/Library/x",
+        "/etc/asta",
+        "/private/var/x",
+        "/Applications/y",
+    ):
+        r = subprocess.run(["sh", str(SCRIPT), "--vm-base", bad], capture_output=True, text=True)
+        assert r.returncode == 1 and "REFUSING" in (r.stdout + r.stderr), bad
+    import shutil
+    import uuid
+
+    foreign = Path("/Users/Shared") / f"asta-test-{uuid.uuid4().hex[:8]}"
+    foreign.mkdir()
+    try:
+        (foreign / "precious.txt").write_text("do not chown me")
+        r = subprocess.run(
+            ["sh", str(SCRIPT), "--vm-base", str(foreign)], capture_output=True, text=True
+        )
+        assert r.returncode == 1 and "refusing to chown -R" in (r.stdout + r.stderr)
+        assert (foreign / "precious.txt").read_text() == "do not chown me"  # untouched (dry run)
+    finally:
+        shutil.rmtree(foreign, ignore_errors=True)
+
+
+def test_the_symlink_parent_is_created_before_linking_when_the_base_is_elsewhere():
+    assert 'run mkdir -p "$(dirname "$BASE")"; run ln -s "$REAL" "$BASE"' in CODE

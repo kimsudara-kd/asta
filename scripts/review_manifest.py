@@ -32,6 +32,20 @@ SCOPES = [
     "scripts/review_manifest.py",
     ".gitleaksignore",
     ".gitleaks.toml",
+    # M3-B-R3: the order-path work, the roles/migrations and the R-series evidence
+    "docs/m3b",
+    "docs/evidence/M3B-GOVERNANCE-01.md",
+    "docs/evidence/M3B-DECISION-007.md",
+    "docs/evidence/M3B-R2.md",
+    "docs/evidence/M3B-R3.md",
+    "src/asta/orders",
+    "src/asta/core/order_gate.py",
+    "migrations/versions",
+    "tests/orders",
+    "tests/integration/test_m3b_integrity.py",
+    "tests/integration/test_risk_bridge.py",
+    "tests/integration/test_bridge_supervision.py",
+    "scripts/secret_scan.py",
 ]
 
 

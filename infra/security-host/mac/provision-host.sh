@@ -57,11 +57,27 @@ for f in qemu-vms.sh launchd/com.asta.socket_vmnet.plist launchd/com.asta.vm.fw.
 done
 for d in $DAEMONS; do plutil -lint "$HERE/launchd/$d.plist" >/dev/null || die "invalid plist $d"; done
 [ -x /opt/homebrew/bin/qemu-system-aarch64 ] || say "note: qemu-system-aarch64 not found in /opt/homebrew/bin (install QEMU via Homebrew first)"
+if [ -x /opt/homebrew/bin/qemu-system-aarch64 ]; then
+  QOWN="$(stat -f %Su "$(readlink -f /opt/homebrew/bin/qemu-system-aarch64 2>/dev/null || echo /opt/homebrew/bin/qemu-system-aarch64)" 2>/dev/null || echo unknown)"
+  [ "$QOWN" = root ] || say "note: the QEMU binary is owned by '$QOWN' (Homebrew), not root. The VMs run it as $SVC (unprivileged); record its SHA-256 at provisioning and re-check it before every boot (see docs/m3b/MAC-READINESS-AUDIT.md)"
+fi
 AVAIL_GB=$(df -g / | awk 'NR==2{print $4}')
 say "free space on /: ${AVAIL_GB} GB (design disks are sparse qcow2: fw 8 + app 60 + cred 10 + backup 20 GB maximum)"
 [ "${AVAIL_GB:-0}" -ge 40 ] || say "WARNING: less than 40 GB free; consider ASTA_VM_BASE on another volume"
 if [ -n "$VMBASE" ]; then
   case "$VMBASE" in /*) ;; *) die "--vm-base must be an absolute path" ;; esac
+  # the data directory is chown -R'ed to $SVC: never an existing home, system or shared directory
+  case "$VMBASE" in
+    /Users/Shared/?*) ;;   # the shared (non-home) area is allowed
+    /|/Users|/Users/*|/System*|/Library*|/Applications*|/usr*|/etc*|/private*|/opt*|/bin|/sbin|/var|/var/db*|/Volumes|/Volumes/*/) die "--vm-base $VMBASE is a protected location; choose a new directory such as /Volumes/<APFS>/asta-vm" ;;
+  esac
+  if [ -e "$VMBASE" ]; then
+    [ -d "$VMBASE" ] || die "--vm-base exists and is not a directory"
+    OWNER="$(stat -f %Su "$VMBASE")"
+    if [ "$OWNER" != "$SVC" ] && [ -n "$(ls -A "$VMBASE" 2>/dev/null)" ]; then
+      die "--vm-base $VMBASE already exists, is not owned by $SVC and is not empty: refusing to chown -R someone else's data"
+    fi
+  fi
   P="$VMBASE"; while [ ! -e "$P" ]; do P="$(dirname "$P")"; done
   MP="$(df -P "$P" | awk 'NR==2{for(i=6;i<=NF;i++) printf "%s%s",$i,(i<NF?" ":"")}')"
   MLINE="$(mount | grep -F " on $MP (" | head -1)"
@@ -99,6 +115,7 @@ else
   run dscl . -create "/Users/$SVC" NFSHomeDirectory /var/empty
   run dscl . -create "/Users/$SVC" RealName "ASTA VM service"
   run dscl . -create "/Users/$SVC" IsHidden 1
+  run dscl . -create "/Users/$SVC" Password '*'   # no usable password hash: the account cannot authenticate
 fi
 
 # ---------------------------------------------------------------- 2 directories
@@ -109,7 +126,7 @@ run chmod 700 "$REAL" "$REAL/run"
 if [ "$REAL" != "$BASE" ]; then
   if [ -L "$BASE" ] && [ "$(readlink "$BASE")" = "$REAL" ]; then say "symlink present: $BASE -> $REAL"
   elif [ -e "$BASE" ] || [ -L "$BASE" ]; then die "$BASE already exists and is not the expected symlink; resolve by hand"
-  else run ln -s "$REAL" "$BASE"; fi
+  else run mkdir -p "$(dirname "$BASE")"; run ln -s "$REAL" "$BASE"; fi
 fi
 run chown root:wheel "$LIBEXEC"
 run chmod 755 "$LIBEXEC"

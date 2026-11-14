@@ -1,0 +1,46 @@
+[Unit]
+Description=ASTA risk-halt bridge (paper risk halts -> central kill switch; latch-only, never releases)
+After=postgresql.service
+Requires=postgresql.service
+# if the bridge is down for good the order path is already closed (BridgedKillState: stale heartbeat = halt)
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+User=asta-bridge
+Group=asta-bridge
+WorkingDirectory=/var/lib/asta-bridge
+EnvironmentFile=/etc/asta/asta-bridge.env
+ExecStart=/opt/asta/venv/bin/python -m asta.orders.risk_bridge
+# database access over the unix socket only (peer authentication maps asta-bridge -> role asta_bridge)
+IPAddressDeny=any
+RestrictAddressFamilies=AF_UNIX
+PrivateNetwork=yes
+ReadWritePaths=/var/lib/asta-bridge
+CapabilityBoundingSet=
+AmbientCapabilities=
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+ProtectProc=invisible
+RestrictNamespaces=yes
+RestrictRealtime=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@privileged @resources
+UMask=0077
+LimitCORE=0
+Restart=always
+RestartSec=2
+WatchdogSec=60
+
+[Install]
+WantedBy=multi-user.target

@@ -133,3 +133,7 @@ Read `docs/evidence/M3B-DECISION-007.md` (gateway boundary, fill integrity, dura
 
 ## Addendum 2026-11-14 (3): ASTA-M3B-R2
 Read `docs/evidence/M3B-R2.md` (bridge, vault, channel hardening, Docker gate transcripts with image digests, E2E results, High-finding register, host readiness) and `docs/m3b/RISK-HALT-BRIDGE.md`. This package is **not** an independent review and is not signed as one.
+
+
+## Addendum 2026-11-14 (4): ASTA-M3B-R3
+Baseline `a6623a2` plus the R3 commits (local only; remote head `924da22`). Read `docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md` first (High findings, skipped-test classification, scanner-exception review, H1-H8 / C1-C10 / R1-R10 acceptance tests, exact evidence required), then `docs/evidence/M3B-R3.md`, `docs/m3b/MAC-READINESS-AUDIT.md`, `docs/m3b/SECURITY-TOPOLOGY.md`, `docs/m3b/VAULT-AND-BACKUP.md`. Not an independent review; not signed.

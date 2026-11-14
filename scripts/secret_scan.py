@@ -35,10 +35,11 @@ def git(*args: str) -> str:
 
 def scan(label: str, text: str, findings: list[str]) -> None:
     for i, line in enumerate(text.splitlines(), 1):
-        if any(a in line for a in ALLOW):
-            continue
         for name, pat in PATTERNS.items():
-            if pat.search(line):
+            m = pat.search(line)
+            # an exception applies to the MATCHED text only (M3-B-R3): a real secret on a line that
+            # merely mentions "test-only" in a comment is still a finding
+            if m and not any(a in m.group(0) for a in ALLOW):
                 findings.append(f"{label}:{i}: {name}")
 
 

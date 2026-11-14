@@ -391,3 +391,55 @@ def test_arm64_dependency_audit_matches_the_lockfile():
     wheels = read(ROOT / "docs" / "evidence" / "m3a" / "mac-arm64-runtime-wheels.sha256")
     assert len([ln for ln in wheels.splitlines() if ln.strip() and not ln.startswith("#")]) >= 30
     assert "cryptography" in wheels and "pydantic_core" in wheels and "aarch64" in wheels
+
+
+# ---------------------------------------------------------------- M3-B-R3: bridge supervision units
+def test_bridge_unit_is_hardened_database_socket_only_and_always_restarted():
+    u = unit(MAC / "app-vm" / "asta-risk-bridge.service")
+    assert u["User"] == ["asta-bridge"] and u["Restart"] == ["always"]
+    assert u["PrivateNetwork"] == ["yes"] and u["RestrictAddressFamilies"] == ["AF_UNIX"]
+    assert u["NoNewPrivileges"] == ["yes"] and u["CapabilityBoundingSet"] == [""]
+    assert u["ExecStart"] == ["/opt/asta/venv/bin/python -m asta.orders.risk_bridge"]
+    assert u["StartLimitIntervalSec"] == ["0"]  # never gives up restarting
+
+
+def test_monitor_runs_every_30_seconds_as_its_own_user_and_a_critical_exit_raises_the_alert():
+    s = unit(MAC / "app-vm" / "asta-security-monitor.service")
+    assert s["User"] == ["asta-monitor"] and s["SuccessExitStatus"] == [
+        "0 1"
+    ]  # 2 (critical) fails the unit
+    assert s["OnFailure"] == ["asta-security-alert@%n.service"]
+    t = read(MAC / "app-vm" / "asta-security-monitor.timer")
+    assert "OnUnitActiveSec=30" in t
+    assert (MAC / "app-vm" / "asta-security-alert@.service").exists()
+
+
+def test_the_service_roles_are_distinct_and_the_release_role_runs_no_service():
+    units = [
+        p for p in (MAC / "app-vm").glob("*.service") if p.name != "asta-security-alert@.service"
+    ]
+    users = {p.name: unit(p).get("User", [""])[0] for p in units if "User" in unit(p)}
+    assert users["asta-risk-bridge.service"] != users["asta-paper-service.service"]
+    assert users["asta-security-monitor.service"] not in {
+        users["asta-risk-bridge.service"],
+        users["asta-paper-service.service"],
+    }
+    sql = read(MAC / "app-vm" / "pg_roles_m3b.sql")
+    assert "release_kill_switch" in sql and "TO asta_release" in sql
+    assert not any("asta_release" in read(p) for p in units)  # no daemon runs as the release role
+
+
+def test_every_service_role_has_peer_only_authentication_and_a_distinct_os_user():
+    hba = read(MAC / "app-vm" / "pg_hba.conf.asta")
+    ident = read(MAC / "app-vm" / "pg_ident.conf.asta")
+    roles = (
+        ("asta_bridge", "asta-bridge"),
+        ("asta_orders", "asta-orders"),
+        ("asta_monitor", "asta-monitor"),
+        ("asta_release", "asta-release"),
+    )
+    for role, osuser in roles:
+        assert re.search(rf"local\s+asta\s+{role}\s+peer map=", hba), role
+        assert re.search(rf"{osuser}\s+{role}\b", ident), role
+    active = "\n".join(ln for ln in hba.splitlines() if not ln.startswith("#"))
+    assert not re.search(r"\b(md5|password|trust|scram-sha-256)\b", active)

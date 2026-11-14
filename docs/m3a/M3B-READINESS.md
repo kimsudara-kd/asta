@@ -132,3 +132,10 @@ Every offline item of the order path is now built and proven (fills ledger, amen
 # 2026-11-14 (6) ASTA-M3B-R2
 
 **Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Done: fail-closed risk-halt bridge, synthetic-only vault, channel hardening, all 8 Docker/firewall gates executed and passing, Playwright E2E 39/39 (after one UI fix), gitleaks full history clean, full regression 1,295 passed. Still blocking: F-01, F-02 (dedicated host unprovisioned, needs `sudo` and a separate authorisation), F-03 (no independent review), vault backend/key ceremony (F-05/F-06), bridge supervision (R-D1b), hosted CI, push identity (G-08). Evidence: `docs/evidence/M3B-R2.md`.
+
+
+---
+
+# 2026-11-14 (7) ASTA-M3B-R3
+
+**Status BUILT - NOT ACCEPTED; credential readiness NO-GO.** Mac mini readiness audited (read-only), provisioning script reviewed line by line and hardened (not run), rollback prepared, 2-VM-now topology proposed for the 16 GiB host, bridge supervision made fail closed (heartbeat + monitor + units), least-privilege DB roles tested, OpenBao-transit recommended (unverified artifacts), key ceremony written and rehearsed with synthetic keys, review checklist prepared. Blocking: F-01/F-02/F-03, shared-host H-1, vault backend and ceremony, hosted CI, a separate authorisation. Evidence: `docs/evidence/M3B-R3.md`.

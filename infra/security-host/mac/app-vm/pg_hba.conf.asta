@@ -1,6 +1,10 @@
 # /etc/postgresql/16/main/pg_hba.conf (asta-app): local peer authentication only, no passwords, no TCP
 local   all   postgres                 peer
 local   asta  asta                     peer map=asta
+local   asta  asta_bridge              peer map=bridge
+local   asta  asta_orders              peer map=orders
+local   asta  asta_monitor             peer map=monitor
+local   asta  asta_release             peer map=release
 local   all   all                      reject
 host    all   all   0.0.0.0/0          reject
 host    all   all   ::/0               reject

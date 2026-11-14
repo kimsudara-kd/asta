@@ -87,6 +87,14 @@ class RiskHaltBridge:
             db.commit()
             return True
 
+    def _beat(self) -> None:
+        try:
+            with self._sessions() as db:
+                db.execute(text("SELECT bridge_heartbeat()"))
+                db.commit()
+        except Exception:  # noqa: BLE001, S110 - a missed beat only makes the gate stricter
+            pass
+
     def _latched(self) -> bool:
         try:
             with self._sessions() as db:
@@ -121,6 +129,7 @@ class RiskHaltBridge:
                     rep.tripped.append(key)
             return rep
         self._failures = 0
+        self._beat()  # alive and able to read: a stale heartbeat closes the gate (BridgedKillState)
         for tid, sid, reason in transitions:
             if self._trip_once(SOURCE_TRANSITION, str(tid), f"session {sid}: {reason or 'halt'}"):
                 rep.tripped.append(f"{SOURCE_TRANSITION}:{tid}")

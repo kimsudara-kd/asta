@@ -146,3 +146,9 @@ class RiskHaltBridgeSeen(Base):
     event_key: Mapped[str] = mapped_column(String(96))
     detail: Mapped[str] = mapped_column(Text)
     seen_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class RiskHaltBridgeHeartbeat(Base):
+    __tablename__ = "risk_halt_bridge_heartbeat"
+    id: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
+    beat_at: Mapped[datetime] = mapped_column(TS)

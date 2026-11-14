@@ -72,3 +72,21 @@ def test_the_e2e_runner_creates_disposable_credentials_and_deletes_them():
     assert "DROP DATABASE IF EXISTS asta_e2e" in run  # the users disappear with the database
     gi = (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "data/" in gi and "*.key" in gi and ".env" in gi
+
+
+def test_the_secret_scanner_exception_applies_to_the_matched_text_not_the_whole_line():
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "scripts"))
+    import secret_scan
+
+    found: list[str] = []
+    secret_scan.scan("t", 'x = "' + "Ab1" * 21 + 'A" # api key (test-only note)', found)
+    assert found, "a key-shaped value on a line that merely says test-only must still be a finding"
+    found = []
+    secret_scan.scan("t", 'ASTA_SECRET_KEY = "test-only-secret-key-not-a-real-secret"', found)
+    assert not found  # the reviewed test credential itself is still allowed
+    found = []
+    secret_scan.scan("t", 'k = "Bkq3ZtYw9mNpXr2L' + "x" * 48 + '"  # api', found)
+    assert not found  # the one reviewed historical vector

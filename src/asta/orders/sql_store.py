@@ -434,3 +434,38 @@ class SqlKillSwitch:
                 text("SELECT action, cause, actor FROM kill_switch_events ORDER BY id")
             ).all()
         return [(str(a), None if c is None else str(c), str(b)) for a, c, b in rows]
+
+
+class BridgedKillState:
+    """The kill state the order path must be built with in any real deployment: latched OR the
+    risk-halt bridge is not alive. A missing, stale or unreadable heartbeat counts as a halt, so the
+    death of the bridge can never leave the order path open (fail closed)."""
+
+    durable = True
+
+    def __init__(
+        self,
+        kill: SqlKillSwitch,
+        sessions: sessionmaker[Session],
+        max_heartbeat_age_s: float = 30.0,
+    ) -> None:
+        self._kill, self._sessions, self._max_age = kill, sessions, max_heartbeat_age_s
+
+    def heartbeat_age(self) -> float | None:
+        try:
+            with self._sessions() as db:
+                v = db.execute(
+                    text(
+                        "SELECT extract(epoch FROM now() - beat_at)"
+                        " FROM risk_halt_bridge_heartbeat WHERE id = 1"
+                    )
+                ).scalar_one_or_none()
+            return None if v is None else float(v)
+        except Exception:  # noqa: BLE001
+            return None
+
+    def active(self) -> bool:
+        age = self.heartbeat_age()
+        if age is None or age > self._max_age or age < -5:  # unreadable / stale / clock nonsense
+            return True
+        return self._kill.active()

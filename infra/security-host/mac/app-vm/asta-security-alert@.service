@@ -1,0 +1,11 @@
+[Unit]
+Description=ASTA security alert for %i (writes a CRITICAL line to the journal and the alert spool)
+
+[Service]
+Type=oneshot
+User=asta-monitor
+ExecStart=/bin/sh -c 'logger -p auth.crit -t asta-security "CRITICAL: %i failed"; echo "$(date -u +%%FT%%TZ) %i" >> /var/lib/asta-monitor/alerts.log'
+ReadWritePaths=/var/lib/asta-monitor
+NoNewPrivileges=yes
+ProtectSystem=strict
+PrivateNetwork=yes

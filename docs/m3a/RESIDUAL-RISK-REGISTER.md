@@ -47,3 +47,16 @@ G-01 **closed (offline scope)** - mandatory gateway boundary, import-graph and b
 
 ## ASTA-M3B-R2 status update (2026-11-14; detail `docs/evidence/M3B-R2.md`)
 G-02 **closed** (vault refuses non-synthetic values). G-04 Low items **closed** (no pre-auth JSON parse, per-receiver key allowlist). G-06 **closed**: all 8 Docker/firewall gates executed and passing on the Mac (Docker-VM boundary; scope limits stated). R-D1 logic **closed**; **R-D1b (Med) open**: the bridge process is not supervised/deployed. New note **N-1 (Low)**: market-data WebSockets fail TLS verification under the uv Python on this host unless `SSL_CERT_FILE` points at certifi's bundle (operator configuration). **F-01, F-02, F-03 remain OPEN (High).**
+
+## ASTA-M3B-R3 additions (2026-11-14; detail `docs/evidence/M3B-R3.md`)
+| ID | Sev | Risk | Owner | Status |
+|---|---|---|---|---|
+| H-1 | High-adjacent | the Mac is a shared workstation (unrelated Docker projects with all-interface ports, `exo`, Tailscale, cloud-sync updaters, same admin account); firewall off | CEO | OPEN (D-A); part of F-01/F-19 |
+| H-2 | Med | 8 GiB VM design vs a contended 16 GiB host, 60 GiB free | Eng | mitigated by the 2-VM-now topology; measure in Phase C |
+| P-5 | Med | Homebrew QEMU binary writable by the admin account | Eng | OPEN |
+| P-7 | Med | `--firewall` breaks unrelated listeners | CEO | OPEN (D-A) |
+| G-10 | Med | releaser identity is a parameter, not `session_user` | Eng | OPEN |
+| G-11 | Low | latch-clear guard honours a custom setting (only roles with table UPDATE) | Eng | accepted |
+| S-2 | Low | five stale `.gitleaksignore` fingerprints | CEO | OPEN |
+| D-F | decision | FileVault vs unattended reboot | CEO | OPEN |
+Closed in R3: P-1..P-4 (provisioning script), S-1 (scanner exception scope). R-D1b: units written, process not deployed, **now fail closed** (dead bridge closes the gate). **F-01, F-02, F-03 remain OPEN (High).**
