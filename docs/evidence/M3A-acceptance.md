@@ -295,3 +295,7 @@ gitleaks 8.30.1 (official arm64 release, checksum verified) over 73 commits repo
 
 ## MAC-A8. External SSD assessment and `--vm-base` safety check (2026-11-14, read-only inspection)
 The attached USB SSD (4 TB, 3.4 TB free, 613 GB already in use) is **exFAT mounted `noowners`**: it cannot enforce the file ownership/permissions that isolate the VM disks, so VM disks must not be placed there (age-encrypted backups may). Nothing on the disk was read beyond mount/size facts or modified, and it is not proposed to be reformatted. `provision-host.sh --vm-base DIR` now refuses any base on a non-APFS/HFS+ volume or a `noowners` mount (verified by dry run: exFAT refused; the other external APFS volume refused with the `diskutil enableOwnership` hint; the internal APFS volume accepted). Tests: 2 added. `--apply` still has not been run (needs `sudo`).
+
+## MAC-A9. Backup-to-external-SSD script (2026-11-14)
+`infra/security-host/mac/backup-image-to-external.sh` + 6 executed tests (copy verified by SHA-256, retention only on its own file pattern, unrelated files untouched, refuses an unmounted volume, a destination outside `/Volumes`, and an image still open by the VM). Dry-run against the real external volume wrote nothing. **Not run for real**: there is no backup image yet (the VMs are not provisioned); the age key custody (offline private key) is an owner action. F-01/F-02/F-03 unchanged.
+
