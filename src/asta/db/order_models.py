@@ -13,10 +13,12 @@ from decimal import Decimal
 
 from sqlalchemy import (
     BigInteger,
+    Boolean,
     ForeignKey,
     Index,
     Integer,
     PrimaryKeyConstraint,
+    SmallInteger,
     String,
     Text,
     UniqueConstraint,
@@ -83,3 +85,55 @@ class OrderFill(Base):
     fee: Mapped[Decimal] = mapped_column(NUM)
     fee_asset: Mapped[str] = mapped_column(String(16))
     recorded_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class KillSwitchState(Base):
+    __tablename__ = "kill_switch_state"
+    id: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
+    active: Mapped[bool] = mapped_column(Boolean)
+    updated_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class KillSwitchEvent(Base):
+    __tablename__ = "kill_switch_events"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+    action: Mapped[str] = mapped_column(String(8))
+    cause: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    actor: Mapped[str] = mapped_column(String(64))
+    reason: Mapped[str] = mapped_column(Text)
+
+
+class KillSwitchReleaser(Base):
+    __tablename__ = "kill_switch_releasers"
+    name: Mapped[str] = mapped_column(String(64), primary_key=True)
+    added_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class OrderFillConflict(Base):
+    __tablename__ = "order_fill_conflicts"
+    __table_args__ = (Index("ix_order_fill_conflicts_decision", "decision_id"),)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    decision_id: Mapped[str] = mapped_column(ForeignKey("order_intents.decision_id"))
+    trade_id: Mapped[str] = mapped_column(String(64))
+    kind: Mapped[str] = mapped_column(String(16))
+    detail: Mapped[str] = mapped_column(Text)
+    existing: Mapped[str | None] = mapped_column(Text, nullable=True)
+    offered: Mapped[str] = mapped_column(Text)
+    at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class ChannelSender(Base):
+    __tablename__ = "channel_senders"
+    sender: Mapped[str] = mapped_column(String(64), primary_key=True)
+    high_seq: Mapped[int] = mapped_column(BigInteger, server_default="0")
+    updated_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class ChannelNonce(Base):
+    __tablename__ = "channel_nonces"
+    __table_args__ = (PrimaryKeyConstraint("sender", "nonce"),)
+    sender: Mapped[str] = mapped_column(ForeignKey("channel_senders.sender"))
+    nonce: Mapped[str] = mapped_column(String(128))
+    expires_at: Mapped[int] = mapped_column(BigInteger)
+    accepted_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())

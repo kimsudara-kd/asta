@@ -12,7 +12,7 @@ refused with a reason code and never reaches the dispatcher.
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Protocol
 
@@ -30,6 +30,46 @@ class Authenticator(Protocol):
     def tag_for(self, key_id: str, payload: bytes) -> bytes: ...
 
     def verify(self, key_id: str, payload: bytes, tag: bytes) -> bool: ...
+
+
+class FailClosedAuthenticator:
+    """The ONLY authenticator shipped in this repository: it authenticates nothing. With it every
+    message is refused: the required state until a reviewed implementation exists (M3-B)."""
+
+    def tag_for(self, key_id: str, payload: bytes) -> bytes:
+        raise NotImplementedError("no authenticator exists in this build")
+
+    def verify(self, key_id: str, payload: bytes, tag: bytes) -> bool:
+        return False
+
+
+class ReplayStore(Protocol):
+    """Replay/expiry state. ``accept`` is atomic: it either records (sender, seq, nonce) and returns
+    "" or returns a refusal reason and changes nothing. ``durable`` must be True in any real use."""
+
+    durable: bool
+
+    def accept(self, sender: str, seq: int, nonce: str, expires_at: int, now: int) -> str: ...
+
+
+class MemoryReplayStore:
+    """Process-local state, tests only: a restart forgets it, so Receiver refuses it by default."""
+
+    durable = False
+
+    def __init__(self) -> None:
+        self._last_seq: dict[str, int] = {}
+        self._nonces: list[tuple[str, str]] = []
+
+    def accept(self, sender: str, seq: int, nonce: str, expires_at: int, now: int) -> str:
+        if seq <= self._last_seq.get(sender, 0):
+            return "REPLAYED_OR_OUT_OF_ORDER"
+        if (sender, nonce) in self._nonces:
+            return "NONCE_REUSED"
+        self._last_seq[sender] = seq
+        self._nonces.append((sender, nonce))
+        del self._nonces[:-MAX_NONCE_MEMORY]
+        return ""
 
 
 @dataclass(frozen=True)
@@ -90,15 +130,22 @@ def _opt_dec(v: object) -> Decimal | None:
 
 @dataclass
 class Receiver:
-    """Credential-side checks. Holds replay state; one instance per channel endpoint."""
+    """Credential-side checks. Replay and expiry state lives in a ReplayStore, which must be durable
+    (a process restart must never re-accept a message) unless ``require_durable`` is turned off,
+    which only the unit tests do."""
 
     auth: Authenticator
     allowed_senders: frozenset[str]
-    clock: int = 0  # not used; the caller passes ``now`` explicitly (deterministic)
+    replay: ReplayStore
     max_skew_seconds: int = 30
     max_validity_seconds: int = 60
-    _last_seq: dict[str, int] = field(default_factory=dict)
-    _nonces: list[str] = field(default_factory=list)
+    require_durable: bool = True
+
+    def __post_init__(self) -> None:
+        if self.require_durable and not getattr(self.replay, "durable", False):
+            raise ValueError(
+                "the replay store must be durable (a restart would re-accept messages)"
+            )
 
     def open(self, wire: bytes, now: int) -> tuple[Envelope | None, str]:
         """(envelope, "") if accepted, else (None, REASON). Replay state changes only on accept."""
@@ -132,17 +179,13 @@ class Receiver:
             return None, "EXPIRED"
         if env.issued_at > now + self.max_skew_seconds:
             return None, "FROM_THE_FUTURE"
-        if env.seq <= self._last_seq.get(env.sender, 0):
-            return None, "REPLAYED_OR_OUT_OF_ORDER"
-        if env.nonce in self._nonces:
-            return None, "NONCE_REUSED"
         try:
             env.intent.validate()
         except ValueError:
             return None, "INTENT_INVALID"
-        self._last_seq[env.sender] = env.seq
-        self._nonces.append(env.nonce)
-        del self._nonces[:-MAX_NONCE_MEMORY]
+        why = self.replay.accept(env.sender, env.seq, env.nonce, env.expires_at, now)
+        if why:
+            return None, why
         return env, ""
 
     @staticmethod

@@ -22,6 +22,9 @@ class Trigger(StrEnum):
     CLOCK_SKEW = "CLOCK_SKEW"
     EXCHANGE_RESET = "EXCHANGE_RESET"  # testnet reset detected: stop until a human re-baselines
     RATE_LIMIT_BAN = "RATE_LIMIT_BAN"
+    FILL_CONFLICT = "FILL_CONFLICT"  # a different trade under a stored trade id
+    FILL_REJECTED = "FILL_REJECTED"  # overfill / outside the limit / wrong order state
+    RECONCILIATION_MISMATCH = "RECONCILIATION_MISMATCH"
 
 
 @dataclass(frozen=True)

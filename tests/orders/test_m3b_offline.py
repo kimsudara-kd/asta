@@ -10,7 +10,14 @@ from fractions import Fraction
 
 import pytest
 
-from asta.orders.channel import MAX_BYTES, Envelope, Receiver, payload_bytes, seal
+from asta.orders.channel import (
+    MAX_BYTES,
+    Envelope,
+    MemoryReplayStore,
+    Receiver,
+    payload_bytes,
+    seal,
+)
 from asta.orders.clockguard import SkewPolicy, estimate, verdict
 from asta.orders.fills import Fill, FillBook, consistency
 from asta.orders.halts import KillSwitch, Trigger
@@ -27,7 +34,7 @@ from asta.orders.reconcile import (
     reconcile_orders,
 )
 from asta.orders.replace import build_replacement, may_replace, replacement_tag
-from tests.orders.fakes import make_intent
+from tests.orders.fakes import gated, make_intent
 
 
 def fill(
@@ -178,7 +185,7 @@ def env(
 @pytest.fixture
 def chan() -> tuple[FakeAuth, Receiver]:
     a = FakeAuth({"k1": b"x" * 32})
-    return a, Receiver(a, frozenset({"app-1"}))
+    return a, Receiver(a, frozenset({"app-1"}), MemoryReplayStore(), require_durable=False)
 
 
 def test_a_valid_message_round_trips(chan):
@@ -438,7 +445,7 @@ def test_after_chaos_and_recovery_the_books_reconcile_with_zero_findings():
         )
         store, k = MemoryStore(), KillSwitch()
         d = Dispatcher(
-            ex,
+            gated(ex),
             store,
             lim,
             lambda k=k: DayState(0, D(0), k.active),
