@@ -110,7 +110,7 @@ def _deadman(tmp: Path, stamp: str | None, key: bytes = KEY) -> tuple[int, str]:
     return r.returncode, url
 
 
-@pytest.mark.skipif(shutil.which("openssl") is None, reason="openssl not installed")
+@pytest.mark.skipif(shutil.which("python3") is None, reason="python3 not installed")
 def test_deadman_pings_only_for_a_fresh_authentic_healthy_app_stamp(tmp_path: Path):
     good = alerting.make_stamp(KEY, [])
     first = tmp_path / "a"

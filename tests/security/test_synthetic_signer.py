@@ -3,17 +3,25 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 import pickle
+import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
-from asta.security import signer as sg
+_PATH = Path(__file__).parents[2] / "proposals/binance_testnet_signer/signer.py"
+_spec = importlib.util.spec_from_file_location("staged_signer", _PATH)
+assert _spec and _spec.loader
+sg: Any = importlib.util.module_from_spec(_spec)
+sys.modules["staged_signer"] = sg  # dataclasses need the module registered
+_spec.loader.exec_module(sg)
 
 NOW = 1_800_000_000_000
 
 
-def _req(s: sg.Signer, **kw):
+def _req(s: Any, **kw: Any) -> Any:
     return sg.build_signed_request(
         s, "POST", "/api/v3/order", {"symbol": "BTCUSDT", "side": "BUY", "type": "LIMIT"}, NOW, **kw
     )
@@ -102,7 +110,7 @@ def test_nothing_secret_reaches_repr_audit_or_pickle():
 
 
 def test_the_module_has_no_network_or_credential_loading_code():
-    src = Path(sg.__file__).read_text(encoding="utf-8")
+    src = Path(str(sg.__file__)).read_text(encoding="utf-8")
     tree = ast.parse(src)
     imported = {
         a.name.split(".")[0] for n in ast.walk(tree) if isinstance(n, ast.Import) for a in n.names
@@ -125,3 +133,9 @@ def test_the_module_has_no_network_or_credential_loading_code():
         and "load_pem_private_key" not in src
         and "from_private_bytes" not in src
     )
+
+
+def test_the_signer_is_staged_outside_src_and_the_live_lock_ban_still_covers_src():
+    src = Path(__file__).parents[2] / "src"
+    assert not any("X-MBX-APIKEY" in p.read_text(encoding="utf-8") for p in src.rglob("*.py"))
+    assert _PATH.is_file() and "src" not in _PATH.relative_to(Path(__file__).parents[2]).parts

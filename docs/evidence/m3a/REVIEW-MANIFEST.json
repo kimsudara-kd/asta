@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "a8ed63b7f9ede01b7b7727f8c97282335ce9f37d",
+ "generated_from_commit": "8a79a75b9f23a653abe1980b7f2d22d0873fe430",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -31,6 +31,10 @@
    "sha256": "a60c626a687a320d12fe2322ce9e8b6753e42b3b6f106dc5c618cc46ba2c1dda"
   },
   {
+   "path": "docs/evidence/M3B-FINAL-EXECUTION-REGISTER.md",
+   "sha256": "c126893d0125904edefc103fa761c7a856786811b050386438d26f745b30e8e4"
+  },
+  {
    "path": "docs/evidence/M3B-GOVERNANCE-01.md",
    "sha256": "05efebcb88e132d152c04b1463a2e30adc5db5e429d43f2e72c2efba5c956bf8"
   },
@@ -49,6 +53,10 @@
   {
    "path": "docs/evidence/M3B-R5.md",
    "sha256": "49828ca0e340235c31cdcccb4938e4c1195dc279d6893009dd18e08dd58c4b7f"
+  },
+  {
+   "path": "docs/evidence/M3B-R6.md",
+   "sha256": "6f6de70cd58ab4cf172493f8b9cbe6fb916ee5ad231d001c1110d50de3b18aa5"
   },
   {
    "path": "docs/evidence/m3a/capability-probe.json",
@@ -279,6 +287,10 @@
    "sha256": "bccd321448951a09a9dc7ea7e4086a019253d22ab656252aea024de40d41c97f"
   },
   {
+   "path": "docs/evidence/m3b-final/host-posture-2026-11-14.json",
+   "sha256": "9973fff3c31cb5ad3b3b388a4cf1d6a8ed687753a6a94e3f3794268c65a41ddb"
+  },
+  {
    "path": "docs/m3a/CREDENTIAL-HYGIENE.md",
    "sha256": "046976197b93e5e52889063c88472adfe13dedbc22a72bef45a536ddc971d886"
   },
@@ -343,6 +355,10 @@
    "sha256": "257cbcdb9836f2a90701f36cb4c829b928e0f0849564714dd572a6da3d40d4ca"
   },
   {
+   "path": "docs/m3b/BINANCE-TESTNET-ACTIVATION-PLAN.md",
+   "sha256": "a844f61c9cf7f08852fa53982761f4f6dc786bf0a08b16ea26b4879b38c5b212"
+  },
+  {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
    "sha256": "96dbe9f24f2a7359eb104ff37c5e530463259eb0135ca59ed36cbf7996378107"
   },
@@ -351,12 +367,20 @@
    "sha256": "bd045a68b800bfca9122d5cb5f2807cd83a585b3072f0b9883711ab1eb47f9a4"
   },
   {
+   "path": "docs/m3b/DOCKER-STORAGE-RECOVERY-PACKAGE.md",
+   "sha256": "5a9c326c514d8699757e4deaa1a6c65bfc1ae0d0d829d3d609efb2871f151d07"
+  },
+  {
    "path": "docs/m3b/GITLEAKS-EXCEPTIONS-REVIEW.md",
    "sha256": "c0df0a7183d40649ad9e4626393188b6e0dcf5732e36aa07cd5a70375e09bc2e"
   },
   {
    "path": "docs/m3b/HOST-DEDICATION-INVENTORY.md",
    "sha256": "9ced0f1c31f94c2b6c16ebd507988c459cb283454e6894b44c1ed272788cd5bd"
+  },
+  {
+   "path": "docs/m3b/HOST-HARDENING-CHANGESET.md",
+   "sha256": "abdfa7961f4c60883c6734670bd8acbca0df51e837529bb4233ebbf0f7665c43"
   },
   {
    "path": "docs/m3b/HOST-HARDENING-RUNBOOK.md",
@@ -387,12 +411,16 @@
    "sha256": "08db1df27189406502a6392d4cd48c6d1b5c8b8e344064d96e28531f71c41353"
   },
   {
+   "path": "docs/m3b/PUBLISH-PLAN.md",
+   "sha256": "5ed519949077a30cac44dcc0b332f23085e2518c9f60d4974e65876adfa80099"
+  },
+  {
    "path": "docs/m3b/RISK-HALT-BRIDGE.md",
    "sha256": "69604b8f39c4384045d1b2390826679f974f464433606d0501874550c5acaefb"
   },
   {
    "path": "docs/m3b/SECURITY-EVENTS-AND-ALERTS.md",
-   "sha256": "14e1499f18359cd21ea28d0c78f635346281da3d55afff7e9d688f346c236f31"
+   "sha256": "1bb25773e4859a9472c5282d4dd7c80bb03d744f8c02a3c808572b8255e7f1f0"
   },
   {
    "path": "docs/m3b/SECURITY-TOPOLOGY.md",
@@ -608,7 +636,7 @@
   },
   {
    "path": "infra/security-host/mac/firewall-vm/asta-deadman.sh",
-   "sha256": "74d5dc77ad5e8681d0049816d215195cc2800625243bf159d1bd06900c875089"
+   "sha256": "8bfb437c953af34433557cf9c0fbf7720da47badab5fb779a4725f6dd51101c9"
   },
   {
    "path": "infra/security-host/mac/firewall-vm/asta-deadman.timer",
@@ -771,6 +799,14 @@
    "sha256": "1eb071bc2e394dbfbcdafc4b4ef0c4ae97b233ff2838fd0b2987fcd2531ff60c"
   },
   {
+   "path": "proposals/binance_testnet_signer/README.md",
+   "sha256": "1fdc5a9f7ceed880e9ed618c8e64a4fdef878c5d7b51964350f3d0a211e6f6fd"
+  },
+  {
+   "path": "proposals/binance_testnet_signer/signer.py",
+   "sha256": "84c0cb8fe1737108344f165beb620cec78d110732ca4b6252af63a61dfedbc0d"
+  },
+  {
    "path": "scripts/ci_skip_guard.py",
    "sha256": "d8b22d8147b10799aa42cb87391423debf21434fbdb106675c97073ce87b6beb"
   },
@@ -779,8 +815,24 @@
    "sha256": "a10ba2d12173bc4fe175245cbd31f7eebb16c157d5ecd06637da83862afd90ac"
   },
   {
+   "path": "scripts/history_scrub.py",
+   "sha256": "ea5205d6110d2ddbbf59aa2e07d30912ebc0ba24c0bb81384626c465b72d5608"
+  },
+  {
+   "path": "scripts/host_posture.py",
+   "sha256": "2c5361a20f44da1087349b13b242be2f83befd37ed278166eb151f25238a6b45"
+  },
+  {
+   "path": "scripts/paper_integrity.py",
+   "sha256": "68e7bf4fe15354a94c9005b22913f64fdc246dffecd8dde552c801fe12c5df60"
+  },
+  {
+   "path": "scripts/privacy_scan.py",
+   "sha256": "a24be142dbebef426e9db2f221741cb6f8d3c39de0ed95bbaa2f343126a9ec16"
+  },
+  {
    "path": "scripts/review_manifest.py",
-   "sha256": "178602c07e017ce30c8ea46fa841317f907aeb8177d9101e9ff2263eab557d89"
+   "sha256": "2bd3d59fe3e0767cfbf248ea681f24b783559f8e17a78a728761a3fc80e7a255"
   },
   {
    "path": "scripts/secret_scan.py",
@@ -800,7 +852,7 @@
   },
   {
    "path": "src/asta/orders/alerting.py",
-   "sha256": "6f421b038239b39b773a905b0a779a02101d39010e8326baa07c609f15550781"
+   "sha256": "872ac11a1937e9c6fd0a4243eb829049755c8b0997d410554443b1cdd2cb4508"
   },
   {
    "path": "src/asta/orders/boundary.py",
@@ -879,10 +931,6 @@
    "sha256": "1ca46373152e710362ce134a67226793da59f77b4b32556a7e8a10e49d15a534"
   },
   {
-   "path": "src/asta/security/signer.py",
-   "sha256": "84c0cb8fe1737108344f165beb620cec78d110732ca4b6252af63a61dfedbc0d"
-  },
-  {
    "path": "src/asta/security/vault.py",
    "sha256": "637dae5e4a121753d2ca90d672b969f5f1c9278a9ed11a822536bb5ef7398414"
   },
@@ -893,6 +941,10 @@
   {
    "path": "tests/integration/test_m3b_integrity.py",
    "sha256": "b64894f96b6df8bb66ecd3f8f49354d58840015828230d42327571d776728bfc"
+  },
+  {
+   "path": "tests/integration/test_offhost_alerts.py",
+   "sha256": "ca5cf9bb14ba67af5c02b15ae028f0916ba58fd1869a788b83d9c8b5574302e0"
   },
   {
    "path": "tests/integration/test_risk_bridge.py",
@@ -989,6 +1041,14 @@
   {
    "path": "tests/orders/test_order_path.py",
    "sha256": "313cdcd4a9d605e60efc6e139c3e2f7a8c73e1b6e1c0d934cba89954a72f5ade"
+  },
+  {
+   "path": "tests/paper/test_integrity_script.py",
+   "sha256": "619c501a1463731a92910d85fd13d64caddafc49a4f2711a8faf2a40fb4a412a"
+  },
+  {
+   "path": "tests/security/test_synthetic_signer.py",
+   "sha256": "4497682095d83a83ac68e4a7a7348fe98840e65e4e7fa37b985d3f8d3d427722"
   }
  ]
 }

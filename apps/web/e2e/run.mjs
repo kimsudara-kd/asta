@@ -51,6 +51,11 @@ function run(cmd, args, opts = {}) {
   if (r.status !== 0) throw new Error(`${cmd} ${args.join(" ")} -> exit ${r.status}`);
 }
 function psql(sql) {
+  // E2E_PSQL=<path to psql>: use a local PostgreSQL (e.g. scripts/dev_pg_tcp.sh on 5640) instead of the Docker container
+  if (process.env.E2E_PSQL) {
+    const u = new URL(pgBase.replace("postgresql+pg8000://", "postgresql://"));
+    return spawnSync(process.env.E2E_PSQL, ["-h", u.hostname, "-p", u.port, "-U", decodeURIComponent(u.username), "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-c", sql], { stdio: "inherit", env: { ...process.env, PGPASSWORD: decodeURIComponent(u.password) } });
+  }
   return spawnSync("docker", ["exec", "asta-db-test", "psql", "-U", "asta_test", "-d", "postgres", "-v", "ON_ERROR_STOP=1", "-c", sql], { stdio: "inherit" });
 }
 function start(name, cmd, args, opts) {

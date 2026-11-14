@@ -51,6 +51,21 @@ SCOPES = [
     "tests/integration/test_risk_bridge.py",
     "tests/integration/test_bridge_supervision.py",
     "scripts/secret_scan.py",
+    # M3-B-FINAL
+    "docs/evidence/M3B-R6.md",
+    "docs/evidence/M3B-FINAL-ACCEPTANCE.md",
+    "docs/evidence/M3B-FINAL-GATE-MATRIX.md",
+    "docs/evidence/M3B-FINAL-CEO-DECISION-PACK.md",
+    "docs/evidence/M3B-FINAL-EXECUTION-REGISTER.md",
+    "docs/evidence/m3b-final",
+    "proposals",
+    "tests/security",
+    "tests/paper/test_integrity_script.py",
+    "tests/integration/test_offhost_alerts.py",
+    "scripts/paper_integrity.py",
+    "scripts/host_posture.py",
+    "scripts/history_scrub.py",
+    "scripts/privacy_scan.py",
 ]
 
 

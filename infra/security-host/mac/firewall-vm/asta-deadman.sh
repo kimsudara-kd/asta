@@ -20,7 +20,7 @@ systemctl is-active --quiet asta-egress-proxy.service || ok=0
 [ "$(cat /proc/sys/net/ipv4/ip_forward 2>/dev/null)" = 0 ] || ok=0
 # G-13: the APPLICATION must also be alive. asta-app writes a signed status stamp (asta.orders.alerting) over the
 # one-way status feed; a missing, stale, forged or critical stamp turns the heartbeat into a /fail signal, and a dead
-# app VM stops refreshing it. Key: /etc/asta-egress/status.key (root-only, ASCII, shared with the monitor only).
+# app VM stops refreshing it. Key: /etc/asta-egress/status.key (root-only, 16..64 ASCII bytes, shared with the monitor only; keyed BLAKE2b MAC).
 STAMP="${STATUS_FILE:-/var/lib/asta-egress/app-status}"
 SKEY="${STATUS_KEY_FILE:-/etc/asta-egress/status.key}"
 app_ok() {
@@ -31,7 +31,7 @@ app_ok() {
   codes="${line#* codes=}"; codes="${codes%% mac=*}"
   mac="${line##* mac=}"
   case "$ts$okf" in *[!0-9]*|"") return 1 ;; esac
-  want="$(printf 'ts=%s;ok=%s;codes=%s' "$ts" "$okf" "$codes" | openssl dgst -sha256 -hmac "$(tr -d '\n' < "$SKEY")" -r | cut -d' ' -f1)"
+  want="$(printf 'ts=%s;ok=%s;codes=%s' "$ts" "$okf" "$codes" | python3 -c 'import hashlib,sys;k=open(sys.argv[1],"rb").read().strip();print(hashlib.blake2b(sys.stdin.buffer.read(),key=k,digest_size=32).hexdigest())' "$SKEY" 2>/dev/null)"
   [ "$want" = "$mac" ] || return 1
   now="$(date +%s)"
   [ $((now - ts)) -le 120 ] && [ $((ts - now)) -le 120 ] && [ "$okf" = 1 ]

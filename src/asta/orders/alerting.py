@@ -14,8 +14,8 @@
 from __future__ import annotations
 
 import hashlib
-import hmac
 import json
+import secrets
 import time
 import urllib.request
 from collections.abc import Callable
@@ -75,7 +75,9 @@ def extended_checks(
 # ------------------------------------------------------------------ signed status stamp
 def _mac(key: bytes, ts: int, ok: bool, codes: list[str]) -> str:
     msg = f"ts={ts};ok={int(ok)};codes={','.join(codes)}".encode()
-    return hmac.new(key, msg, hashlib.sha256).hexdigest()
+    if not 16 <= len(key) <= 64:
+        raise ValueError("status key must be 16..64 bytes")
+    return hashlib.blake2b(msg, key=key, digest_size=32).hexdigest()  # keyed BLAKE2b (RFC 7693) MAC
 
 
 def make_stamp(key: bytes, alerts: list[Alert], now: float | None = None) -> str:
@@ -93,7 +95,7 @@ def verify_stamp(key: bytes, stamp: str, now: float | None = None) -> tuple[bool
     except (KeyError, ValueError):
         return False, "MALFORMED"
     expect = _mac(key, ts, ok, [c for c in codes.split(",") if c])
-    if not hmac.compare_digest(expect, mac):
+    if not secrets.compare_digest(expect, mac):
         return False, "NOT_AUTHENTIC"
     t = now if now is not None else time.time()
     if t - ts > STAMP_MAX_AGE_S or ts - t > STAMP_MAX_AGE_S:
