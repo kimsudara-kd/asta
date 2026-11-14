@@ -22,6 +22,7 @@ The already-public commits `1cdb07a` and `23cc022` (before `924da22`) contain **
 rewrite public history (force-push) and does not remove copies already fetched. Recommendation: accept as internal metadata unless the owner wants a forced rewrite (separate decision).
 
 ## Publish steps (owner approval required for each)
+0. After rebuilding the candidate on the final HEAD: `python scripts/review_manifest.py --write`, commit "manifest regenerated" on top of the candidate (the scrubbed docs change four manifest hashes), then rerun all scans and the full suite on the candidate.
 1. Verify bundle sha256 and that the remote head is still `924da22`. 2. `git push origin sanitized:main` is a **fast-forward** (no force). 3. Watch the hosted CI run (29 earlier runs; the new
 `ci.yml` jobs backend/security/egress-boundary/web/required have never run) — CI stays **unverified** until it is green. 4. Keep the private bundle; delete the scratch clone.
 If the owner prefers the local branch to match: `git branch backup/pre-sanitize; git reset --hard origin/main` after the push.

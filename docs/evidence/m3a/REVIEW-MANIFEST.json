@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "91149985d7d7570189152a42c6f40c8c57a80073",
+ "generated_from_commit": "346cae6400d9599bbcec9672d15a7da7593a79c6",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -32,7 +32,7 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-ACCEPTANCE.md",
-   "sha256": "1812e6377428cc65b042174684345e1c9301ce795943b607c228e55ead09e1b9"
+   "sha256": "4348f415ddcadada656a56ea4c7f3c676cd3cf74dff6f3ae23865dc4208461a3"
   },
   {
    "path": "docs/evidence/M3B-FINAL-CEO-DECISION-PACK.md",
@@ -424,7 +424,7 @@
   },
   {
    "path": "docs/m3b/PUBLISH-PLAN.md",
-   "sha256": "5ed519949077a30cac44dcc0b332f23085e2518c9f60d4974e65876adfa80099"
+   "sha256": "a64470916acc145ae6918932b263de9d938520dd6df0bdac0b92859cc2b4357e"
   },
   {
    "path": "docs/m3b/RISK-HALT-BRIDGE.md",
