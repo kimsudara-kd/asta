@@ -17,7 +17,7 @@
 | B-3 | Proxy egress not independently firewalled (F-02) | VM/firewall-level enforcement or reviewer acceptance with compensating controls |
 | B-4 | Real vault backend and custody undefined (F-05, F-06) | select, review and test backend; reviewer key ceremony |
 | B-5 | OKX connectivity/behaviour unverified (R-1, F-04) | lawful route to OKX public hosts (DNS blocker resolved outside ASTA), live re-read of OKX docs, runtime verification of header/`50101` behaviour |
-| B-6 | Duplicate-order controls (F-12) | idempotent client order IDs and signal de-duplication designed and tested before any order |
+| B-6 | Duplicate-order controls (F-12) | idempotent client order IDs and signal de-duplication designed and tested before any order. **Status 2026-11-14: PARTIAL** - deterministic 128-bit decision ids (`order_identity.py`, known-answer pinned, Binance/OKX format-compatible) and an in-memory exact-once gate exist with 17 tests; opt-in repeat guard exists (default OFF). NOT yet: durable UNIQUE-constraint gate, reconciliation by client id, exact-once proof with a connector. |
 | B-7 | R-2 hosted CI never executed; R-11 fee/rule assumptions | at least verify demo exchange rules at runtime in M3-B |
 
 ## 3. Preconditions recommended for a future M3-B authorization
