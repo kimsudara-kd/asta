@@ -75,3 +75,16 @@ Data snapshot 2026-11-13 ~09:10 UTC, `observe-5m` (`489d0990-...`), tables `stra
 4. Reporting: show distinct rejected intents next to raw counts.
 5. Portfolio layer: decide whether six accounts should share one per-asset cap; allocate headroom explicitly.
 All require their own work package, new paper sessions and a fresh evaluation (the M2 sessions and holdout data must not be tuned).
+
+
+---
+
+# Addendum 2026-11-14: opt-in repeated-rejection guard (implements D1 + D2; default OFF)
+
+**Status: implemented, tested, NOT enabled anywhere.** No strategy, risk limit, fee, exposure rule or capital allocation was changed, the risk engine and `core` are untouched, and every existing paper session keeps its configuration hash and replay behaviour (the flag is part of a session's config JSON, and therefore its hash, **only when true**).
+
+* Code: `src/asta/research/sim/repeat_guard.py` (pure rule), engine hook in `Engine._submit` (default `suppress_repeated_rejections=False`), `PaperSessionConfig.suppress_repeated_rejections`, `_Hooks.state_token` (other accounts' fills + open orders).
+* Rule: a BUY refused for a **headroom** reason (`RISK_ASSET_EXPOSURE_CAP`, `RISK_TOTAL_EXPOSURE_CAP`, `INSUFFICIENT_CASH`) is not re-created while the discrete-state fingerprint (fills, open orders, available cash, held quantity, other accounts' fills/open orders) is unchanged and fewer than **12 bars** have passed (5m session: 1 h; 1h session: 12 h). Any change re-arms it immediately; the window covers headroom that opens through price moves alone, so a legitimate entry is delayed by at most 12 bars. Halt, daily-loss, rule, sizing, warm-up and data-quality rejections are never suppressed. The guard only removes orders the risk engine would refuse again; it cannot add exposure.
+* Measured on the project's own 6-account paper scenario (`tests/paper/helpers.py`, 1h bars): orders **6,990 -> 1,537**, headroom refusals **6,807 -> 1,355**, fills **70 -> 70**, final equity identical (1013.3427803600), every account still passes the independent audit, runs are deterministic step for step.
+* Tests: `tests/research/test_repeat_guard.py` (pure rules, engine on/off, ledger unchanged), `tests/paper/test_repeat_guard_runtime.py`; full suite 605 passed. Lookup of the OFF path: `suppressed_repeat` counter and `repeat_guard` are absent, so output is identical to the accepted build.
+* **Still open (not done here):** D4 (strategy sees headroom before submitting), D5 (deterministic client order ids, a prerequisite for M3-B), the six-accounts-share-one-cap design question, and a "distinct rejected intents" report. Enabling the flag requires a **new** paper session (new config hash); it cannot be switched on for the running M2 sessions, and results are not comparable with them. Using it is a separate owner decision.

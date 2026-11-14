@@ -74,6 +74,15 @@ class _Hooks:
     def entry_block_reason(self, symbol: str) -> str | None:
         return self.rt.blocked.get(f"{self.venue}:{symbol}")
 
+    def state_token(self) -> Decimal:
+        """Discrete activity of the OTHER accounts (fills + open orders): used only by the opt-in repeat
+        guard to notice that shared headroom may have changed. Never mark-dependent."""
+        total = 0
+        for k, a in self.rt.active.items():
+            if k != self.key:
+                total += len(a.engine.fills) + sum(len(v) for v in a.engine.open.values())
+        return Decimal(total)
+
 
 class SubAccount:
     def __init__(self, rt: PaperRuntime, spec: AccountSpec, cfg: PaperSessionConfig) -> None:
@@ -103,7 +112,13 @@ class SubAccount:
             checkpoint_every=0,  # the runtime emits its own per-step checkpoint
         )
         self.strategy = build_strategy(spec.strategy_id, spec.params)
-        self.engine = Engine.live(ecfg, self.strategy, risk=risk, hooks=self.hooks)
+        self.engine = Engine.live(
+            ecfg,
+            self.strategy,
+            risk=risk,
+            hooks=self.hooks,
+            suppress_repeated_rejections=cfg.suppress_repeated_rejections,
+        )
         self.began = False
         self.version = REGISTRY[spec.strategy_id].version
         # persistence cursors

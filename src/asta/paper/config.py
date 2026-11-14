@@ -95,6 +95,9 @@ class PaperSessionConfig:
     benchmark_venue: str | None = None
     stale_after_seconds: int = 180  # no complete 1m candle for this long => entries blocked
     checkpoint_every: int = 1
+    #: opt-in (default False): drop repeated identical headroom rejections (repeat_guard.py). Part of the
+    #: config (and its hash) ONLY when True, so every existing session's hash and replay are unchanged.
+    suppress_repeated_rejections: bool = False
 
     # ---------------------------------------------------------------- derived
     @property
@@ -180,6 +183,12 @@ class PaperSessionConfig:
 
     # ---------------------------------------------------------------- serialisation
     def to_json(self) -> dict[str, Any]:
+        out = self._base_json()
+        if self.suppress_repeated_rejections:
+            out["suppress_repeated_rejections"] = True
+        return out
+
+    def _base_json(self) -> dict[str, Any]:
         return {
             "config_version": CONFIG_VERSION,
             "label": LABEL,
@@ -229,6 +238,7 @@ class PaperSessionConfig:
             benchmark_venue=d.get("benchmark_venue"),
             stale_after_seconds=int(d["stale_after_seconds"]),
             checkpoint_every=int(d["checkpoint_every"]),
+            suppress_repeated_rejections=bool(d.get("suppress_repeated_rejections", False)),
         )
 
     def config_hash(self) -> str:

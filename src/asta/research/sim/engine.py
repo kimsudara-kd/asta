@@ -29,6 +29,7 @@ from asta.research.sim.context import (
 from asta.research.sim.execution import ExecutionModel, quote_fill, tick_down, tick_up
 from asta.research.sim.ledger import Ledger, LedgerError, ReconcileReport
 from asta.research.sim.orders import CancelIntent, OrderEvent, OrderIntent, SimFill, SimOrder
+from asta.research.sim.repeat_guard import RepeatRejectionGuard
 from asta.research.sim.risk import RiskEngine, RiskEvent, SimRiskLimits
 from asta.research.strategies.base import Strategy
 from asta.research.types import OrderStatus, OrderType, Side, Timeframe
@@ -99,6 +100,10 @@ class RunResult:
     notes: list[str] = field(default_factory=list)
 
 
+#: opt-in repeat guard re-evaluates a refused intent at least every N bars (5m: 1 h, 1h: 12 h)
+REPEAT_REARM_BARS = 12
+
+
 class PortfolioHooks(Protocol):
     """Optional portfolio-level coordination (M2 paper trading). When absent (every M1 run), the
     engine behaves exactly as before: all limits are judged on this account alone."""
@@ -118,14 +123,21 @@ class Engine:
         on_progress: Callable[[int, int], None] | None = None,
         risk: RiskEngine | None = None,
         hooks: PortfolioHooks | None = None,
+        suppress_repeated_rejections: bool = False,
     ) -> None:
         self.cfg = cfg
         self.hooks = hooks
+        #: opt-in (default OFF = identical to the accepted M1/M2 behaviour), see repeat_guard.py
+        self.repeat_guard: RepeatRejectionGuard | None = (
+            RepeatRejectionGuard() if suppress_repeated_rejections else None
+        )
         self.strategy = strategy
         self.series = series
         self.should_cancel = should_cancel
         self.on_progress = on_progress
         self.tf = timedelta(seconds=cfg.timeframe.seconds)
+        if self.repeat_guard is not None:
+            self.repeat_guard.rearm_after = self.tf * REPEAT_REARM_BARS
         for s in cfg.symbols:
             base, quote = s.split("-")
             if quote != cfg.quote_asset:
@@ -164,6 +176,8 @@ class Engine:
             "duplicate_ignored": 0,
             "orders_total": 0,
         }
+        if self.repeat_guard is not None:
+            self.counters["suppressed_repeat"] = 0
         self.fills_this_step: list[FillView] = []
         self._seq = 0
         self._order_id = 0
@@ -183,9 +197,17 @@ class Engine:
         strategy: Strategy,
         risk: RiskEngine | None = None,
         hooks: PortfolioHooks | None = None,
+        suppress_repeated_rejections: bool = False,
     ) -> Engine:
         """Incrementally driven engine (paper trading): bars arrive through begin()/step()."""
-        return cls(cfg, {s: [] for s in cfg.symbols}, strategy, risk=risk, hooks=hooks)
+        return cls(
+            cfg,
+            {s: [] for s in cfg.symbols},
+            strategy,
+            risk=risk,
+            hooks=hooks,
+            suppress_repeated_rejections=suppress_repeated_rejections,
+        )
 
     # ------------------------------------------------------------------ helpers
     def _base(self, symbol: str) -> str:
@@ -219,11 +241,32 @@ class Engine:
         self.risk.record_rejection(ts, reason, eq)
 
     # ------------------------------------------------------------------ order intake
+    def _guard_fingerprint(self, symbol: str) -> tuple[Decimal, ...]:
+        """Discrete state only (no mark-dependent values): changes on fills, orders opening/closing, cash
+        or held-quantity moves, or the same events in other accounts (hooks.state_token)."""
+        led = self._led()
+        token = getattr(self.hooks, "state_token", None) if self.hooks is not None else None
+        return (
+            Decimal(len(self.fills)),
+            Decimal(sum(len(v) for v in self.open.values())),
+            led.available(self.cfg.quote_asset),
+            led.balance(self._base(symbol)),
+            token() if token is not None else ZERO,
+        )
+
     def _submit(self, intent: OrderIntent, decision_close: datetime, is_warmup: bool) -> None:
         led = self._led()
         if intent.client_id is not None and intent.client_id in self.clients:
             self.counters["duplicate_ignored"] += 1  # idempotent: same key, no second order
             return
+        guard_key: tuple[str, str, str, str] | None = None
+        if self.repeat_guard is not None and intent.side == Side.BUY and not is_warmup:
+            guard_key = (intent.symbol, intent.side.value, intent.type.value, intent.tag)
+            if self.repeat_guard.should_suppress(
+                guard_key, self._guard_fingerprint(intent.symbol), decision_close
+            ):
+                self.counters["suppressed_repeat"] += 1
+                return  # a refusal that cannot have changed: no order, no row, no risk event
         self._order_id += 1
         self.counters["orders_total"] += 1
         sym = intent.symbol
@@ -250,6 +293,10 @@ class Engine:
         def reject(reason: str) -> None:
             order.transition(OrderStatus.REJECTED, self._next_seq(), decision_close, reason)
             self._reject(decision_close, reason)
+            if guard_key is not None and self.repeat_guard is not None:
+                self.repeat_guard.record_rejection(
+                    guard_key, reason, self._guard_fingerprint(intent.symbol), decision_close
+                )
 
         order.events.append(
             OrderEvent(self._next_seq(), decision_close, order.order_id, OrderStatus.CREATED, "")
@@ -336,6 +383,8 @@ class Engine:
         order.transition(OrderStatus.VALIDATED, self._next_seq(), decision_close)
         order.transition(OrderStatus.SIMULATED_OPEN, self._next_seq(), decision_close)
         self.open[sym].append(order)
+        if guard_key is not None and self.repeat_guard is not None:
+            self.repeat_guard.record_accepted(guard_key)
 
     def _cancel(self, client_id: str, ts: datetime, reason: str = "STRATEGY_CANCEL") -> None:
         oid = self.clients.get(client_id)
