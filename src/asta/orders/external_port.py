@@ -15,9 +15,11 @@ from __future__ import annotations
 
 import secrets
 from collections.abc import Callable
+from decimal import Decimal
 
 from asta.orders.channel import Authenticator
-from asta.orders.extwire import Reply, Request, open_reply, seal_request
+from asta.orders.extwire import NO_ORDER_ID, Reply, Request, open_reply, seal_request
+from asta.orders.fills import Fill
 from asta.orders.lifecycle import Intent, State
 from asta.orders.ports import (
     CancelOutcome,
@@ -29,6 +31,7 @@ from asta.orders.ports import (
 )
 
 Channel = Callable[[bytes], bytes]
+BALANCE_SYMBOL = "BTC-USDT"  # BALANCES is about the account; the symbol only passes the allow-list
 
 
 class NotSent(Exception):
@@ -59,7 +62,7 @@ class ExternalChannelPort:
         return self._seq
 
     def _roundtrip(
-        self, op: str, client_id: str, symbol: str, intent: Intent | None
+        self, op: str, client_id: str, symbol: str, intent: Intent | None, skip: int = 0
     ) -> Reply | None:
         now = int(self._clock())
         req = Request(
@@ -73,6 +76,7 @@ class ExternalChannelPort:
             client_id=client_id,
             symbol=symbol,
             intent=intent,
+            skip=skip,
         )
         try:
             sealed = seal_request(req, self._auth)
@@ -119,6 +123,37 @@ class ExternalChannelPort:
             except ValueError:
                 return QueryResult(QueryKind.UNAVAILABLE)
         return QueryResult(kind)
+
+    # ---------------------------------------------- read-only: trades and balances (reconciliation)
+    def trades(self, client_id: str, skip: int = 0) -> tuple[QueryKind, list[Fill], bool]:
+        """One page of the venue's trades of this order (oldest first) after ``skip`` received.
+
+        FOUND with [] means the order has no trade; anything unreadable is UNAVAILABLE."""
+        sym = self._symbols.get(client_id)
+        if sym is None:
+            return QueryKind.UNAVAILABLE, [], False
+        r = self._roundtrip("TRADES", client_id, sym, None, skip=skip)
+        if r is None:
+            return QueryKind.UNAVAILABLE, [], False
+        try:
+            kind = QueryKind(r.outcome)
+            fills = [
+                Fill(row[0], client_id, Decimal(row[1]), Decimal(row[2]), Decimal(row[3]), row[4])
+                for row in r.data
+            ]
+        except (ValueError, IndexError, ArithmeticError):
+            return QueryKind.UNAVAILABLE, [], False
+        return kind, fills, r.state == "MORE"
+
+    def balances(self) -> dict[str, tuple[Decimal, Decimal]] | None:
+        """Non-zero account balances as {asset: (free, locked)}, or None when unavailable."""
+        r = self._roundtrip("BALANCES", NO_ORDER_ID, BALANCE_SYMBOL, None)
+        if r is None or r.outcome != QueryKind.FOUND.value:
+            return None
+        try:
+            return {row[0]: (Decimal(row[1]), Decimal(row[2])) for row in r.data}
+        except (ValueError, IndexError, ArithmeticError):
+            return None
 
     def cancel(self, client_id: str) -> CancelResult:
         sym = self._symbols.get(client_id)

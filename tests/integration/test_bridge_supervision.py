@@ -582,3 +582,69 @@ def test_releasing_the_kill_switch_never_re_enables_and_the_enable_function_lock
         Path(__file__).parents[2] / "migrations/versions/0014_m3b_enablement_race_and_release.py"
     ).read_text()
     assert "FOR SHARE" in body
+
+
+# ------------------------------------------------------------------ venue sync against the real SQL fill store
+def test_sync_order_uses_the_sql_fill_store_idempotently_and_records_conflicts(
+    roles, migrated_engine
+):
+    from decimal import Decimal as Dec
+
+    from asta.orders.boundary import GatedExchange, InternalGate, PortKind
+    from asta.orders.fills import Fill
+    from asta.orders.lifecycle import State
+    from asta.orders.ports import QueryKind
+    from asta.orders.sql_store import SqlFillStore, SqlIntentStore, SqlKillSwitch
+    from asta.orders.venue_sync import ledger_fills, sync_order
+    from tests.orders.fakes import make_intent
+
+    e = migrated_engine
+    sessions = sessionmaker(e, expire_on_commit=False)
+    intents, fills = SqlIntentStore(sessions), SqlFillStore(sessions)
+    i = make_intent(
+        1,
+        session=__import__("uuid").uuid4().hex * 2,
+        order_type="LIMIT",
+        quote_notional=None,
+        quantity=Dec("0.0002"),
+        limit_price=Dec("50000"),
+    )
+    assert intents.insert_if_absent(i)
+    intents.save(i.moved(State.DISPATCHED))
+    intents.save(intents.get(i.decision_id).moved(State.ACCEPTED))  # type: ignore[union-attr]
+
+    class Port:
+        rows = [
+            Fill("1", i.decision_id, Dec("0.0001"), Dec("50000"), Dec("0.0000001"), "BTC"),
+            Fill("2", i.decision_id, Dec("0.0001"), Dec("50000"), Dec("0.0000001"), "BTC"),
+        ]
+
+        def trades(self, cid, skip=0):
+            return (
+                QueryKind.FOUND,
+                self.rows[skip : skip + 1],
+                skip + 1 < len(self.rows),
+            )  # one trade per page
+
+    port = Port()
+    gx = GatedExchange(port, PortKind.SIMULATED, InternalGate(SqlKillSwitch(sessions)))  # type: ignore[arg-type]
+    rep = sync_order(gx, fills, i)
+    assert (rep.new, rep.duplicates, rep.conflicts) == (2, 0, [])
+    assert intents.get(i.decision_id).state is State.FILLED  # type: ignore[union-attr]
+    assert [(f.trade_id, f.quantity) for f in ledger_fills(sessions, i.decision_id)] == [
+        ("1", Dec("0.0001")),
+        ("2", Dec("0.0001")),
+    ]
+    again = sync_order(gx, fills, i)
+    assert (again.new, again.duplicates) == (0, 2)
+    port.rows[0] = Fill(
+        "1", i.decision_id, Dec("0.0001"), Dec("49999"), Dec("0.0000001"), "BTC"
+    )  # same id, other price
+    bad = sync_order(gx, fills, i)
+    assert bad.conflicts and "FillConflict" in bad.conflicts[0]
+    with e.connect() as c:
+        n = c.execute(
+            text("SELECT count(*) FROM order_fill_conflicts WHERE decision_id = :d"),
+            {"d": i.decision_id},
+        ).scalar()
+    assert n >= 1  # the append-only conflict log has it

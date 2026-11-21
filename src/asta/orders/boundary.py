@@ -16,10 +16,11 @@ This module is policy only: it does not implement a connector and holds no crede
 
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
 from decimal import Decimal
 from enum import StrEnum
-from typing import Protocol
+from typing import Any, Protocol
 
 from asta.core.order_gate import Surface, authorize
 from asta.orders.lifecycle import Intent
@@ -147,6 +148,27 @@ class GatedExchange:
         elif self.kind != PortKind.SIMULATED:
             raise ExecutionDenied(("PORT_NOT_SIMULATED",))
         return self._port.query(client_id)
+
+    def trades(self, client_id: str, intent: Intent | None = None, skip: int = 0) -> Any:
+        """Read-only: one page of the venue's trades of an order. Same gate as query/cancel."""
+        reader = self._reader("trades", intent)
+        return reader(client_id, skip)
+
+    def balances(self, intent: Intent | None = None) -> Any:
+        """Read-only: the venue account's non-zero balances. Same gate as query/cancel."""
+        return self._reader("balances", intent)()
+
+    def _reader(self, name: str, intent: Intent | None) -> Callable[..., Any]:
+        if self.kind == PortKind.EXTERNAL:
+            self._external_gate(intent)  # also binds the intent's symbol to the port
+        elif self.kind != PortKind.SIMULATED:
+            raise ExecutionDenied(("PORT_NOT_SIMULATED",))
+        elif intent is not None and (bind := getattr(self._port, "bind_intent", None)) is not None:
+            bind(intent)
+        fn = getattr(self._port, name, None)
+        if fn is None:
+            raise ExecutionDenied(("READ_NOT_SUPPORTED",))
+        return fn  # type: ignore[no-any-return]
 
     def cancel(self, client_id: str, intent: Intent | None = None) -> CancelResult:
         if self.kind == PortKind.EXTERNAL:

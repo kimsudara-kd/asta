@@ -32,13 +32,16 @@ from asta.orders.channel import (
 from asta.orders.lifecycle import Intent
 
 VERSION = 1
-OPS = ("SEND", "QUERY", "CANCEL")
+OPS = ("SEND", "QUERY", "CANCEL", "TRADES", "BALANCES")
+NO_ORDER_ID = "0" * 32  # BALANCES is about the account, not an order
+MAX_REPLY_BYTES = 6_144  # replies may carry a page of trades or the balances
+MAX_DATA_ROWS, MAX_DATA_COLS, MAX_DATA_STR = 64, 8, 48
 _KEY_ID = re.compile(rb'"key_id":"([A-Za-z0-9._-]{1,64})"')
 _CLIENT_ID = re.compile(r"[0-9a-f]{32}")
 _SYMBOL = re.compile(r"[A-Z0-9]{2,12}-[A-Z0-9]{2,12}")
 _REQUEST_FIELDS = frozenset(
     {"kind", "v", "sender", "key_id", "seq", "nonce", "issued_at", "expires_at", "op",
-     "client_id", "symbol", "intent"}
+     "client_id", "symbol", "intent", "skip"}
 )  # fmt: skip
 _INTENT_FIELDS = (
     "decision_id", "environment", "venue", "symbol", "side", "order_type",
@@ -101,6 +104,7 @@ class Request:
     client_id: str
     symbol: str
     intent: Intent | None = field(default=None)  # SEND only
+    skip: int = 0  # TRADES only: how many trades of the order were already received
 
     def __post_init__(self) -> None:
         if self.op not in OPS:
@@ -109,6 +113,14 @@ class Request:
             raise ValueError("exactly SEND carries an intent")
         if not _CLIENT_ID.fullmatch(self.client_id) or not _SYMBOL.fullmatch(self.symbol):
             raise ValueError("bad client id or symbol")
+        if (
+            not isinstance(self.skip, int)
+            or isinstance(self.skip, bool)
+            or not 0 <= self.skip <= 10_000
+        ):
+            raise ValueError("bad skip")
+        if (self.op == "BALANCES") != (self.client_id == NO_ORDER_ID):
+            raise ValueError("BALANCES (and only BALANCES) uses the no-order id")
         if self.intent is not None and (
             self.intent.decision_id != self.client_id or self.intent.symbol != self.symbol
         ):
@@ -119,7 +131,7 @@ def payload_bytes(r: Request) -> bytes:
     body: dict[str, object] = {
         "kind": "ext-request", "v": VERSION, "sender": r.sender, "key_id": r.key_id, "seq": r.seq,
         "nonce": r.nonce, "issued_at": r.issued_at, "expires_at": r.expires_at, "op": r.op,
-        "client_id": r.client_id, "symbol": r.symbol, "intent": None,
+        "client_id": r.client_id, "symbol": r.symbol, "intent": None, "skip": r.skip,
     }  # fmt: skip
     if r.intent is not None:
         i = r.intent
@@ -132,8 +144,8 @@ def payload_bytes(r: Request) -> bytes:
     return json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
-def _seal(payload: bytes, key_id: str, auth: Authenticator) -> bytes:
-    if len(payload) > MAX_BYTES:
+def _seal(payload: bytes, key_id: str, auth: Authenticator, limit: int = MAX_BYTES) -> bytes:
+    if len(payload) > limit:
         raise ValueError("message too large")
     tag = auth.tag_for(key_id, payload)
     return len(tag).to_bytes(2, "big") + tag + payload
@@ -143,8 +155,8 @@ def seal_request(r: Request, auth: Authenticator) -> bytes:
     return _seal(payload_bytes(r), r.key_id, auth)
 
 
-def _split(wire: bytes) -> tuple[bytes, bytes] | str:
-    if len(wire) > MAX_BYTES + 2 + 64:
+def _split(wire: bytes, limit: int = MAX_BYTES) -> tuple[bytes, bytes] | str:
+    if len(wire) > limit + 2 + 64:
         return "TOO_LARGE"
     if len(wire) < 3:
         return "MALFORMED"
@@ -152,7 +164,7 @@ def _split(wire: bytes) -> tuple[bytes, bytes] | str:
     if not MIN_TAG <= n <= MAX_TAG:
         return "MALFORMED"
     tag, payload = wire[2 : 2 + n], wire[2 + n :]
-    if not payload or len(payload) > MAX_BYTES:
+    if not payload or len(payload) > limit:
         return "TOO_LARGE" if payload else "MALFORMED"
     return tag, payload
 
@@ -247,7 +259,7 @@ class RequestReceiver:
             sender=str(body["sender"]), key_id=str(body["key_id"]), seq=body["seq"],
             nonce=str(body["nonce"]), issued_at=body["issued_at"], expires_at=body["expires_at"],
             op=str(body["op"]), client_id=str(body["client_id"]), symbol=str(body["symbol"]),
-            intent=intent,
+            intent=intent, skip=body["skip"],
         )  # fmt: skip
 
 
@@ -259,23 +271,36 @@ class Reply:
     outcome: str  # SendOutcome / QueryKind / CancelOutcome value, or "REFUSED"
     state: str = ""  # a lifecycle State name when relevant
     code: str = ""  # reason code for REFUSED
+    data: tuple[tuple[str, ...], ...] = ()  # TRADES / BALANCES rows (strings only, bounded)
+
+
+def _check_data(data: object) -> None:
+    if not isinstance(data, list) or len(data) > MAX_DATA_ROWS:
+        raise ValueError("bad data")
+    for row in data:
+        if not isinstance(row, list) or len(row) > MAX_DATA_COLS:
+            raise ValueError("bad data row")
+        for cell in row:
+            if not isinstance(cell, str) or len(cell) > MAX_DATA_STR:
+                raise ValueError("bad data cell")
 
 
 def seal_reply(r: Reply, auth: Authenticator) -> bytes:
     body = {
         "kind": "ext-reply", "v": VERSION, "key_id": r.key_id, "request_nonce": r.request_nonce,
         "op": r.op, "outcome": r.outcome, "state": r.state, "code": r.code,
+        "data": [list(row) for row in r.data],
     }  # fmt: skip
-    return _seal(
-        json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8"), r.key_id, auth
-    )
+    _check_data(body["data"])
+    payload = json.dumps(body, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    return _seal(payload, r.key_id, auth, MAX_REPLY_BYTES)
 
 
 def open_reply(
     wire: bytes, auth: Authenticator, key_ids: frozenset[str], request_nonce: str, op: str
 ) -> Reply | None:
     """The reply if authentic AND answering exactly this request; else None (caller: UNKNOWN)."""
-    parts = _split(wire)
+    parts = _split(wire, MAX_REPLY_BYTES)
     if isinstance(parts, str):
         return None
     tag, payload = parts
@@ -293,7 +318,9 @@ def open_reply(
             return None
         if body["request_nonce"] != request_nonce or body["op"] != op:
             return None
+        _check_data(body["data"])
+        data = tuple(tuple(row) for row in body["data"])
         return Reply(key_id, str(body["request_nonce"]), str(body["op"]), str(body["outcome"]),
-                     str(body["state"]), str(body["code"]))  # fmt: skip
+                     str(body["state"]), str(body["code"]), data)  # fmt: skip
     except (ValueError, TypeError, KeyError):
         return None

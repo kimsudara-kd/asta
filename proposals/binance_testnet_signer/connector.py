@@ -115,12 +115,14 @@ class BinanceTestnetPort:
         self._symbols = {}
 
     # ------------------------------------------------------------------ plumbing
-    def _call(self, method: str, params: dict[str, str]) -> tuple[int, dict[str, Any]] | None:
+    def _call(
+        self, method: str, params: dict[str, str], path: str = "/api/v3/order"
+    ) -> tuple[int, dict[str, Any]] | None:
         """None = the request may or may not have reached the venue (timeout / transport error)."""
         req = build_signed_request(
             self._signer,
             method,
-            "/api/v3/order",
+            path,
             params,
             self._now(),
             self._rw,
@@ -185,6 +187,61 @@ class BinanceTestnetPort:
         if self._code(body) == -2013:
             return QueryResult(QueryKind.NOT_FOUND)
         return QueryResult(QueryKind.UNAVAILABLE)
+
+    # ------------------------------------------------------------------ read-only: trades and balances (reconciliation)
+    def trades(
+        self, client_id: str, skip: int = 0, page: int = 8
+    ) -> tuple[QueryKind, list[tuple[str, ...]], bool]:
+        """The venue's trades of ONE order, oldest first, ``page`` at a time after ``skip`` already received.
+        Rows: (trade_id, quantity, price, commission, commission_asset). FOUND with [] means the order has no trade."""
+        sym = self._symbols.get(client_id)
+        if sym is None or not _CLIENT_ID.fullmatch(client_id):
+            return QueryKind.UNAVAILABLE, [], False
+        res = self._call("GET", {"symbol": sym, "origClientOrderId": client_id})
+        if res is None:
+            return QueryKind.UNAVAILABLE, [], False
+        status, body = res
+        if self._code(body) == -2013:
+            return QueryKind.NOT_FOUND, [], False
+        if status != 200 or not isinstance(body.get("orderId"), int):
+            return QueryKind.UNAVAILABLE, [], False
+        res = self._call(
+            "GET",
+            {"symbol": sym, "orderId": str(body["orderId"]), "limit": "100"},
+            "/api/v3/myTrades",
+        )
+        if res is None or res[0] != 200 or not isinstance(res[1].get("value"), list):
+            return QueryKind.UNAVAILABLE, [], False
+        rows = []
+        for t in sorted(res[1]["value"], key=lambda x: int(x.get("id", 0))):
+            try:
+                rows.append(
+                    (str(int(t["id"])), str(Decimal(str(t["qty"]))), str(Decimal(str(t["price"]))),
+                     str(Decimal(str(t["commission"]))), str(t["commissionAsset"]))
+                )  # fmt: skip
+            except (KeyError, ValueError, ArithmeticError):
+                return (
+                    QueryKind.UNAVAILABLE,
+                    [],
+                    False,
+                )  # a trade we cannot read exactly is never guessed
+        chunk = rows[skip : skip + page]
+        return QueryKind.FOUND, chunk, skip + page < len(rows)
+
+    def balances(self) -> list[tuple[str, str, str]] | None:
+        """Non-zero balances of the virtual account as (asset, free, locked), or None when unavailable."""
+        res = self._call("GET", {"omitZeroBalances": "true"}, "/api/v3/account")
+        if res is None or res[0] != 200 or not isinstance(res[1].get("balances"), list):
+            return None
+        out = []
+        for b in res[1]["balances"]:
+            try:
+                free, locked = Decimal(str(b["free"])), Decimal(str(b["locked"]))
+            except (KeyError, ValueError, ArithmeticError):
+                return None
+            if free or locked:
+                out.append((str(b["asset"]), format(free, "f"), format(locked, "f")))
+        return out
 
     def cancel(self, client_id: str) -> CancelResult:
         sym = self._symbols.get(client_id)

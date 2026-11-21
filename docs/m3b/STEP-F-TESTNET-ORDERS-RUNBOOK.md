@@ -1,6 +1,6 @@
 # Step F — tiny real testnet orders (Binance Spot Testnet, virtual funds): readiness, runbook, drills
 
-**Status 2026-11-21: BUILT (tooling and guards), NOT STARTED.** No real order has been or can be placed: the gateway constant ships False, no key exists,
+**Status 2026-11-21: BUILT (tooling, guards, fill ingestion and reconciliation), NOT STARTED.** No real order has been or can be placed: the gateway constant ships False, no key exists,
 the probe (step E) has not run, the service is not installed and the host is not hardened. `python3 scripts/step_f_preflight.py` prints exactly what blocks
 (read-only; exits 1 until every item is PASS).
 
@@ -32,7 +32,14 @@ the probe (step E) has not run, the service is not installed and the host is not
 6. **Drill 3 — crash recovery:** kill the credential service between place and confirm; restart; `Dispatcher.recover()` finds the order by client id (exactly one order at the venue).
 7. **Close:** `SELECT disable_testnet_execution('drill finished');`, remove the enabled file, stop the service, flip the constant back to False in its own commit.
 
-## Not covered yet (needed before any strategy trades on the testnet)
-* **Fill ingestion / venue reconciliation:** the port reports order states, not individual trades; `myTrades` mapping into `SqlFillStore` and a daily venue-vs-ledger
-  reconciliation are still to be built. Drill 1 deliberately rests and cancels, so no fill is expected.
-* Real-money trading is a separate decision and is **not** covered by any of this.
+## Fill ingestion and venue reconciliation (BUILT 2026-11-21, offline)
+* **Wire:** two new read-only operations, `TRADES` (one page of an order's trades, oldest first) and `BALANCES` (non-zero account balances). Replies may carry a bounded data table
+  (≤ 64 rows × 8 cells × 48 characters); all of it is authenticated and bound to the request like every other reply.
+* **Gate:** `GatedExchange.trades/balances` use the same gate as query/cancel (denied while the gateway is DENY; **never** blocked by the kill switch or by an expired enablement — reading the truth only reduces risk).
+* **Ingestion (`src/asta/orders/venue_sync.py`):** `sync_order` pulls every trade of an order (paged), records each through the SQL fill store — idempotent by trade id; the same id with different
+  content is a CONFLICT written to the append-only log, never absorbed; more than 160 trades for one order is refused as an anomaly.
+* **Reconciliation:** `reconcile_session` compares order states (venue answers only: an unreachable venue is "unavailable", never "missing") and **balances** (baseline + what OUR ledger recorded
+  versus the venue account). A serious finding (`ORDER_MISSING`, `STATE_MISMATCH`, `BALANCE_MISMATCH`) or any trade conflict latches the kill switch (`RECONCILIATION_ANOMALY`).
+* **Use:** before the first order of a session `python -m asta.orders.venue_sync --config FILE --snapshot` saves the baseline balances; after any order or at the end of the session
+  `… --reconcile` prints the report (exit 1 if not clean). The config adds `baseline_file` to the drill config keys.
+* **Not covered:** detecting an order that exists at the venue but not locally (`UNKNOWN_AT_EXCHANGE`) needs a venue order-list call; and strategy-driven trading itself is a later step. Real money is a separate decision.

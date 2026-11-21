@@ -128,3 +128,8 @@ Nothing under `src/` changed in step E; the gateway constant is still False.
 No real order was placed and none can be: constant False, no key, probe not run, service not installed, host not hardened (`scripts/step_f_preflight.py` lists every blocker).
 Built: service `testnet` mode guarded by a fresh passing probe stamp for the same key; `probe.py` writes that stamp only on a full pass; read-only preflight; the place/confirm/cancel/confirm
 drill (`src/asta/orders/testnet_session.py`, inert unless every gate is open); runbook `STEP-F-TESTNET-ORDERS-RUNBOOK.md`. Open: fill ingestion + venue reconciliation.
+
+## 13. Fill ingestion and venue reconciliation — BUILT (offline, 2026-11-21)
+`TRADES`/`BALANCES` wire operations, gated read-only `trades()/balances()`, `src/asta/orders/venue_sync.py` (idempotent trade ingestion into `SqlFillStore`, order-state and balance
+reconciliation against our ledger, kill switch on serious findings, "venue unreachable" is never reported as a missing order). 22 new tests incl. a real-SQL fill-store test; the mock exchange now
+keeps trades and balances. Details: `STEP-F-TESTNET-ORDERS-RUNBOOK.md`. Still open: `UNKNOWN_AT_EXCHANGE` detection (needs an order-list call).

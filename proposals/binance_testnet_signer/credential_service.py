@@ -148,8 +148,11 @@ class CredentialService:
         except Exception:  # noqa: BLE001 - no input may ever kill the service
             return b"REFUSED:INTERNAL_ERROR"
 
-    def _reply(self, r: Request, outcome: str, state: str = "", code: str = "") -> Reply:
-        return Reply(self._key, r.nonce, r.op, outcome, state, code)
+    def _reply(
+        self, r: Request, outcome: str, state: str = "", code: str = "",
+        data: tuple[tuple[str, ...], ...] = (),
+    ) -> Reply:  # fmt: skip
+        return Reply(self._key, r.nonce, r.op, outcome, state, code, data)
 
     def _dispatch(self, r: Request) -> Reply:
         if r.op == "SEND":
@@ -173,9 +176,19 @@ class CredentialService:
         if r.symbol not in self._caps.symbols:
             return self._reply(r, "REFUSED", code="SYMBOL_NOT_ALLOWED")
         bind = getattr(self._port, "bind_symbol", None)
-        if bind is not None:
+        if bind is not None and r.op != "BALANCES":
             bind(r.client_id, r.symbol)
         try:
+            if (
+                r.op == "BALANCES"
+            ):  # read-only; never blocked by the kill switch (it only reveals the truth)
+                rows = self._port.balances()  # type: ignore[attr-defined]
+                if rows is None or len(rows) > 60:
+                    return self._reply(r, "UNAVAILABLE")
+                return self._reply(r, QueryKind.FOUND.value, data=tuple(rows))
+            if r.op == "TRADES":  # read-only trades of one order, a page at a time
+                kind, trade_rows, more = self._port.trades(r.client_id, r.skip)  # type: ignore[attr-defined]
+                return self._reply(r, kind.value, "MORE" if more else "", data=tuple(trade_rows))
             if r.op == "QUERY":
                 q = self._port.query(r.client_id)
                 if q.kind is QueryKind.FOUND and q.view is not None:
