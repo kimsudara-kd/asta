@@ -11,8 +11,6 @@ import sys
 import tempfile
 from pathlib import Path
 
-import pytest
-
 ROOT = Path(__file__).parents[2]
 NOVM = ROOT / "infra/no-vm"
 INSTALL = NOVM / "install-no-vm.sh"
@@ -25,10 +23,12 @@ def sh(script: Path, *args: str) -> subprocess.CompletedProcess[str]:
     )  # noqa: S603
 
 
-@pytest.mark.skipif(
-    sys.platform != "darwin", reason="the installer is macOS only (it refuses elsewhere)"
-)
 def test_dry_run_is_the_default_and_changes_nothing_and_apply_needs_root():
+    if sys.platform != "darwin":  # the installer is macOS-only: anywhere else it must refuse
+        for script in (INSTALL, UNINSTALL):
+            r = sh(script)
+            assert r.returncode == 1 and "macOS only" in r.stderr
+        return
     out = sh(INSTALL)
     assert out.returncode == 0 and "nothing was changed" in out.stdout and "[dry-run]" in out.stdout
     assert "auth.key" in out.stdout and "never printed" in out.stdout
@@ -41,10 +41,10 @@ def test_dry_run_is_the_default_and_changes_nothing_and_apply_needs_root():
     assert sh(UNINSTALL).returncode == 0 and "nothing was changed" in sh(UNINSTALL).stdout
 
 
-@pytest.mark.skipif(
-    sys.platform != "darwin", reason="the installer is macOS only (it refuses elsewhere)"
-)
 def test_dry_run_leaves_the_machine_untouched():
+    if sys.platform != "darwin":
+        assert sh(INSTALL).returncode == 1  # refuses before doing anything
+        return
     for p in ("/opt/asta-cred", "/etc/asta-cred", "/var/asta-cred", "/var/asta-cred-run"):
         before = os.path.exists(p)
         sh(INSTALL)

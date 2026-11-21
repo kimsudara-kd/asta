@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "9b979f4da7f9241d46756747fcceadff5972bc92",
+ "generated_from_commit": "122ba56b94910775524f140aac7cc77093d22a30",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -1136,7 +1136,7 @@
   },
   {
    "path": "tests/security/test_no_vm_install.py",
-   "sha256": "62aa58ae0b549d5cea4e618455b6420a070e493103dd74275ad8308a7e4cf1df"
+   "sha256": "0837159315cd6f174ef7d69b7f93dfd12244c647ee63772bdd7f3b3bb6ce6968"
   },
   {
    "path": "tests/security/test_pf_anchor.py",
