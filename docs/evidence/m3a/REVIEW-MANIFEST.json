@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "c622fb3416e2ac9c412410b65a6e615209e90c10",
+ "generated_from_commit": "7da919a1af2ce28b08f82c8e0af6064bdc86a6b7",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -369,6 +369,10 @@
   {
    "path": "docs/m3b/BINANCE-TESTNET-ACTIVATION-PLAN.md",
    "sha256": "a844f61c9cf7f08852fa53982761f4f6dc786bf0a08b16ea26b4879b38c5b212"
+  },
+  {
+   "path": "docs/m3b/BINANCE-TESTNET-CONNECTOR-PROPOSAL.md",
+   "sha256": "2fe1bf18640430515744b149f239792896fd3d3fdad73f31f1f3f9590cf7b8cb"
   },
   {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
@@ -819,6 +823,14 @@
    "sha256": "1fdc5a9f7ceed880e9ed618c8e64a4fdef878c5d7b51964350f3d0a211e6f6fd"
   },
   {
+   "path": "proposals/binance_testnet_signer/connector.py",
+   "sha256": "ec9af934ad6c9ce80f8793322c29244ff9f09e1af488df9647f75a3f5317e397"
+  },
+  {
+   "path": "proposals/binance_testnet_signer/mock_exchange.py",
+   "sha256": "c0ec16ed27fbac66998cc594039da1ff94ba130e822a317e835dae710654a569"
+  },
+  {
    "path": "proposals/binance_testnet_signer/signer.py",
    "sha256": "33e4f87f0915b484b3276db0b207b16e523f04e67328c946e0448dfce6892931"
   },
@@ -1069,6 +1081,10 @@
   {
    "path": "tests/security/test_synthetic_signer.py",
    "sha256": "c63ca4090c585bd2d6e2c3e2605226eb7d3d73ef90e10e95b906884395f817d1"
+  },
+  {
+   "path": "tests/security/test_testnet_connector.py",
+   "sha256": "973ac1dc427fd40a0a836a675be7a11a6619cc1d5c65d4a29ad708afa9cd834a"
   }
  ]
 }
