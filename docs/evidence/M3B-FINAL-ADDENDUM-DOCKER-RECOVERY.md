@@ -30,3 +30,8 @@ Next advisory (registry advisories/bulk) before acceptance; this is an open foll
 `pnpm audit --prod` reported 7 moderate advisories in Next 16.4.3 (all fixed in >=16.4.5). Upgraded the single dependency to 16.4.5
 (`pnpm add next@16.4.5`; lockfile only). Afterwards: audit "No known vulnerabilities", `tsc` clean, web unit tests 0 fail, browser E2E 5/5 phases.
 The sanitized candidate predates this commit and must be rebuilt again at publish time (PUBLISH-PLAN step 0).
+
+## Candidate rebuilt again (supersedes b8ca10f)
+Built from local HEAD e5874aa: scratch `/tmp/a/san3`, head 86b603b, 33 commits above 924da22 (fast-forward). gitleaks no leaks, privacy clean,
+secret scan 0, manifest verified, ruff/mypy clean, suite 1365 passed + 7 skipped (boundary stack down in the scratch run; the same code passed 1367/5
+with the stack up on the real repo), single author identity. Not pushed. Any later commit requires one more rebuild (PUBLISH-PLAN step 0).
