@@ -62,5 +62,24 @@ def test_the_skip_guard_rejects_an_unreviewed_skip_and_accepts_the_reviewed_ones
         )  # noqa: S603
 
     assert run(ok).returncode == 0
+    plat = tmp_path / "plat.log"
+    plat.write_text(
+        "SKIPPED [1] tests/m3a/test_mac_backup_copy.py:48: macOS tools (stat -f, mount, lsof)\n"
+    )
+    assert run(plat).returncode == 1  # strict by default
+    r2 = subprocess.run(  # noqa: S603
+        [sys.executable, str(ROOT / "scripts/ci_skip_guard.py"), str(plat), "--allow-platform"],
+        capture_output=True,
+        text=True,
+    )
+    assert r2.returncode == 0
+    dk = tmp_path / "dk.log"
+    dk.write_text("SKIPPED [1] tests/m3a/test_security_host_config.py:131: Docker not available\n")
+    r3 = subprocess.run(  # noqa: S603
+        [sys.executable, str(ROOT / "scripts/ci_skip_guard.py"), str(dk), "--allow-platform"],
+        capture_output=True,
+        text=True,
+    )
+    assert r3.returncode == 1  # Docker skips are never allowed
     r = run(bad)
     assert r.returncode == 1 and "Docker not available" in r.stdout

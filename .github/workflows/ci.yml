@@ -46,7 +46,7 @@ jobs:
         run: uv run python -m pytest tests -q -rs 2>&1 | tee pytest.log; test ${PIPESTATUS[0]} -eq 0
         shell: bash
       - name: No security gate may be skipped
-        run: python3 scripts/ci_skip_guard.py pytest.log
+        run: python3 scripts/ci_skip_guard.py pytest.log --allow-platform
 
   security:
     runs-on: ubuntu-24.04
