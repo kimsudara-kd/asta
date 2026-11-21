@@ -17,3 +17,11 @@ the remote head 924da22 (still the remote head); gitleaks 128 commits, no leaks;
 manifest verified; ruff clean; mypy 123 files clean; full suite **1365 passed, 7 skipped**; all author/committer emails normalised to the
 already-public identity (owner to confirm). The push (`git push origin sanitized:main`, fast-forward, no force) remains reserved action 10 and
 needs your explicit written approval. Docker image removal remains reserved action 2 and was not started.
+
+## Browser E2E closed (2026-11-21)
+The earlier port conflict was ASTA's own dev API/web (4640/3640); I stopped those two processes (not P1–P8) and ran `apps/web/e2e/run.mjs`
+with `E2E_PSQL` (local PG 5640). The first `live` failures were environmental: the python.org macOS Python has no CA bundle, so the Binance
+WebSocket failed TLS verification (`CERTIFICATE_VERIFY_FAILED`); with `SSL_CERT_FILE=<certifi bundle>` the feed connects. Result:
+**PHASE RESULTS live/nodata/aging/research/paper = all true** (16+1+1+12+9 tests passed). Note: the Next.js 16.4.3 build prints a one-time
+"known security vulnerability" reminder and exits 1 on first attempt per cycle; a retry continues. `pnpm audit` was clean earlier — re-check the
+Next advisory (registry advisories/bulk) before acceptance; this is an open follow-up, no upgrade was performed.
