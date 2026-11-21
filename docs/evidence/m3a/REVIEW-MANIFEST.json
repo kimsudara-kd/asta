@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "e949cb2656463474e5371830108cf2a2df4f4592",
+ "generated_from_commit": "c3e1e625dae932ca93bdebae47c8dedabc510dd9",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -996,15 +996,15 @@
   },
   {
    "path": "tests/m3a/test_mac_deployment.py",
-   "sha256": "51ccf93e8b1efcab42152f2724849b6265a97fd071b2a9ad5d857fccbda857ee"
+   "sha256": "e16a47534c55672b09c95aa4d4e1005e3daf0d9f604ea8e9151c1b29330e610b"
   },
   {
    "path": "tests/m3a/test_mac_provision_host.py",
-   "sha256": "b568e52f58b3f91ab5374a8e7b1049192f651569442c07b28ca2e41b1f7331c6"
+   "sha256": "bb2961d241354d45cc3a4ff05a69ff3c1bbf625a7359f7bdf6f55bdfa7bfe80c"
   },
   {
    "path": "tests/m3a/test_mac_rollback_host.py",
-   "sha256": "cd13ee4506a23a5ad9acc7d784eeab565e759023040f153948bf83438937256c"
+   "sha256": "5fcf90d6ddaa39f846e6be515fccdd0c87ab00488a6c45efd14987b90c82dcc7"
   },
   {
    "path": "tests/m3a/test_provisioning_artifacts.py",

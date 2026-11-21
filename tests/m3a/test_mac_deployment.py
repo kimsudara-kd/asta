@@ -536,7 +536,10 @@ def test_security_services_installer_is_dry_run_by_default_linux_only_and_passwo
         "asta-orders" in code and "only when the order path is authorised" in code
     )  # the order worker is NOT installed
     r = subprocess.run(["/bin/sh", str(script)], capture_output=True, text=True, timeout=30)  # noqa: S603
-    assert r.returncode == 1 and "Linux app VM" in r.stderr  # on macOS it refuses at once
+    if sys.platform == "linux":  # the intended target: a dry run that succeeds
+        assert r.returncode == 0, r.stderr
+    else:  # on macOS it refuses at once
+        assert r.returncode == 1 and "Linux app VM" in r.stderr
 
 
 # ---------------------------------------------------------------- M3-B-R4: host separation check

@@ -124,6 +124,10 @@ def test_vm_base_refuses_protected_locations_and_foreign_non_empty_directories()
     ):
         r = subprocess.run(["sh", str(SCRIPT), "--vm-base", bad], capture_output=True, text=True)
         assert r.returncode == 1 and "REFUSING" in (r.stdout + r.stderr), bad
+    if (
+        sys.platform != "darwin"
+    ):  # needs the macOS /Users/Shared volume; the refusals above already ran
+        return
     import shutil
     import uuid
 
@@ -148,6 +152,9 @@ def test_the_default_phase_is_two_vms_and_the_credential_vm_needs_an_explicit_fl
     assert 'DAEMONS="com.asta.socket_vmnet com.asta.vm.fw com.asta.vm.app"' in CODE
     assert '[ "$WITHCRED" = 1 ] && DAEMONS="$DAEMONS com.asta.vm.cred"' in CODE
     out = subprocess.run(["/bin/sh", str(SCRIPT)], capture_output=True, text=True, timeout=60)
+    if sys.platform != "darwin":  # the host script refuses to run anywhere but an Apple-silicon Mac
+        assert out.returncode == 1 and "REFUSING" in out.stderr
+        return
     assert out.returncode == 0 and "com.asta.vm.cred.plist /Library" not in out.stdout
     assert (
         "com.asta.vm.fw.plist /Library" in out.stdout

@@ -2,6 +2,7 @@
 
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 MAC = Path(__file__).resolve().parents[2] / "infra" / "security-host" / "mac"
@@ -27,6 +28,9 @@ def test_dry_run_is_the_default_apply_needs_root_and_a_dry_run_changes_nothing()
     daemons = Path("/Library/LaunchDaemons")
     before = sorted(p.name for p in daemons.glob("com.asta.*"))
     out = sh()
+    if sys.platform != "darwin":  # macOS-only script: it must refuse elsewhere
+        assert out.returncode == 1 and "macOS only" in out.stderr
+        return
     assert out.returncode == 0 and "nothing was changed" in out.stdout
     assert sorted(p.name for p in daemons.glob("com.asta.*")) == before
     r = sh("--apply")
