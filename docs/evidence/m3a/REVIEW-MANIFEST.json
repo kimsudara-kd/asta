@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "7376c2226b26875d8083f2b3e69d04f7fe1a1eff",
+ "generated_from_commit": "e949cb2656463474e5371830108cf2a2df4f4592",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -16,7 +16,7 @@
   },
   {
    "path": "docs/decisions/ceo-approval-register.md",
-   "sha256": "a6ea3e5ec543721d0dd733e42ed213295462e0b3e8a3955775132243d5fc14b1"
+   "sha256": "a681f9d1015d400615bc89988224b0579c1388343a99c6e92b61feea571b42b1"
   },
   {
    "path": "docs/evidence/FROZEN-EVIDENCE.json",
@@ -48,7 +48,7 @@
   },
   {
    "path": "docs/evidence/M3B-GOVERNANCE-01.md",
-   "sha256": "05efebcb88e132d152c04b1463a2e30adc5db5e429d43f2e72c2efba5c956bf8"
+   "sha256": "e8972bca543cf42edd0bee7d9001391269a27b39e7ed75c97b6f768189ebf63b"
   },
   {
    "path": "docs/evidence/M3B-R2.md",
@@ -376,7 +376,7 @@
   },
   {
    "path": "docs/m3b/D0-EXPOSURE-AND-MIGRATION-REGISTER.md",
-   "sha256": "bd045a68b800bfca9122d5cb5f2807cd83a585b3072f0b9883711ab1eb47f9a4"
+   "sha256": "6b87fec75d00ae45f7d99cdb2fb8196b82e1056c1df4a5b00a4d04582c213a0f"
   },
   {
    "path": "docs/m3b/DOCKER-STORAGE-RECOVERY-PACKAGE.md",
@@ -840,7 +840,7 @@
   },
   {
    "path": "scripts/privacy_scan.py",
-   "sha256": "a24be142dbebef426e9db2f221741cb6f8d3c39de0ed95bbaa2f343126a9ec16"
+   "sha256": "3b0dab46df734ea36ac10f978530f49396e4fc36a287689882dcccb92bac1057"
   },
   {
    "path": "scripts/review_manifest.py",
