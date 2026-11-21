@@ -5,7 +5,7 @@ import { login, SHOTS } from "./helpers";
 // heading/tab name) is a read-only list, not a verb; the verbs themselves stay forbidden.
 const FORBIDDEN = /\b(buy|sell|place|order|trade|withdraw|transfer|deposit|execute|leverage|margin|borrow|enable live|go live)\b/i;
 const BANNER = "PAPER TRADING — VIRTUAL FUNDS ONLY";
-const PAGES = ["/paper", "/paper/portfolio", "/paper/orders", "/paper/risk", "/paper/performance"];
+const PAGES = ["/paper", "/paper/agent", "/paper/portfolio", "/paper/orders", "/paper/risk", "/paper/performance"];
 
 async function csrf(page: Page): Promise<string> {
   return (await (await page.request.get("/api/v1/auth/me")).json()).csrf_token;
@@ -34,6 +34,20 @@ test.describe("@paper viewer: read-only", () => {
       const r = await page.request.post(path, { data: path.endsWith("sessions") ? { name: "x" } : {}, headers: { "X-CSRF-Token": c, "Idempotency-Key": "viewer-attempt-0001" }, failOnStatusCode: false });
       expect(r.status(), path).toBe(403);
     }
+  });
+});
+
+test.describe("@paper agent page", () => {
+  test("the Agent page explains the rule-based agent and lists its strategies, decisions and holdings (read-only)", async ({ page }) => {
+    await login(page, "viewer1");
+    await gotoPaper(page, "/paper/agent");
+    await expect(page.getByTestId("agent-identity")).toContainText("rule-based");
+    await expect(page.getByTestId("agent-identity")).toContainText("DENY");
+    await expect(page.getByTestId("agent-strategies").locator("tbody tr").first()).toBeVisible();
+    await expect(page.getByTestId("agent-holdings").locator("tbody tr").first()).toBeVisible();
+    await expect(page.getByTestId("agent-signals")).toBeVisible();
+    await expect(page.locator("main button, main [role=button]").filter({ hasText: FORBIDDEN })).toHaveCount(0);
+    await page.screenshot({ path: `${SHOTS}/paper-agent.png`, fullPage: true });
   });
 });
 

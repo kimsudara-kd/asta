@@ -11,6 +11,7 @@ import { StatePill } from "./paper/ui";
 import { usePrincipal } from "./ResearchShell";
 
 const TABS = [
+  { href: "/paper/agent", label: "Agent" },
   { href: "/paper", label: "Paper Trading Overview" },
   { href: "/paper/portfolio", label: "Paper Portfolio" },
   { href: "/paper/orders", label: "Signals & Paper Orders" },
