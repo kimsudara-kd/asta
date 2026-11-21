@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "7da919a1af2ce28b08f82c8e0af6064bdc86a6b7",
+ "generated_from_commit": "87520e6136ae1d0e2cfb72dc74ce6dc9fc691cc7",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -36,7 +36,7 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-CEO-DECISION-PACK.md",
-   "sha256": "d0809b460a015d84dde698dddb5321f6c929846bd9a74f5a15491a680206eade"
+   "sha256": "608eafc959720b68e4842fa78002cc9fb170664fc85654b08b040f1ef1679cc7"
   },
   {
    "path": "docs/evidence/M3B-FINAL-EXECUTION-REGISTER.md",
@@ -44,7 +44,7 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-GATE-MATRIX.md",
-   "sha256": "1768fc9c22579340dd93a700bfadf4c2ce914e6b2f51ff2f8085bb9b1e9ea7c1"
+   "sha256": "a9f738b76d2981488f8527ebfcc5fd4186b43b761b01ce0fbfb08619f4e29797"
   },
   {
    "path": "docs/evidence/M3B-GOVERNANCE-01.md",
@@ -372,7 +372,7 @@
   },
   {
    "path": "docs/m3b/BINANCE-TESTNET-CONNECTOR-PROPOSAL.md",
-   "sha256": "2fe1bf18640430515744b149f239792896fd3d3fdad73f31f1f3f9590cf7b8cb"
+   "sha256": "1fa78deeca8a9ce8b6308f4611df22aa589a1f0199c7931c4b99833158d31794"
   },
   {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
@@ -421,6 +421,10 @@
   {
    "path": "docs/m3b/MAC-READINESS-AUDIT.md",
    "sha256": "39f477c92c1c9e7f7b293c11253ee31e6745a5937af581aa9ab86d8409de5b6f"
+  },
+  {
+   "path": "docs/m3b/NO-VM-DEPLOYMENT.md",
+   "sha256": "6f03550edfac93f13f26d74d561bfecb71ef0831643aadd0738260862b42d449"
   },
   {
    "path": "docs/m3b/ORDER-PATH-DESIGN.md",

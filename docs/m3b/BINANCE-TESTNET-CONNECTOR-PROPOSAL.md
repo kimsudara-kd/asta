@@ -26,6 +26,8 @@ MARKET/LIMIT only. Real money is a separate, later decision and is NOT covered h
 The client order id **is** the decision id (32 hex), so a re-send can never create a second order; after UNKNOWN the dispatcher queries by
 client id and re-sends only after repeated NOT_FOUND (existing `Dispatcher` logic, unchanged).
 
+> **Owner decision 2026-11-21: no VMs.** Read `NO-VM-DEPLOYMENT.md`: wherever this document says "credential VM" or "VM", read "a separate local OS user (`asta-cred`) running the connector service, reached over a Unix socket". The code and the lock-test reasoning below are unchanged.
+
 ## 2. Where signing must live — two options
 **Option A (recommended): signing outside `src/`, in the credential process/VM.** The app (`src/`) only gets an
 `ExternalChannelPort` that talks to the existing replay-protected channel (`asta.orders.channel`). The connector + signer ship as a separate
@@ -61,7 +63,7 @@ production Binance hosts appear nowhere (tests assert it).
 | A | Offline: connector + mock exchange (**done**, 15 tests) | — |
 | B | Offline integration: `ExternalChannelPort` + credential-side service + the existing `Dispatcher`, against the mock (changes #1,#3,#4, **no #2**: gateway still DENY, so it runs with a test gateway) | your OK to write `src/` code |
 | C | Gateway change #2 + matrix tests + enablement function; still no credentials, no network | your OK for the live-lock change; independent review |
-| D | Credential VM deployed, egress profile for `testnet.binance.vision`, host hardened, off-host alerts live | host work (yours), VM provisioning |
+| D | Connector service installed as user `asta-cred` (launchd), optional pf anchor for `testnet.binance.vision`, host hardened, off-host heartbeat live | host work (yours): `NO-VM-DEPLOYMENT.md` §5 |
 | E | First network contact: **`POST /api/v3/order/test`** (validates a signed order, places nothing) with a testnet key in the vault | key ceremony, your written approval |
 | F | Tiny real testnet orders (virtual funds), reconciliation vs venue, kill-switch and recovery drills | your written approval per session |
 

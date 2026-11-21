@@ -14,18 +14,18 @@ Owner abbreviations: ENG = ASTA engineering, OWN = platform owner (console/privi
 | E-6 | No unexplained ledger discrepancy | PASS | 900/900, 0 discrepancies, digests = frozen | ENG | CLOSED |
 | E-7 | No active secret exposure | PASS | `secret_scan` 0; gitleaks candidate clean (real repo history: 1 synthetic) | ENG | CLOSED (candidate) |
 | E-8 | No unverified mandatory regression | PASS | 2026-11-21: 1367 passed, 5 skipped (4 opt-in network + 1 PowerShell), skip guard OK, boundary stack up; E2E 5/5 phases; see ADDENDUM. Re-run on the final published HEAD / hosted CI | ENG/T | CLOSED locally (hosted CI unverified) |
-| E-9 | All security-critical components supervised | PASS (units, offline) / OPEN (deployed) | `infra/security-host/mac/app-vm/*.service`, tests | ENG/OWN | OPEN until deployed |
+| E-9 | All security-critical components supervised | PASS (units, offline) / OPEN (deployed) — **units must be re-expressed as launchd plists (no-VM)** | `infra/security-host/mac/app-vm/*.service`, `NO-VM-DEPLOYMENT.md` | ENG/OWN | OPEN until deployed |
 | E-10 | Off-host alerts cover app, bridge, firewall, kill switch, reconciliation, feed, backup | PASS offline / OPEN live | `test_offhost_alerts.py`, SECURITY-EVENTS §5 | ENG/OWN | OPEN (drills AL1–AL9) |
 | E-11 | Synthetic signing + testnet-only boundary | PASS offline | `tests/security/test_synthetic_signer.py` | ENG | CLOSED offline |
 ## Infrastructure gates
 | Gate | Requirement | Result | Evidence | Owner | Closure |
 |---|---|---|---|---|---|
 | I-1 | Dedicated/isolated host | FAIL (shared) | `host-posture-2026-11-14.json` | OWN | OPEN |
-| I-2 | Independently enforced egress boundary deployed | OPEN | lab only | OWN/REV | OPEN (F-02) |
+| I-2 | Independently enforced egress boundary deployed | OPEN — **RE-SCOPED 2026-11-21 (no VMs): user separation + optional pf anchor, see `NO-VM-DEPLOYMENT.md` §4** | lab only | OWN/REV | OPEN (F-02 accepted for testnet only) |
 | I-3 | Verified host hardening | FAIL (measured: 5 gaps) | `host_posture.py`, `HOST-HARDENING-CHANGESET.md` | OWN | OPEN |
 | I-4 | Verified backups and recovery | PARTIAL | 9 PG volumes restore-verified; non-DB volumes unverified; ceremony prepared | ENG/OWN | OPEN |
 | I-5 | Adequate storage and memory | OPEN | 54 GiB free; needs Docker image removal (package ready) | OWN/CEO | OPEN |
-| I-6 | Verified reboot behavior | BLOCKED | needs approved window + provisioned VMs | OWN | OPEN |
+| I-6 | Verified reboot behavior | BLOCKED — **RE-SCOPED (no VMs): launchd services restart after a reboot** | needs an approved window + installed services | OWN | OPEN |
 | I-7 | Off-host critical-service monitoring live | OPEN | no external destination configured | OWN | OPEN |
 | I-8 | Docker storage recovery | PASS (executed 2026-11-21, owner-approved) | `DOCKER-STORAGE-RECOVERY-PACKAGE.md` §E: verified checksummed copy on external SSD, internal image removed, free space 49→100 GiB; Docker intentionally not restarted | CEO/OWN | CLOSED |
 ## Governance gates
