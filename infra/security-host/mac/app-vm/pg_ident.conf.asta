@@ -3,4 +3,4 @@ asta   asta-app   asta
 bridge    asta-bridge    asta_bridge
 orders    asta-orders    asta_orders
 monitor   asta-monitor   asta_monitor
-release   asta-release   asta_release   # an interactive operator login, never a service
+release   /^asta-release-(.+)$   rel_\1   # OS login asta-release-<name> -> DB role rel_<name>: one identity per human, never a service

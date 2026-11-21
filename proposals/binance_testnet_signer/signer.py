@@ -1,7 +1,7 @@
 """Synthetic-only request signing for the future Binance Spot Testnet connector (M3-B-FINAL phase 6).
 
 Offline readiness: the *interface* a vault-backed (OpenBao transit Ed25519) signer must satisfy, a synthetic
-in-memory implementation whose private key cannot be exported, and the request builder with its hard
+in-memory implementation whose private key is not exportable BY INTERFACE (a test double only: in-process Python cannot truly hide a key), and the request builder with its hard
 boundaries. Nothing here performs I/O, reads a real credential or enables an order path: the module has no
 network import, ``ExecutionGateway`` stays default-deny, and a *real* key cannot be loaded into it.
 
@@ -39,14 +39,31 @@ SIGNABLE_PATHS = frozenset(
 )
 FORBIDDEN_PARAMS = frozenset(
     {
-        "sideEffectType",
-        "isIsolated",
-        "marginBuyBorrowAmount",
-        "withdrawOrderId",
+        "sideeffecttype",
+        "isisolated",
+        "marginbuyborrowamount",
+        "withdraworderid",
         "network",
         "address",
     }
-)
+)  # lower-case; compared case-insensitively
+# Per-path ALLOW-list of parameter names (exact, case-sensitive). Anything else is refused, so margin/borrow/withdraw
+# style parameters can never be signed even if a new one is invented (review R-11). recvWindow/timestamp are added here.
+_ORDER_PARAMS = frozenset(
+    {
+        "symbol", "side", "type", "timeInForce", "quantity", "quoteOrderQty", "price", "newClientOrderId",
+        "stopPrice", "trailingDelta", "icebergQty", "newOrderRespType", "selfTradePreventionMode",
+        "orderId", "origClientOrderId", "cancelRestrictions",
+    }
+)  # fmt: skip
+ALLOWED_PARAMS: dict[str, frozenset[str]] = {
+    "/api/v3/order": _ORDER_PARAMS,
+    "/api/v3/order/test": _ORDER_PARAMS,
+    "/api/v3/openOrders": frozenset({"symbol"}),
+    "/api/v3/allOrders": frozenset({"symbol", "orderId", "startTime", "endTime", "limit"}),
+    "/api/v3/myTrades": frozenset({"symbol", "orderId", "startTime", "endTime", "fromId", "limit"}),
+    "/api/v3/account": frozenset({"omitZeroBalances"}),
+}
 MAX_RECV_WINDOW_MS = 5000
 
 
@@ -128,8 +145,8 @@ def build_signed_request(
         raise ForbiddenEndpoint("path is not in the spot allow-list")
     if method not in {"GET", "POST", "DELETE"}:
         raise ForbiddenEndpoint("method not allowed")
-    bad = FORBIDDEN_PARAMS & set(params)
-    if bad or "signature" in params:
+    bad = FORBIDDEN_PARAMS & {p.lower() for p in params}  # defence in depth, case-insensitive
+    if bad or "signature" in params or not set(params) <= ALLOWED_PARAMS[path]:
         raise ForbiddenEndpoint("parameter not permitted")
     if not 0 < recv_window_ms <= MAX_RECV_WINDOW_MS:
         raise SignerError("recvWindow out of range")

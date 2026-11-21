@@ -436,11 +436,13 @@ def test_every_service_role_has_peer_only_authentication_and_a_distinct_os_user(
         ("asta_bridge", "asta-bridge"),
         ("asta_orders", "asta-orders"),
         ("asta_monitor", "asta-monitor"),
-        ("asta_release", "asta-release"),
     )
     for role, osuser in roles:
         assert re.search(rf"local\s+asta\s+{role}\s+peer map=", hba), role
         assert re.search(rf"{osuser}\s+{role}\b", ident), role
+    # releasers (review R-04): one OS login asta-release-<name> -> one DB role rel_<name> (member of asta_release)
+    assert re.search(r"local\s+asta\s+\+asta_release\s+peer map=release", hba)
+    assert re.search(r"release\s+/\^asta-release-\(\.\+\)\$\s+rel_\\1", ident)
     active = "\n".join(ln for ln in hba.splitlines() if not ln.startswith("#"))
     assert not re.search(r"\b(md5|password|trust|scram-sha-256)\b", active)
 

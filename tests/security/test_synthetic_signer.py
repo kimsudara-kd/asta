@@ -139,3 +139,27 @@ def test_the_signer_is_staged_outside_src_and_the_live_lock_ban_still_covers_src
     src = Path(__file__).parents[2] / "src"
     assert not any("X-MBX-APIKEY" in p.read_text(encoding="utf-8") for p in src.rglob("*.py"))
     assert _PATH.is_file() and "src" not in _PATH.relative_to(Path(__file__).parents[2]).parts
+
+
+def test_parameters_are_an_allow_list_per_path_and_case_insensitive_denials_hold():
+    import pytest
+
+    s = sg.SyntheticEd25519Signer()
+    ok = {"symbol": "BTCUSDT", "side": "BUY", "type": "MARKET", "quantity": "0.001"}
+    sg.build_signed_request(s, "POST", "/api/v3/order", ok, 1_700_000_000_000)
+    for extra in (
+        "SideEffectType",
+        "sideEffectType",
+        "Network",
+        "isIsolated",
+        "unknownParam",
+        "symbol2",
+    ):
+        with pytest.raises(sg.ForbiddenEndpoint):
+            sg.build_signed_request(
+                s, "POST", "/api/v3/order", {**ok, extra: "x"}, 1_700_000_000_000
+            )
+    with pytest.raises(sg.ForbiddenEndpoint):  # a valid order parameter on the wrong path
+        sg.build_signed_request(
+            s, "GET", "/api/v3/openOrders", {"symbol": "BTCUSDT", "side": "BUY"}, 1
+        )

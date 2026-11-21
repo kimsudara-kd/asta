@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "3c0774643561490a3a09a9669cb65e0a35572b2c",
+ "generated_from_commit": "fbc59e22adcfc788d2948c52b4beac5cc28aa3a6",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -436,7 +436,7 @@
   },
   {
    "path": "docs/m3b/SECURITY-TOPOLOGY.md",
-   "sha256": "5b5fcc5d54807da5c2549aaa88792d2235f402653034df69349d57f291b295cc"
+   "sha256": "566bc720d10f60b9f0447204a1798b65992ebb5c8fb27c3eacbe0bb474c5f6b0"
   },
   {
    "path": "docs/m3b/VAULT-AND-BACKUP.md",
@@ -592,11 +592,11 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_hba.conf.asta",
-   "sha256": "10a34f76a8cae3bec4514cc350a273183e50897e5f5e4b0177050f1c106cbf52"
+   "sha256": "c8133935cdf6f43c0a4869c4ef57864fa31236a0edb75acb66365343bad06bca"
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_ident.conf.asta",
-   "sha256": "d91300dac6cb0f8b1b1f0a7546ba5d541c181cfbf5d62215f2bee4f6fd50b842"
+   "sha256": "98bf8fbffe42de283950a4aca53f9161a90053b4d8eb96a8c3343eff088220c9"
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_roles_m3b.sql",
@@ -820,7 +820,7 @@
   },
   {
    "path": "proposals/binance_testnet_signer/signer.py",
-   "sha256": "84c0cb8fe1737108344f165beb620cec78d110732ca4b6252af63a61dfedbc0d"
+   "sha256": "33e4f87f0915b484b3276db0b207b16e523f04e67328c946e0448dfce6892931"
   },
   {
    "path": "scripts/ci_skip_guard.py",
@@ -1000,7 +1000,7 @@
   },
   {
    "path": "tests/m3a/test_mac_deployment.py",
-   "sha256": "e16a47534c55672b09c95aa4d4e1005e3daf0d9f604ea8e9151c1b29330e610b"
+   "sha256": "7dfc8f025a75adb8966de52251d8551ad7ce425ffe7ae3624060ed9356c489e2"
   },
   {
    "path": "tests/m3a/test_mac_provision_host.py",
@@ -1055,6 +1055,10 @@
    "sha256": "442d117a2044a3ba881011aebe708c355d853bed2d471d9ca4bf97fbb20e31c2"
   },
   {
+   "path": "tests/orders/test_no_network_in_orders_package.py",
+   "sha256": "69c803e82efbfc823f1be302bc84d72f09a269d167cb268e2b0f19e5790d64da"
+  },
+  {
    "path": "tests/orders/test_order_path.py",
    "sha256": "313cdcd4a9d605e60efc6e139c3e2f7a8c73e1b6e1c0d934cba89954a72f5ade"
   },
@@ -1064,7 +1068,7 @@
   },
   {
    "path": "tests/security/test_synthetic_signer.py",
-   "sha256": "4497682095d83a83ac68e4a7a7348fe98840e65e4e7fa37b985d3f8d3d427722"
+   "sha256": "c63ca4090c585bd2d6e2c3e2605226eb7d3d73ef90e10e95b906884395f817d1"
   }
  ]
 }

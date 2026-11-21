@@ -4,7 +4,7 @@ local   asta  asta                     peer map=asta
 local   asta  asta_bridge              peer map=bridge
 local   asta  asta_orders              peer map=orders
 local   asta  asta_monitor             peer map=monitor
-local   asta  asta_release             peer map=release
+local   asta  +asta_release            peer map=release   # any member role (rel_<name>), one login per human (review R-04)
 local   all   all                      reject
 host    all   all   0.0.0.0/0          reject
 host    all   all   ::/0               reject
