@@ -41,6 +41,8 @@ GRANT EXECUTE ON FUNCTION release_kill_switch(text) TO asta_release;
 
 -- failure monitor: read-only
 GRANT SELECT ON kill_switch_state, risk_halt_bridge_heartbeat TO asta_monitor;
+-- extended checks (alerting.extended_checks): reconciliation incidents and market-feed freshness (review R-02)
+GRANT SELECT ON incidents, market_feed_connections TO asta_monitor;
 -- the monitor records alert-state CHANGES in the append-only audit chain (and nothing else)
 GRANT SELECT, INSERT ON audit_events TO asta_monitor;
 GRANT USAGE ON SEQUENCE audit_events_id_seq TO asta_monitor;

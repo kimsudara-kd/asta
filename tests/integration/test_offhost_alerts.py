@@ -175,3 +175,23 @@ def test_extended_checks_cover_reconciliation_feed_and_backup(migrated_engine, t
     }
     with migrated_engine.begin() as c:
         c.execute(text("DELETE FROM incidents WHERE dedupe_key = 'k1'"))
+
+
+def test_notifier_destination_is_parsed_not_prefix_matched_and_never_redirected():
+    import pytest
+
+    from asta.orders.alerting import Notifier, NotifyError
+
+    for ok in ("https://hc-ping.example/abc", "http://127.0.0.1:9/x", "http://localhost:8080/x"):
+        Notifier(ok)
+    for bad in (
+        "http://localhost.evil.example/x",
+        "http://127.0.0.1.evil.example/x",
+        "http://user:pw@127.0.0.1/x",
+        "http://example.com/x",
+        "ftp://example.com/x",
+        "https:///nohost",
+        "file:///etc/passwd",
+    ):
+        with pytest.raises(NotifyError):
+            Notifier(bad)

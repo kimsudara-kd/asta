@@ -17,6 +17,7 @@ import hashlib
 import json
 import secrets
 import time
+import urllib.parse
 import urllib.request
 from collections.abc import Callable
 from pathlib import Path
@@ -110,6 +111,33 @@ def write_stamp(path: Path, key: bytes, alerts: list[Alert]) -> None:
 
 
 # ------------------------------------------------------------------ notifier
+
+
+def _destination_allowed(url: str) -> bool:
+    """https with a real host, or http to an exact loopback host name (parsed, no prefix match)."""
+    try:
+        p = urllib.parse.urlsplit(url)
+        host = p.hostname
+    except ValueError:
+        return False
+    if not host or p.username or p.password:
+        return False
+    if p.scheme == "https":
+        return True
+    return p.scheme == "http" and host in ("127.0.0.1", "localhost", "::1")
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(
+        self, *a: object, **k: object
+    ) -> None:  # a redirect could leave the vetted host
+        return None
+
+
+def _no_redirect_open(req: object, timeout: float = 10.0) -> object:
+    return urllib.request.build_opener(_NoRedirect()).open(req, timeout=timeout)  # type: ignore[arg-type]
+
+
 class NotifyError(Exception):
     """Delivery failed. The message never contains the destination."""
 
@@ -121,12 +149,10 @@ class Notifier:
         opener: Callable[..., object] | None = None,
         timeout: float = 10.0,
     ) -> None:
-        if url is not None and not url.startswith(
-            ("https://", "http://127.0.0.1", "http://localhost")
-        ):
+        if url is not None and not _destination_allowed(url):
             raise NotifyError("destination must be https (loopback http allowed for tests)")
         self._url = url
-        self._open = opener or urllib.request.urlopen
+        self._open = opener or _no_redirect_open
         self._timeout = timeout
 
     @property

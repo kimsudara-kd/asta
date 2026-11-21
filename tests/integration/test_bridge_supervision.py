@@ -331,3 +331,34 @@ def test_the_monitor_role_can_append_audit_events_but_still_cannot_touch_the_hal
     ):
         with pytest.raises(DBAPIError):
             as_role(e, "asta_monitor", sql)
+
+
+def test_the_monitor_role_can_run_every_query_of_the_extended_checks(roles, migrated_engine):
+    """R-02: asta_monitor needs SELECT on incidents and market_feed_connections or the stamp is always ok=0."""
+    e = migrated_engine
+    as_role(
+        e, "asta_monitor", "SELECT count(*) FROM incidents WHERE kind = 'RECONCILIATION_MISMATCH'"
+    )
+    as_role(
+        e,
+        "asta_monitor",
+        "SELECT extract(epoch FROM now() - coalesce(last_event_at, since)) "
+        "FROM market_feed_connections WHERE source = 'LIVE'",
+    )
+
+
+def test_setting_the_release_guc_is_not_enough_to_release_the_kill_switch(roles, migrated_engine):
+    """R-01: a direct UPDATE with the GUC set is refused unless a releaser logged a RELEASE in the same transaction."""
+    import pytest
+    from sqlalchemy.exc import DBAPIError
+
+    e = migrated_engine
+    as_role(e, "asta_bridge", "SELECT trip_kill_switch('RISK_HALT', 'risk-bridge', 'guard test')")
+    with e.connect() as c:
+        trans = c.begin()
+        c.execute(text("SET LOCAL asta.kill_release_ok = 'on'"))
+        with pytest.raises(DBAPIError, match="not an authorised releaser"):
+            c.execute(text("UPDATE kill_switch_state SET active = false WHERE id = 1"))
+        trans.rollback()
+    with e.connect() as c:
+        assert c.execute(text("SELECT active FROM kill_switch_state")).scalar() is True

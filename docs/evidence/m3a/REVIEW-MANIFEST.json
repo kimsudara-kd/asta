@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "964d272246c38c48a87e6327cf3f471e24774a38",
+ "generated_from_commit": "272345afe5da5cad93907d473935d1b8962af176",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -32,7 +32,7 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-ACCEPTANCE.md",
-   "sha256": "9869b7105f4e492b9eaf4863f652a246e67d7dd42b4c6ee7d8b3dba8a18118ab"
+   "sha256": "9065620e25c1ab4b8bfc9840d3fcebfb85dd3869731df6e1d2f7e0c8db5fb6c1"
   },
   {
    "path": "docs/evidence/M3B-FINAL-CEO-DECISION-PACK.md",
@@ -424,7 +424,7 @@
   },
   {
    "path": "docs/m3b/PUBLISH-PLAN.md",
-   "sha256": "a64470916acc145ae6918932b263de9d938520dd6df0bdac0b92859cc2b4357e"
+   "sha256": "c0684cee950c252cd4fa26527d0da9b7a35c0eacbcaad5d6e25298321e21decc"
   },
   {
    "path": "docs/m3b/RISK-HALT-BRIDGE.md",
@@ -436,7 +436,7 @@
   },
   {
    "path": "docs/m3b/SECURITY-TOPOLOGY.md",
-   "sha256": "f14db36f538914113e6c516530e09bc780e7fce1f5a05f550733cc2ced587a63"
+   "sha256": "5b5fcc5d54807da5c2549aaa88792d2235f402653034df69349d57f291b295cc"
   },
   {
    "path": "docs/m3b/VAULT-AND-BACKUP.md",
@@ -556,7 +556,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/asta-risk-bridge.service",
-   "sha256": "2780a7e6e52faf5c0af4d0ba15839a830f9d59b3a52be9ae65e5ace64ad371a0"
+   "sha256": "daae99d97dfc93abcc4449db48e5a009d989b66590529af8a6a23a5c87e2ee90"
   },
   {
    "path": "infra/security-host/mac/app-vm/asta-security-alert@.service",
@@ -600,7 +600,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_roles_m3b.sql",
-   "sha256": "ac0ea2cc97f8e64fda6a1475778f0b30614af810c02e7e54ae57045b180d802b"
+   "sha256": "70fd68f2069821d5ca8354faa98d4070053ad14a41abf0f07e454c0a4e12809a"
   },
   {
    "path": "infra/security-host/mac/app-vm/postgresql-hardening.conf",
@@ -811,6 +811,10 @@
    "sha256": "1eb071bc2e394dbfbcdafc4b4ef0c4ae97b233ff2838fd0b2987fcd2531ff60c"
   },
   {
+   "path": "migrations/versions/0012_m3b_kill_switch_guard_hardening.py",
+   "sha256": "830df27f06f77d0da5cb1d55f376ac2266d09fd1d8036c4ecb02265a71ea31f6"
+  },
+  {
    "path": "proposals/binance_testnet_signer/README.md",
    "sha256": "1fdc5a9f7ceed880e9ed618c8e64a4fdef878c5d7b51964350f3d0a211e6f6fd"
   },
@@ -828,7 +832,7 @@
   },
   {
    "path": "scripts/history_scrub.py",
-   "sha256": "ea5205d6110d2ddbbf59aa2e07d30912ebc0ba24c0bb81384626c465b72d5608"
+   "sha256": "c6fb8b03ca6faea448b7b54482ecf8fd86e202be9e08238a8fb48ee97b10c3e7"
   },
   {
    "path": "scripts/host_posture.py",
@@ -836,11 +840,11 @@
   },
   {
    "path": "scripts/paper_integrity.py",
-   "sha256": "68e7bf4fe15354a94c9005b22913f64fdc246dffecd8dde552c801fe12c5df60"
+   "sha256": "2077ab82e82b61b9fb7d65605719b4c5acb12ff8c5b2d9e880a744dbedab7b51"
   },
   {
    "path": "scripts/privacy_scan.py",
-   "sha256": "3b0dab46df734ea36ac10f978530f49396e4fc36a287689882dcccb92bac1057"
+   "sha256": "0ffa856337cd598675fc6adc01c074972d15523a727c7e2201d13263faaa24a3"
   },
   {
    "path": "scripts/review_manifest.py",
@@ -864,7 +868,7 @@
   },
   {
    "path": "src/asta/orders/alerting.py",
-   "sha256": "872ac11a1937e9c6fd0a4243eb829049755c8b0997d410554443b1cdd2cb4508"
+   "sha256": "5762bf7a38499f45a2c367a17f7c8192dbecce40e4b0dab6a8a9f83e25223bd6"
   },
   {
    "path": "src/asta/orders/boundary.py",
@@ -948,7 +952,7 @@
   },
   {
    "path": "tests/integration/test_bridge_supervision.py",
-   "sha256": "44f391302356aaa43622c314edf856280f4e99b1da304d687053696a97254357"
+   "sha256": "d7d4497276287e9ed89c8168812cd97cc63edb2c7c139f8d17a9070bd2a94cc0"
   },
   {
    "path": "tests/integration/test_m3b_integrity.py",
@@ -956,7 +960,7 @@
   },
   {
    "path": "tests/integration/test_offhost_alerts.py",
-   "sha256": "ca5cf9bb14ba67af5c02b15ae028f0916ba58fd1869a788b83d9c8b5574302e0"
+   "sha256": "c5cd9a0590a725d71ffcd35c54c641de65780f47f51ebf4c121d37abfa17c38a"
   },
   {
    "path": "tests/integration/test_risk_bridge.py",
@@ -1056,7 +1060,7 @@
   },
   {
    "path": "tests/paper/test_integrity_script.py",
-   "sha256": "619c501a1463731a92910d85fd13d64caddafc49a4f2711a8faf2a40fb4a412a"
+   "sha256": "a05da5eb98d23d7e959073279583b796eaa646d3206249a6633db227621cf5b2"
   },
   {
    "path": "tests/security/test_synthetic_signer.py",

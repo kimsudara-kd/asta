@@ -22,6 +22,13 @@ FROZEN_DIGESTS = {
     "f9d8e770d765ee84",
     "be76eb9ef1a917a5",
 }  # docs/evidence/m3a/mac-xarch-integrity-*.json
+# session name -> sha256[:16] of md5 over the full fill rows; measured on the accepted M2 ledgers (see PIN below)
+CONTENT_DIGESTS: dict[
+    str, str
+] = {  # PIN 2026-11-21: ids already matched the frozen digests, so these are the M2 rows
+    "demo-synthetic-default": "970891b4aef19133",
+    "demo-synthetic-repeat-guard-on": "4a7f40147ac8df6d",
+}
 
 
 def verify(out: dict[str, dict[str, object]]) -> list[str]:
@@ -38,6 +45,13 @@ def verify(out: dict[str, dict[str, object]]) -> list[str]:
             bad.append(f"{name}: fills {r.get('fills')} != 35")
     if {str(r.get("fills_digest")) for r in out.values()} != FROZEN_DIGESTS:
         bad.append("fill digests differ from the frozen M2 evidence")
+    # the id digest above cannot see a changed price/quantity/fee; the content digest covers those, per session
+    if CONTENT_DIGESTS:
+        got = {n: str(r.get("content_digest")) for n, r in out.items()}
+        if got != CONTENT_DIGESTS:
+            bad.append(
+                "fill CONTENT digests (id, side, symbol, price, quantity, fee, notional, pnl) differ"
+            )
     return bad
 
 
@@ -79,8 +93,10 @@ def _run(check: bool) -> int:
             bad = store.reconcile(db, sid)
             ledger = db.execute(
                 text(
-                    "select count(*), coalesce(md5(string_agg(id::text, ',' order by id)), '') "
-                    "from paper_fills where session_id = :s"
+                    "select count(*), coalesce(md5(string_agg(id::text, ',' order by id)), ''), "
+                    "coalesce(md5(string_agg(concat_ws('|', id, fill_id, side, symbol, price::text, "
+                    "quantity::text, fee_amount::text, notional::text, realized_pnl::text), ';' "
+                    "order by id)), '') from paper_fills where session_id = :s"
                 ),
                 {"s": sid},
             ).one()
@@ -94,6 +110,7 @@ def _run(check: bool) -> int:
                 "reconcile_discrepancies": len(bad),
                 "fills": ledger[0],
                 "fills_digest": hashlib.sha256(ledger[1].encode()).hexdigest()[:16],
+                "content_digest": hashlib.sha256(ledger[2].encode()).hexdigest()[:16],
             }
         db.rollback()
     print(json.dumps(out, indent=1, default=str))

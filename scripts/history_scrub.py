@@ -21,6 +21,14 @@ def main() -> int:
     if "--map" not in argv:
         print("usage: history_scrub.py --map FILE (env BASE=<commit>)", file=sys.stderr)
         return 2
+    if (
+        os.environ.get("SCRUB_CONFIRM_SCRATCH") != "1"
+    ):  # it rewrites files in the CURRENT directory (review R-15)
+        print(
+            "REFUSING: set SCRUB_CONFIRM_SCRATCH=1 to confirm this is a scratch clone",
+            file=sys.stderr,
+        )
+        return 2
     base = os.environ["BASE"]
     pairs = []
     for line in open(argv[argv.index("--map") + 1], encoding="utf-8"):

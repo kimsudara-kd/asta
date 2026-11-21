@@ -17,9 +17,14 @@ import sys
 
 
 def git(repo: str, *a: str) -> str:
-    return subprocess.run(
-        ["git", "-C", repo, *a], capture_output=True, text=True, check=False
-    ).stdout  # noqa: S603,S607
+    r = subprocess.run(["git", "-C", repo, *a], capture_output=True, text=True, check=False)  # noqa: S603,S607
+    if r.returncode != 0:  # fail CLOSED: a broken repo path or range must never read as "clean"
+        print(
+            f"PRIVACY SCAN: ERROR - git failed ({r.returncode}); the result is NOT clean",
+            file=sys.stderr,
+        )
+        raise SystemExit(2)
+    return r.stdout
 
 
 def main() -> int:
@@ -28,16 +33,23 @@ def main() -> int:
     mapf = argv[argv.index("--map") + 1]
     rng = argv[argv.index("--range") + 1] if "--range" in argv else "--all"
     hits = 0
+    checked = 0
     for line in open(mapf, encoding="utf-8"):
         if "\t" not in line:
             continue
         real = line.split("\t", 1)[0]
         if not real or real == "P8":  # the product's own name is not an identifier
             continue
+        checked += 1
         commits = git(repo, "log", "-S" + real, "--format=%h", rng).split()
         if commits:
             hits += 1
             print(f"identifier #{hits}: {len(commits)} commit(s): {' '.join(commits[:6])}")
+    if checked == 0:  # an empty/wrong map would otherwise pass vacuously
+        print(
+            "PRIVACY SCAN: ERROR - the map has no identifiers; nothing was checked", file=sys.stderr
+        )
+        return 2
     print("PRIVACY SCAN:", "FINDINGS" if hits else "clean")
     return 1 if hits else 0
 

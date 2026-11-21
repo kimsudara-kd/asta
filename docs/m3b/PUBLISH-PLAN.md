@@ -9,7 +9,7 @@ already-public author identity; **owner to confirm**). Private map and original-
 Rebuild command (run again on the final local HEAD before publishing):
 ```
 git clone --no-hardlinks <repo> <scratch>; cd <scratch>; git checkout -b sanitized
-BASE=924da22 git filter-branch -f --tree-filter "python3 <copy>/history_scrub.py --map ~/asta-private/r6/replace-map.tsv" \
+SCRUB_CONFIRM_SCRATCH=1 BASE=<last public commit> git filter-branch -f --tree-filter "python3 <copy>/history_scrub.py --map ~/asta-private/r6/replace-map.tsv" \
   --env-filter '<author-normalisation>' -- 924da22..HEAD
 rm refs/original/*, delete the clone's other branches/remotes, reflog expire, gc --prune=now
 ```

@@ -9,6 +9,8 @@ All offline engineering that can be completed safely is complete and verified (1
 Mandatory acceptance gates remain open because they need things I am not authorized or able to do: privileged host hardening and VM provisioning (sudo), interruption of P1–P3 and removal of the Docker image, an appointed independent reviewer, a first hosted-CI run, publishing the sanitized history, and separate credential/demo authorization.
 One new environmental fault appeared during the work: **Docker Desktop's daemon stopped creating containers** (existing containers still run); every Docker-dependent verification is therefore marked BLOCKED, not passed.
 
+> **Status update 2026-11-21:** history published (fast-forward, owner-approved) and hosted CI green; Docker recovered; E2E 5/5; AI code review done and its High/Medium code findings fixed (see ADDENDUM and REVIEW-REPORT). Sections below that say "never pushed" describe the state at the time they were written.
+
 ## 2. Repository baseline and local commits
 Branch `main`; remote head `924da22` (re-read with `git ls-remote`); at start 19 unpushed commits (HEAD `8beb277`, clean). This program added commits `bf1784e`, `a8ed63b`, `8a79a75`, `0dffed8` and the documentation commit(s) after them (`git log 924da22..HEAD`). **Nothing was pushed, tagged or rewritten in the real repository.** Rollback baseline: `~/asta-private/r6/asta-original-9e1f552.bundle` (+sha256) and the commits themselves.
 
@@ -69,7 +71,7 @@ Env: macOS 26.5 arm64, Python 3.12.8, dev PG 16 on 127.0.0.1:5640 (`ASTA_TEST_DA
 | Lint/format/types | `ruff check`, `ruff format --check`, `mypy` (203 files) | clean | yes (pyright not configured) |
 | Dependency audits | `pip-audit`, `pnpm audit --prod` | none | yes |
 | Frozen M0–M2, review manifest, QEMU pin, secret scan | respective scripts | intact / verified / verified / 0 | yes |
-| CI workflow | parsed (`backend, security, egress-boundary, web, required`; gitleaks pinned 8.30.1) | configuration OK; **hosted CI unverified** | NO |
+| CI workflow | parsed (`backend, security, egress-boundary, web, required`; gitleaks pinned 8.30.1) | configuration OK; hosted CI **green** at published HEAD (2026-11-21, run on `964d272`) | yes |
 
 ## 15. Gitleaks and privacy scan
 Real repository: full-history gitleaks reports **1 finding** (the synthetic string quoted in unpushed commit `3b2a631`), no new exceptions added (`.gitleaksignore` unchanged, guard test intact). Sanitized candidate (scratch clone, rebuilt on local HEAD `346cae6`, 25 commits over `924da22`, fast-forward verified): **gitleaks: no leaks**, `scripts/privacy_scan.py` over the unpushed range **clean**, commit messages clean, `secret_scan` 0, tree identical to HEAD except 4 alias/hostname edits in docs and `privacy_scan.py`, authors normalised to the already-public identity, and the **full suite on the candidate: 1359 passed, 13 skipped (same Docker/opt-in skips)**. The review manifest differs in those 4 files, so publishing needs one extra "manifest regenerated" commit on top of the candidate (PUBLISH-PLAN step 0); documentation commits made after `346cae6` must be re-filtered by the same procedure. Details/commands: `docs/m3b/PUBLISH-PLAN.md`.
@@ -79,14 +81,14 @@ Real repository: full-history gitleaks reports **1 finding** (the synthetic stri
 **UNVERIFIED.** The rewritten `ci.yml` has never run remotely; earlier runs (29: 26 ok, 3 failed) used the old file and the mypy-in-tests failure is fixed locally. Marked open until the first approved push runs green.
 
 ## 17. Independent security review
-**BLOCKED — REVIEWER NOT APPOINTED.** The package scope (F-01, F-02, F-03, H-1, H-3, gateway, kill switch/bridge, vault, VM networking, backup/recovery, prod/demo separation, audit, data integrity, host config, test coverage) is covered by `docs/m3a/INDEPENDENT-REVIEW-PACKAGE.md`, `docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md` and the review manifest (extended to this program's files). I did not and cannot sign it.
+**UPDATE 2026-11-21: an AI reviewer appointed by the owner reviewed the code (read-only) — see `M3B-FINAL-REVIEW-REPORT.md`; verdict ACCEPT WITH CONDITIONS; owner sign-off pending.** Earlier text: BLOCKED — REVIEWER NOT APPOINTED. The package scope (F-01, F-02, F-03, H-1, H-3, gateway, kill switch/bridge, vault, VM networking, backup/recovery, prod/demo separation, audit, data integrity, host config, test coverage) is covered by `docs/m3a/INDEPENDENT-REVIEW-PACKAGE.md`, `docs/m3b/INDEPENDENT-REVIEW-CHECKLIST.md` and the review manifest (extended to this program's files). I did not and cannot sign it.
 
 ## 18. Finding register (High/Critical in bold)
 | ID | Finding | Status |
 |---|---|---|
 | **F-01** | legacy processes / runtime isolation | OPEN (needs dedicated host, review) |
 | **F-02** | independently enforced egress not deployed | OPEN (lab only) |
-| **F-03** | independent review not done | OPEN — reviewer not appointed |
+| **F-03** | independent review not done | OPEN — code review done (AI reviewer), deployed host not reviewed, owner sign-off pending |
 | **H-1** | shared host with unrelated workloads | OPEN (Docker package + hardening set) |
 | **H-3** | exposed host services (SSH, SMB, P2/P3, desktop app) | OPEN, measured |
 | G-13 | alerts must cover app/bridge | **CLOSED offline**; live drills open |
