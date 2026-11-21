@@ -75,3 +75,19 @@ production Binance hosts appear nowhere (tests assert it).
 The mock is ours: it proves our mapping and exactly-once logic, **not** the venue's real behaviour (e.g. exact error texts, filter rules,
 `-1021` handling, partial-fill timing). Step E is the first time that is learned, which is why it uses `order/test` first.
 The signer in `proposals/` is a **test double** (in-process key). A vault-backed signer (non-exportable key) replaces it before step E.
+
+## 9. Step B — DONE (offline; owner-approved 2026-11-21; gateway still DENY, no credentials, no network)
+Added under `src/` (all covered by the existing live-lock scans, which were **not** modified):
+- `src/asta/orders/extwire.py` — authenticated request/reply wire (SEND / QUERY / CANCEL), keyed BLAKE2b authenticator, authenticate-before-parse,
+  canonical bytes, replay/expiry via `ReplayStore`, replies bound to the request nonce and operation.
+- `src/asta/orders/external_port.py` — `ExternalChannelPort` (an `ExchangePort`): no signing, no exchange key, no HTTP, no socket; conservative mapping.
+- `src/asta/ipc/unix_socket.py` — length-prefixed frames over **AF_UNIX only**.
+- `src/asta/orders/boundary.py` — **change #1 of §3**: `GatedExchange.query/cancel` on an EXTERNAL port now go through the same gate as `send`
+  (`InternalGate.authorize_reducing`: the latched kill switch does not block a cancel, the gateway still does), the intent is required, and the dispatcher passes it.
+  The existing hard stop stays: even if the gateway one day returned ALLOW, `EXTERNAL_PORT_NOT_SUPPORTED_IN_THIS_BUILD` still denies until step C.
+Staged outside `src/` (`proposals/binance_testnet_signer/credential_service.py`): the credential-side service — re-validates every request, enforces venue/symbol
+allow-lists, per-order (20 USDT) and per-day (200 USDT) caps (proposed values, to be confirmed), refuses MARKET orders whose size cannot be verified, honours the
+kill switch for sends (never for cancels), and serves a 0660 Unix socket.
+Verified: 24 new tests (wire 7, port + gate 8, end-to-end 9 incl. lost reply → recovered by query with exactly one order, caps, kill switch, tamper/replay, a real
+socket); declared EXTERNAL the whole chain is **denied** with zero channel calls. `tests/live_lock` and `risk/gateway.py` unchanged.
+Not done (needs your approval, step C): the gateway change + enablement function; a durable replay store for the service; the launchd/`asta-cred` deployment.

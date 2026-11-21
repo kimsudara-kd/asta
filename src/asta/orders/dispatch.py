@@ -149,7 +149,7 @@ class Dispatcher:
             if rec.state == State.PENDING:  # never marked dispatched: it was never sent
                 self._retry(rec, rep)
                 continue
-            q = self.exchange.query(rec.decision_id)
+            q = self.exchange.query(rec.decision_id, rec)
             if q.kind == QueryKind.UNAVAILABLE:
                 rep.unavailable += 1
             elif q.kind == QueryKind.FOUND and q.view is not None:
@@ -165,14 +165,14 @@ class Dispatcher:
         for rec in sorted(
             self.store.by_state(frozenset({State.ABANDONED})), key=lambda r: r.decision_id
         ):
-            q = self.exchange.query(rec.decision_id)
+            q = self.exchange.query(rec.decision_id, rec)
             if (
                 q.kind == QueryKind.FOUND and q.view is not None
             ):  # it did reach the exchange after all
                 self._adopt(rec, q.view.state, rep)
         resting = frozenset({State.ACCEPTED, State.PARTIALLY_FILLED})
         for rec in sorted(self.store.by_state(resting), key=lambda r: r.decision_id):
-            q = self.exchange.query(rec.decision_id)
+            q = self.exchange.query(rec.decision_id, rec)
             if q.kind == QueryKind.FOUND and q.view is not None and q.view.state != rec.state:
                 self._adopt(rec, q.view.state, rep)
         self._recover_cancels(rep)
@@ -200,7 +200,7 @@ class Dispatcher:
             return rec
         rec = self._save(rec.moved(State.CANCEL_REQUESTED, cancel_attempts=rec.cancel_attempts + 1))
         rep.cancels += 1
-        res = self.exchange.cancel(rec.decision_id)  # write-ahead is already durable
+        res = self.exchange.cancel(rec.decision_id, rec)  # write-ahead is already durable
         if res.outcome == CancelOutcome.CANCELED:
             return self._save(rec.moved(State.CANCELED))
         if res.outcome == CancelOutcome.FINAL and res.state in ALLOWED[State.CANCEL_REQUESTED]:
@@ -214,7 +214,7 @@ class Dispatcher:
         for rec in sorted(
             self.store.by_state(frozenset({State.CANCEL_REQUESTED})), key=lambda r: r.decision_id
         ):
-            q = self.exchange.query(rec.decision_id)
+            q = self.exchange.query(rec.decision_id, rec)
             if q.kind == QueryKind.UNAVAILABLE:
                 rep.unavailable += 1
             elif q.kind == QueryKind.FOUND and q.view is not None:
@@ -247,7 +247,7 @@ class Dispatcher:
         rep.adopted += 1
 
     def _adopt_by_query(self, rec: Intent) -> Intent | None:
-        q = self.exchange.query(rec.decision_id)
+        q = self.exchange.query(rec.decision_id, rec)
         if q.kind == QueryKind.FOUND and q.view is not None and q.view.state in ALLOWED[rec.state]:
             return self._save(rec.moved(q.view.state, "adopted from exchange"))
         return None

@@ -88,6 +88,35 @@ class InternalGate:
             reasons.append("PORT_KIND_UNDECLARED")
         return Authorization(not reasons, tuple(dict.fromkeys(reasons)))
 
+    def authorize_reducing(self, intent: Intent, kind: PortKind | None) -> Authorization:
+        """Query / cancel of an existing order: same contract and gateway as ``authorize``, but a
+        latched kill switch does NOT block it (cancel / learning the truth only reduce exposure)."""
+        reasons: list[str] = []
+        d = authorize(Surface.DEMO_INTENT, intent.environment.value)
+        if not d.allowed:
+            reasons.extend(d.reasons)
+        if kind == PortKind.SIMULATED:
+            pass
+        elif kind == PortKind.EXTERNAL:
+            ext = self._external.authorize(
+                OrderRequest(
+                    intent.environment.value,
+                    intent.venue,
+                    "demo",
+                    intent.symbol,
+                    intent.side,
+                    intent.quantity or intent.quote_notional or Decimal(0),
+                    intent.limit_price,
+                )
+            )
+            if ext.decision != Decision.ALLOW:
+                reasons.extend(ext.reason_codes)
+            else:  # pragma: no cover - unreachable while the gateway is default-DENY
+                reasons.append("EXTERNAL_PORT_NOT_SUPPORTED_IN_THIS_BUILD")
+        else:
+            reasons.append("PORT_KIND_UNDECLARED")
+        return Authorization(not reasons, tuple(dict.fromkeys(reasons)))
+
 
 class GatedExchange:
     """The only way the order path reaches an exchange port. Re-checks the gate on every call."""
@@ -104,14 +133,27 @@ class GatedExchange:
             raise ExecutionDenied(a.reasons)
         return self._port.send(intent)
 
-    def query(self, client_id: str) -> QueryResult:
-        if (
-            self.kind != PortKind.SIMULATED
-        ):  # reading an external exchange is also execution-adjacent
+    def _external_gate(self, intent: Intent | None) -> None:
+        """EXTERNAL query/cancel: the same gate as send (minus the kill switch); intent required."""
+        if intent is None:
+            raise ExecutionDenied(("INTENT_REQUIRED",))
+        a = self.gate.authorize_reducing(intent, self.kind)
+        if not a.allowed:
+            raise ExecutionDenied(a.reasons)
+        bind = getattr(self._port, "bind_intent", None)
+        if bind is not None:
+            bind(intent)
+
+    def query(self, client_id: str, intent: Intent | None = None) -> QueryResult:
+        if self.kind == PortKind.EXTERNAL:  # reading an external exchange is execution-adjacent
+            self._external_gate(intent)
+        elif self.kind != PortKind.SIMULATED:
             raise ExecutionDenied(("PORT_NOT_SIMULATED",))
         return self._port.query(client_id)
 
     def cancel(self, client_id: str, intent: Intent | None = None) -> CancelResult:
-        if self.kind != PortKind.SIMULATED:
+        if self.kind == PortKind.EXTERNAL:
+            self._external_gate(intent)
+        elif self.kind != PortKind.SIMULATED:
             raise ExecutionDenied(("PORT_NOT_SIMULATED",))
         return self._port.cancel(client_id)
