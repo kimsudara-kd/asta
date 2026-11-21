@@ -39,6 +39,12 @@ GRANT USAGE ON SEQUENCE audit_events_id_seq TO asta_release;
 -- One LOGIN role per human, a member of asta_release (e.g. CREATE ROLE rel_alice LOGIN IN ROLE asta_release;).
 GRANT EXECUTE ON FUNCTION release_kill_switch(text) TO asta_release;
 
+-- M3-B step C: runtime enablement of testnet execution. Only releasers can turn it ON/OFF (functions, one login per human);
+-- the order worker and the monitor can only ASK (execution_enabled) and READ; nobody gets UPDATE on the table.
+GRANT SELECT ON execution_enablement, execution_enablement_events TO asta_orders, asta_monitor, asta_release;
+GRANT EXECUTE ON FUNCTION execution_enabled(text) TO asta_orders, asta_monitor, asta_release;
+GRANT EXECUTE ON FUNCTION enable_testnet_execution(integer, text), disable_testnet_execution(text) TO asta_release;
+
 -- failure monitor: read-only
 GRANT SELECT ON kill_switch_state, risk_halt_bridge_heartbeat TO asta_monitor;
 -- extended checks (alerting.extended_checks): reconciliation incidents and market-feed freshness (review R-02)

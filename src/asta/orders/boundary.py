@@ -6,9 +6,10 @@ Nothing in ``asta.orders`` may talk to an exchange port except through ``GatedEx
 
 1. the shared contract ``asta.core.order_gate`` (DEMO_INTENT: environment must be EXCHANGE_DEMO);
 2. the durable kill switch (a latched halt refuses anything that could increase exposure);
-3. the port kind: a SIMULATED port (fake/offline) may run; an EXTERNAL port is passed to the
-   unchanged ``asta.risk.gateway.ExecutionGateway``, which denies everything, so an external port
-   can never be reached in this build; a port that declares no kind is refused (fail closed).
+3. the port kind: a SIMULATED port (fake/offline) may run; an EXTERNAL port is passed to
+   ``asta.risk.gateway.ExecutionGateway``, which denies everything except the Binance Spot Testnet
+   cell, and only while the reviewed constant AND the runtime enablement hold (both default OFF); a
+   port that declares no kind is refused (fail closed).
 
 This module is policy only: it does not implement a connector and holds no credential.
 """
@@ -82,8 +83,6 @@ class InternalGate:
             )
             if ext.decision != Decision.ALLOW:
                 reasons.extend(ext.reason_codes)
-            else:  # pragma: no cover - unreachable while the gateway is default-DENY
-                reasons.append("EXTERNAL_PORT_NOT_SUPPORTED_IN_THIS_BUILD")
         else:
             reasons.append("PORT_KIND_UNDECLARED")
         return Authorization(not reasons, tuple(dict.fromkeys(reasons)))
@@ -111,8 +110,6 @@ class InternalGate:
             )
             if ext.decision != Decision.ALLOW:
                 reasons.extend(ext.reason_codes)
-            else:  # pragma: no cover - unreachable while the gateway is default-DENY
-                reasons.append("EXTERNAL_PORT_NOT_SUPPORTED_IN_THIS_BUILD")
         else:
             reasons.append("PORT_KIND_UNDECLARED")
         return Authorization(not reasons, tuple(dict.fromkeys(reasons)))

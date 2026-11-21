@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "f27288b164db5546ca04f9d43f422d445ba6e21b",
+ "generated_from_commit": "2c3af0dd5271674c036035db83edc826bd607753",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -372,7 +372,7 @@
   },
   {
    "path": "docs/m3b/BINANCE-TESTNET-CONNECTOR-PROPOSAL.md",
-   "sha256": "09821a9b9f646605b4cd34e161b119b068c12ed95516c84c0849fc8063269fbb"
+   "sha256": "e8e5b29fa3a1dd8aef51b885011fcbf8243394cd90540b752e9e7acffbfa81b0"
   },
   {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
@@ -608,7 +608,7 @@
   },
   {
    "path": "infra/security-host/mac/app-vm/pg_roles_m3b.sql",
-   "sha256": "70fd68f2069821d5ca8354faa98d4070053ad14a41abf0f07e454c0a4e12809a"
+   "sha256": "78ca8b224a56b8ef296573b72da6138a30632f8f2320d6d50217186202dea50c"
   },
   {
    "path": "infra/security-host/mac/app-vm/postgresql-hardening.conf",
@@ -823,6 +823,10 @@
    "sha256": "830df27f06f77d0da5cb1d55f376ac2266d09fd1d8036c4ecb02265a71ea31f6"
   },
   {
+   "path": "migrations/versions/0013_m3b_execution_enablement.py",
+   "sha256": "3dd64171f1301b214d8790e11987e7c24f8cd908aa40b3f8c1dfc38d87ec204e"
+  },
+  {
    "path": "proposals/binance_testnet_signer/README.md",
    "sha256": "1fdc5a9f7ceed880e9ed618c8e64a4fdef878c5d7b51964350f3d0a211e6f6fd"
   },
@@ -888,11 +892,11 @@
   },
   {
    "path": "src/asta/orders/alerting.py",
-   "sha256": "5762bf7a38499f45a2c367a17f7c8192dbecce40e4b0dab6a8a9f83e25223bd6"
+   "sha256": "078971f1e977ce29f991f058e68306c0129f34a769c22861a81bb27ecc8ef00e"
   },
   {
    "path": "src/asta/orders/boundary.py",
-   "sha256": "42c1c492eb71afbe4ea38cb6aee7fde4ab5131eb08436151dbb2de1f398958c0"
+   "sha256": "1311fa4f513507c2ca581548d0aadb895e695a58959f1700a977140544bb36c7"
   },
   {
    "path": "src/asta/orders/channel.py",
@@ -905,6 +909,10 @@
   {
    "path": "src/asta/orders/dispatch.py",
    "sha256": "2cb6918556387d0b466b68594c18c6cb8b41604f94b3def5f024c530c5b1908e"
+  },
+  {
+   "path": "src/asta/orders/enablement.py",
+   "sha256": "357dd47897c05c73c963ff5ff5ba069ee28e4364cdabe9a7685132978da8182f"
   },
   {
    "path": "src/asta/orders/external_port.py",
@@ -980,7 +988,7 @@
   },
   {
    "path": "tests/integration/test_bridge_supervision.py",
-   "sha256": "d7d4497276287e9ed89c8168812cd97cc63edb2c7c139f8d17a9070bd2a94cc0"
+   "sha256": "e2f53a9debe0517e21ee562905b8da3f10a1d0d13878c7e377435d67403524c8"
   },
   {
    "path": "tests/integration/test_m3b_integrity.py",
@@ -1087,6 +1095,10 @@
    "sha256": "404bfea5640b7d8f66a9871e4710fdb11eac15d243e48f4cb9c5de4c1ca6bbf2"
   },
   {
+   "path": "tests/orders/test_gateway_enabled_boundary.py",
+   "sha256": "d75a334d82a6e25aea74a34dff05e99a996ad8d60943f6578e657df44bfeb852"
+  },
+  {
    "path": "tests/orders/test_m3b_offline.py",
    "sha256": "442d117a2044a3ba881011aebe708c355d853bed2d471d9ca4bf97fbb20e31c2"
   },
@@ -1104,7 +1116,7 @@
   },
   {
    "path": "tests/security/test_credential_service.py",
-   "sha256": "7345d93a27c979ca029da495197f4304c190b4d76fea9ef812f11e183ff5f51d"
+   "sha256": "dde6510686619e305350e491fe0009f05417f53ef9f9d8016e7c2cf293efb7d6"
   },
   {
    "path": "tests/security/test_synthetic_signer.py",

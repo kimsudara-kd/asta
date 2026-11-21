@@ -238,3 +238,31 @@ def test_the_service_and_the_unix_channel_use_no_internet_sockets():
             or "AF_UNIX" in text
         )
         assert "AF_UNIX" in text
+
+
+def test_declared_external_with_the_constant_on_and_the_enablement_active_the_chain_reaches_the_mock(
+    monkeypatch,
+):
+    """Step C offline end to end: dispatcher -> gate -> gateway(ALLOW, testnet cell) -> channel -> service -> connector -> mock."""
+    from asta.risk import gateway
+    from asta.risk.gateway import ExecutionGateway
+
+    class On:
+        on = True
+
+        def active(self, scope: str) -> bool:
+            return self.on and scope == "BINANCE_TESTNET"
+
+    monkeypatch.setattr(gateway, "TESTNET_EXECUTION_ALLOWED", True)
+    rig = Rig()
+    sw = On()
+    gx = GatedExchange(rig.port(), PortKind.EXTERNAL, InternalGate(rig.kill, ExecutionGateway(sw)))
+    d = Dispatcher(gx, MemoryStore(), LIM, lambda: DAY, lambda s: D("50000"), lambda: 1_000)
+    i = lim(1)
+    assert d.handle(i).state is State.ACCEPTED and len(rig.exchange.orders) == 1
+    assert gx.query(i.decision_id, i).kind.value == "FOUND"
+    sw.on = False  # the owner (or the kill switch) switches testnet execution off
+    assert d.handle(lim(2)).state is State.REJECTED and len(rig.exchange.orders) == 1
+    with pytest.raises(ExecutionDenied):
+        gx.cancel(i.decision_id, i)
+    assert rig.exchange.orders[i.decision_id]["status"] == "NEW"  # the cancel never left the app

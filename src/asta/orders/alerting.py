@@ -47,6 +47,9 @@ def extended_checks(
                     " AND resolved_at IS NULL"
                 )
             ).scalar_one()
+            enabled = bool(
+                db.execute(text("SELECT execution_enabled('BINANCE_TESTNET')")).scalar_one()
+            )
             feeds = db.execute(
                 text(
                     "SELECT venue, state,"
@@ -56,6 +59,8 @@ def extended_checks(
             ).all()
     except Exception as exc:  # noqa: BLE001
         return [Alert("DATABASE_UNREADABLE", "critical", type(exc).__name__)]
+    if enabled:  # not a fault: testnet execution is switched ON, so someone must be told (off-host)
+        out.append(Alert("EXECUTION_ENABLED", "warning", "BINANCE_TESTNET execution is enabled"))
     if n:
         out.append(Alert("RECONCILIATION_DISCREPANCY", "critical", f"{n} unresolved"))
     for venue, state, age in feeds:

@@ -152,3 +152,24 @@ class RiskHaltBridgeHeartbeat(Base):
     __tablename__ = "risk_halt_bridge_heartbeat"
     id: Mapped[int] = mapped_column(SmallInteger, primary_key=True)
     beat_at: Mapped[datetime] = mapped_column(TS)
+
+
+class ExecutionEnablement(Base):
+    """Migration 0013: runtime enablement of testnet execution (default OFF, releaser-only)."""
+
+    __tablename__ = "execution_enablement"
+    scope: Mapped[str] = mapped_column(String(32), primary_key=True)
+    enabled_until: Mapped[datetime] = mapped_column(TS, server_default="epoch")
+    enabled_by: Mapped[str] = mapped_column(String(64), server_default="none")
+    reason: Mapped[str] = mapped_column(Text, server_default="")
+    updated_at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+
+
+class ExecutionEnablementEvent(Base):
+    __tablename__ = "execution_enablement_events"
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
+    at: Mapped[datetime] = mapped_column(TS, server_default=func.now())
+    action: Mapped[str] = mapped_column(String(8))
+    actor: Mapped[str] = mapped_column(String(64))
+    hours: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    reason: Mapped[str] = mapped_column(Text)

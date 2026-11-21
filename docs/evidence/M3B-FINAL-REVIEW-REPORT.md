@@ -27,3 +27,6 @@ exactly-once claim/write-ahead/resend, idempotent fills, channel authenticates b
 | R-15 | Info | stale acceptance text; `history_scrub.py` had no scratch guard | **FIXED**: acceptance refreshed; script requires `SCRUB_CONFIRM_SCRATCH=1` |
 
 Open High/Critical after this round: F-01, F-02, F-03, H-1, H-3 (R-01/R-02 closed in code but their deployed-role proof needs the VM/host steps).
+
+## Addendum 2026-11-21 (step C)
+The gateway change (`risk/gateway.py`, migration 0013, boundary pass-through) was made after this review and has **not** been reviewed by the reviewer agent: re-review required before the constant is ever flipped. `tests/live_lock` unchanged; new `tests/live_lock/test_gateway_matrix.py` only adds protection.

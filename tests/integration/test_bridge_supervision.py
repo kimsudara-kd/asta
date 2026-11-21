@@ -42,6 +42,11 @@ def clean(migrated_engine):
             c.execute(text("DELETE FROM kill_switch_releasers"))
             c.execute(text("DELETE FROM risk_halt_bridge_seen"))
             c.execute(text("UPDATE risk_halt_bridge_heartbeat SET beat_at = 'epoch'"))
+            c.execute(
+                text(
+                    "UPDATE execution_enablement SET enabled_until = 'epoch', enabled_by = 'none', reason = ''"
+                )
+            )
 
     reset()
     yield
@@ -362,3 +367,190 @@ def test_setting_the_release_guc_is_not_enough_to_release_the_kill_switch(roles,
         trans.rollback()
     with e.connect() as c:
         assert c.execute(text("SELECT active FROM kill_switch_state")).scalar() is True
+
+
+# ------------------------------------------------------------------ M3-B step C: runtime enablement of testnet execution
+ENABLED = "SELECT execution_enabled('BINANCE_TESTNET')"
+WHY = "owner approved a testnet session for today"
+
+
+def _list(engine, *names: str) -> None:
+    with engine.begin() as c:
+        for n in names:
+            c.execute(text("INSERT INTO kill_switch_releasers (name) VALUES (:n)"), {"n": n})
+
+
+def _on(engine) -> bool:
+    return bool(as_role(engine, "asta_orders", ENABLED)[0][0])
+
+
+def _events(engine) -> list[tuple[str, str]]:
+    with engine.connect() as c:
+        return [
+            (a, b)
+            for a, b in c.execute(
+                text("SELECT action, actor FROM execution_enablement_events ORDER BY id")
+            ).all()
+        ]
+
+
+def test_execution_is_off_by_default_and_only_a_listed_releaser_can_turn_it_on(
+    roles, migrated_engine
+):
+    e = migrated_engine
+    assert _on(e) is False
+    for who in ("asta_orders", "asta_bridge", "asta_monitor"):  # no EXECUTE on the enable function
+        with pytest.raises(DBAPIError):
+            as_role(e, who, f"SELECT enable_testnet_execution(2, '{WHY}')")
+    with pytest.raises(DBAPIError):  # a member of asta_release who is not listed
+        as_login(e, "rel_alice", f"SELECT enable_testnet_execution(2, '{WHY}')")
+    _list(e, "rel_alice")
+    before = len(_events(e))
+    until = as_login(e, "rel_alice", f"SELECT enable_testnet_execution(2, '{WHY}')")[0][0]
+    assert until is not None and _on(e) is True
+    assert _events(e)[before:] == [("ENABLE", "rel_alice")]
+    with pytest.raises(DBAPIError):  # rel_eve is a releaser-role member but is not listed
+        as_login(e, "rel_eve", f"SELECT enable_testnet_execution(2, '{WHY}')")
+
+
+def test_enablement_arguments_are_validated_and_a_latched_kill_switch_refuses(
+    roles, migrated_engine
+):
+    e = migrated_engine
+    _list(e, "rel_alice")
+    for hours, reason in ((0, WHY), (25, WHY), (-3, WHY), (2, "short"), (2, "         ")):
+        with pytest.raises(DBAPIError):
+            as_login(e, "rel_alice", f"SELECT enable_testnet_execution({hours}, '{reason}')")
+    with pytest.raises(DBAPIError):
+        as_login(e, "rel_alice", f"SELECT enable_testnet_execution(NULL, '{WHY}')")
+    assert _on(e) is False
+    as_role(e, "asta_bridge", "SELECT trip_kill_switch('RISK_HALT', 'risk-bridge', 'guard test')")
+    with pytest.raises(DBAPIError, match="kill switch is latched"):
+        as_login(e, "rel_alice", f"SELECT enable_testnet_execution(2, '{WHY}')")
+    assert _on(e) is False
+
+
+def test_a_direct_update_cannot_turn_execution_on_not_even_with_the_guc_or_as_the_owner(
+    roles, migrated_engine
+):
+    e = migrated_engine
+    on = "UPDATE execution_enablement SET enabled_until = now() + interval '1 hour'"
+    for who in ("asta_orders", "asta_monitor", "asta_release"):
+        with pytest.raises(DBAPIError):
+            as_role(e, who, on)  # no UPDATE privilege
+    for pre in (
+        "",
+        "SET LOCAL asta.kill_release_ok = 'on'",
+    ):  # the owner login, not a listed releaser
+        with e.connect() as c:
+            trans = c.begin()
+            if pre:
+                c.execute(text(pre))
+            with pytest.raises(DBAPIError, match="not an authorised releaser"):
+                c.execute(text(on))
+            trans.rollback()
+    owner = _session_user(e)
+    _list(e, owner)  # even a LISTED releaser needs an ENABLE event in the same transaction
+    with e.connect() as c:
+        trans = c.begin()
+        with pytest.raises(DBAPIError, match="no ENABLE event"):
+            c.execute(text(on))
+        trans.rollback()
+    with e.connect() as c:
+        trans = c.begin()
+        with pytest.raises(DBAPIError, match="24 hours"):
+            c.execute(
+                text("UPDATE execution_enablement SET enabled_until = now() + interval '3 days'")
+            )
+        trans.rollback()
+    assert _on(e) is False
+
+
+def _session_user(engine) -> str:
+    with engine.connect() as c:
+        return str(c.execute(text("SELECT session_user")).scalar_one())
+
+
+def test_the_kill_switch_switches_execution_off_and_releasing_it_does_not_switch_it_back_on(
+    roles, migrated_engine
+):
+    e = migrated_engine
+    _list(e, "rel_alice")
+    as_login(e, "rel_alice", f"SELECT enable_testnet_execution(4, '{WHY}')")
+    assert _on(e) is True
+    as_role(e, "asta_bridge", "SELECT trip_kill_switch('RISK_HALT', 'risk-bridge', 'guard test')")
+    assert _on(e) is False
+    assert ("AUTO_OFF", "kill-switch") in _events(e)
+    as_login(
+        e, "rel_alice", "SELECT release_kill_switch('reviewed the halt and releasing for the test')"
+    )
+    assert _on(e) is False  # still off: a person must enable it again
+
+
+def test_a_releaser_can_disable_and_the_enablement_expires_by_itself(roles, migrated_engine):
+    e = migrated_engine
+    _list(e, "rel_alice")
+    as_login(e, "rel_alice", f"SELECT enable_testnet_execution(1, '{WHY}')")
+    assert (
+        as_login(
+            e, "rel_alice", "SELECT disable_testnet_execution('stopping the testnet session now')"
+        )[0][0]
+        is True
+    )
+    assert _on(e) is False and ("DISABLE", "rel_alice") in _events(e)
+    with pytest.raises(DBAPIError):
+        as_login(e, "rel_alice", "SELECT disable_testnet_execution('x')")  # reason required
+    as_login(e, "rel_alice", f"SELECT enable_testnet_execution(1, '{WHY}')")
+    with e.begin() as c:  # time passes: the window ends without anyone doing anything
+        c.execute(text("SET LOCAL session_replication_role = replica"))
+        c.execute(
+            text("UPDATE execution_enablement SET enabled_until = now() - interval '1 minute'")
+        )
+    assert _on(e) is False
+
+
+def test_the_event_log_is_append_only_and_the_orders_role_can_only_read(roles, migrated_engine):
+    e = migrated_engine
+    _list(e, "rel_alice")
+    as_login(e, "rel_alice", f"SELECT enable_testnet_execution(1, '{WHY}')")
+    for sql in (
+        "UPDATE execution_enablement_events SET actor = 'x'",
+        "DELETE FROM execution_enablement_events",
+        "TRUNCATE execution_enablement_events",
+        "DELETE FROM execution_enablement",
+        "TRUNCATE execution_enablement",
+    ):
+        with pytest.raises(DBAPIError):
+            with e.begin() as c:
+                c.execute(text(sql))
+    for who in ("asta_orders", "asta_monitor"):
+        with pytest.raises(DBAPIError):
+            as_role(
+                e,
+                who,
+                "INSERT INTO execution_enablement_events (action, actor, reason) VALUES ('ENABLE','x','y')",
+            )
+        assert as_role(e, who, "SELECT count(*) FROM execution_enablement_events")[0][0] >= 1
+
+
+def test_the_application_view_fails_closed_and_the_monitor_announces_enablement(
+    roles, migrated_engine
+):
+    from asta.orders import alerting
+    from asta.orders.enablement import SqlEnablement
+
+    e = migrated_engine
+    sessions = sessionmaker(e, expire_on_commit=False)
+    view = SqlEnablement(sessions)
+    assert view.active("BINANCE_TESTNET") is False and view.active("OKX") is False
+    _list(e, "rel_alice")
+    as_login(e, "rel_alice", f"SELECT enable_testnet_execution(1, '{WHY}')")
+    assert view.active("BINANCE_TESTNET") is True and view.active("OKX") is False
+    assert "EXECUTION_ENABLED" in [a.code for a in alerting.extended_checks(sessions, None)]
+    as_role(e, "asta_monitor", ENABLED)  # the monitor role can run the new query (R-02 lesson)
+
+    class Broken:
+        def __call__(self):
+            raise RuntimeError("database down")
+
+    assert SqlEnablement(Broken()).active("BINANCE_TESTNET") is False  # type: ignore[arg-type]
