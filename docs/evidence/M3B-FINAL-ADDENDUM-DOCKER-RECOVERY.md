@@ -35,3 +35,14 @@ The sanitized candidate predates this commit and must be rebuilt again at publis
 Built from local HEAD e5874aa: scratch `/tmp/a/san3`, head 86b603b, 33 commits above 924da22 (fast-forward). gitleaks no leaks, privacy clean,
 secret scan 0, manifest verified, ruff/mypy clean, suite 1365 passed + 7 skipped (boundary stack down in the scratch run; the same code passed 1367/5
 with the stack up on the real repo), single author identity. Not pushed. Any later commit requires one more rebuild (PUBLISH-PLAN step 0).
+
+## PUBLISHED and hosted CI verified (2026-11-21, owner approval "approve push")
+- Sanitized history pushed as a fast-forward (no force): `924da22..c3e1e62`; the local `main` was then aligned to the remote
+  (`backup/pre-sanitize` keeps the original local history; private bundle in `~/asta-private/r6/`). Pushed with the repository owner's `gh` credentials
+  (the default git credential was the other account and got 403; nothing was bypassed).
+- Hosted CI's first runs of the new workflow found two real portability faults, both fixed in follow-up fast-forward commits: (1) four tests of
+  macOS-only host scripts assumed macOS and failed on the Linux runner (`2b4f952`: platform-aware assertions); (2) the skip guard flagged reviewed
+  platform skips in the generic `backend` job (`964d272`: `--allow-platform`, still strict by default and in `egress-boundary`; Docker/firewall skips never allowed).
+- Run 44881899517 on `964d272`: **backend, egress-boundary, security, web, required — all success.** Gate E-8/CI is now PASS at the published HEAD.
+- The macOS-only tests do not run in hosted CI (no Mac runner); they are verified locally on the Mac host (1365 passed). Known public-history item unchanged: commits `1cdb07a`/`23cc022` contain one internal container name.
+- Still not done (reserved or external): acceptance tag, reviewer, Docker image removal, host hardening/VMs, credentials/testnet activation. Status stays **BUILT — NOT ACCEPTED, credential NO-GO**.
