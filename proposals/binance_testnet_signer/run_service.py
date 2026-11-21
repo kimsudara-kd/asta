@@ -2,8 +2,9 @@
 
     python run_service.py --config /path/to/cred.json
 
-Only ``"mode": "mock"`` exists: the in-process mock exchange and a SYNTHETIC signer, for dry runs and drills. ``"mode":
-"testnet"`` is refused until step E (key ceremony, vault-backed signer, a reviewed HTTPS transport, owner approval).
+``"mode": "mock"``: the in-process mock exchange and a SYNTHETIC signer (dry runs, drills). ``"mode": "testnet"``
+(step F): the real Binance Spot Testnet through the pinned HTTPS transport and the key-file signer; it refuses to start
+without a fresh PASSING step E probe stamp for exactly that key.
 Everything is read from the config file (never from environment variables, never from the command line); secrets live in
 files that must not be readable by other users. The request-authentication key is a file of 64 hex characters.
 """
@@ -31,7 +32,7 @@ from connector import BinanceTestnetPort  # noqa: E402
 from credential_service import Caps, CredentialService, serve_unix  # noqa: E402
 from mock_exchange import MockTestnetExchange  # noqa: E402
 from replay_store import FileReplayStore, FileSpendStore  # noqa: E402
-from signer import SyntheticEd25519Signer  # noqa: E402
+from signer import SignerError, SyntheticEd25519Signer  # noqa: E402
 
 from asta.orders.extwire import Blake2bAuthenticator, RequestReceiver  # noqa: E402
 
@@ -106,12 +107,13 @@ def load_config(path: str) -> dict[str, Any]:
     missing = [k for k in REQUIRED if k not in cfg]
     if missing:
         raise ConfigError(f"missing config keys: {missing}")
+    if cfg["mode"] not in ("mock", "testnet"):
+        raise ConfigError("mode must be 'mock' or 'testnet'")
     if cfg["mode"] == "testnet":
-        raise ConfigError(
-            "mode 'testnet' is not available until step E (key ceremony + reviewed transport + approval)"
-        )
-    if cfg["mode"] != "mock":
-        raise ConfigError("mode must be 'mock'")
+        block = cfg.get("testnet")
+        need = ("private_key_file", "api_key_file", "probe_stamp_file")
+        if not isinstance(block, dict) or any(k not in block for k in need):
+            raise ConfigError(f"mode 'testnet' needs a 'testnet' block with {list(need)}")
     if not isinstance(cfg["senders"], list) or not cfg["senders"]:
         raise ConfigError("senders must be a non-empty list")
     uids = cfg["allowed_uids"]
@@ -141,9 +143,29 @@ def build(cfg: dict[str, Any], clock: Any = time.time) -> Built:
         spend=FileSpendStore(cfg["spend_db"]),
     )
     kill = FileKill(cfg.get("kill_file", cfg["socket"] + ".kill"))
-    synth = SyntheticEd25519Signer()  # mock mode only
-    ex = MockTestnetExchange(synth.public_key_b64(), lambda: int(clock() * 1000))
-    port = BinanceTestnetPort(synth, ex, lambda: int(clock() * 1000), "SYNTHETIC-KEY-ID")
+
+    def ms() -> int:
+        return int(clock() * 1000)
+
+    if cfg["mode"] == "mock":
+        synth = SyntheticEd25519Signer()  # mock mode only
+        port = BinanceTestnetPort(
+            synth, MockTestnetExchange(synth.public_key_b64(), ms), ms, "SYNTHETIC-KEY-ID"
+        )
+    else:  # step F: the real testnet. Needs a fresh PASSING probe for exactly this key (E before F).
+        from file_signer import FileEd25519Signer
+        from https_transport import HttpsTransport
+        from probe import ProbeConfigError, _ssl_context, read_private_line, read_stamp
+
+        t_cfg = cfg["testnet"]
+        try:
+            signer = FileEd25519Signer(t_cfg["private_key_file"])
+            fingerprint = repr(signer).split("=")[1].rstrip(">")
+            read_stamp(t_cfg["probe_stamp_file"], fingerprint, clock())
+            api_key = read_private_line(t_cfg["api_key_file"])
+        except (ProbeConfigError, SignerError, OSError) as exc:
+            raise ConfigError(f"testnet mode refused: {exc}") from exc
+        port = BinanceTestnetPort(signer, HttpsTransport(_ssl_context(t_cfg)), ms, api_key)
     enabled = FileEnabled(cfg["enabled_file"], clock)
     svc = CredentialService(
         rx, auth, port, caps, kill.active, clock, cfg["key_id"], execution_enabled=enabled.active

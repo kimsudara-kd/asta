@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "0a396dbdd564e5d545ca68a8b091b51122932bfb",
+ "generated_from_commit": "9f8113a5a5cf0d5de6d0c85dd8c3593f407ec75a",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -372,7 +372,7 @@
   },
   {
    "path": "docs/m3b/BINANCE-TESTNET-CONNECTOR-PROPOSAL.md",
-   "sha256": "ce601141b36668f6cbfaa6ad9073da145107d91d6197a8f14eaf53ef92cca828"
+   "sha256": "23a88d3fe62f217377154549d59e505c2df36d5b5038cfaa9efcc77209f275f3"
   },
   {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
@@ -449,6 +449,10 @@
   {
    "path": "docs/m3b/STEP-E-KEY-CEREMONY-AND-PROBE.md",
    "sha256": "90ad5e676df05935d3dedcde4dbaa8213bbbdc311bd9d98d596bd0f1eff01e7c"
+  },
+  {
+   "path": "docs/m3b/STEP-F-TESTNET-ORDERS-RUNBOOK.md",
+   "sha256": "31841dd2250bb8cc8a01ef07612defd3355737c41ec9e492b53bd4ada5852b4c"
   },
   {
    "path": "docs/m3b/VAULT-AND-BACKUP.md",
@@ -864,7 +868,7 @@
   },
   {
    "path": "proposals/binance_testnet_signer/probe.py",
-   "sha256": "a7ccd9f15c0c684a1533280bc3e4e1c340bf194aa2c6135467ca969461826908"
+   "sha256": "bff9c887f82f17ff6ecf816e76afbc4e75aa1b4a94370d660050daa25c2f81a1"
   },
   {
    "path": "proposals/binance_testnet_signer/replay_store.py",
@@ -872,7 +876,7 @@
   },
   {
    "path": "proposals/binance_testnet_signer/run_service.py",
-   "sha256": "1bbb9ae1f36d0abe15e82be8c6b0373e8893d02f0e28137645c1e55d8c1899f4"
+   "sha256": "159111c4798e574c437d67575174cf21d1e907beed83c02c6a1f7d6e6f9c22f1"
   },
   {
    "path": "proposals/binance_testnet_signer/signer.py",
@@ -1005,6 +1009,10 @@
   {
    "path": "src/asta/orders/supervisor.py",
    "sha256": "65bcabd7d4c2d5c0d9e5aadc826290cf1d0a92a5d050ff855027fd0a4cd594f8"
+  },
+  {
+   "path": "src/asta/orders/testnet_session.py",
+   "sha256": "dc6c6874b5987ee5e4660a749ef5d00728de8dceb23c7502ad5522e21c56c045"
   },
   {
    "path": "src/asta/security/__init__.py",
@@ -1173,6 +1181,10 @@
   {
    "path": "tests/security/test_step_e.py",
    "sha256": "9bf5009f071abf168738cbcab3722667d81931b9fdbf4b6b735a9834ca834953"
+  },
+  {
+   "path": "tests/security/test_step_f.py",
+   "sha256": "9502347a4237c4a7b3d23e00ca89cdaa78ebfad5b1939c48845204e0796784a0"
   },
   {
    "path": "tests/security/test_synthetic_signer.py",

@@ -44,6 +44,31 @@ def read_private_line(path: str) -> str:
     return value
 
 
+def write_stamp(path: str, fingerprint: str, ts: int, verdict: str) -> None:
+    """Procedural guard, not a security boundary: the same user could forge it. It only enforces the ORDER E before F."""
+    tmp = path + ".tmp"
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o400)
+    try:
+        os.write(
+            fd, json.dumps({"fingerprint": fingerprint, "ts": ts, "verdict": verdict}).encode()
+        )
+    finally:
+        os.close(fd)
+    os.replace(tmp, path)
+
+
+def read_stamp(path: str, fingerprint: str, now: float, max_age_s: int = 7 * 86400) -> None:
+    """Raises ProbeConfigError unless a passing probe stamp for this key exists and is fresh."""
+    try:
+        s = json.loads(Path(path).read_text(encoding="ascii"))
+    except (OSError, ValueError) as exc:
+        raise ProbeConfigError("no passing probe stamp: run the step E probe first") from exc
+    if s.get("verdict") != "SIGNATURE_AND_ORDER_VALID" or s.get("fingerprint") != fingerprint:
+        raise ProbeConfigError("the probe stamp is not a pass for this key")
+    if not 0 <= now - int(s.get("ts", 0)) <= max_age_s:
+        raise ProbeConfigError("the probe stamp is stale: run the probe again")
+
+
 def load_config(path: str) -> dict[str, Any]:
     cfg = json.loads(Path(path).read_text(encoding="utf-8"))
     missing = [k for k in REQUIRED if k not in cfg]
@@ -122,7 +147,13 @@ def run(
     else:
         acct["code"] = b2.get("code")
     out["account"] = acct
-    return out, 0 if st == 200 and st2 == 200 else 1
+    rc = 0 if st == 200 and st2 == 200 else 1
+    stamp = cfg.get("probe_stamp_file")
+    if (
+        rc == 0 and stamp
+    ):  # step F's service refuses testnet mode without a fresh stamp for the SAME key
+        write_stamp(stamp, out["public_key_fingerprint"], int(clock()), verdict)
+    return out, rc
 
 
 def main(argv: list[str]) -> int:

@@ -123,3 +123,8 @@ verification cannot be disabled, size/time limits, errors never carry the URL), 
 Verified offline against a local TLS mock (11 tests: key handling, signature accepted by the mock verifier, redirect/size/junk/timeout/proxy handling, clock gate, no `POST /api/v3/order`
 ever sent) and once against the REAL testnet **without credentials**: `GET /api/v3/time` → HTTP 200, clock offset ≈ 158 ms. Runbook: `STEP-E-KEY-CEREMONY-AND-PROBE.md`.
 Nothing under `src/` changed in step E; the gateway constant is still False.
+
+## 12. Step F — tooling BUILT, NOT STARTED (owner "start step f" 2026-11-21)
+No real order was placed and none can be: constant False, no key, probe not run, service not installed, host not hardened (`scripts/step_f_preflight.py` lists every blocker).
+Built: service `testnet` mode guarded by a fresh passing probe stamp for the same key; `probe.py` writes that stamp only on a full pass; read-only preflight; the place/confirm/cancel/confirm
+drill (`src/asta/orders/testnet_session.py`, inert unless every gate is open); runbook `STEP-F-TESTNET-ORDERS-RUNBOOK.md`. Open: fill ingestion + venue reconciliation.
