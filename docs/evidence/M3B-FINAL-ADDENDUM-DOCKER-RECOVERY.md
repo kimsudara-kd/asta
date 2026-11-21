@@ -25,3 +25,8 @@ WebSocket failed TLS verification (`CERTIFICATE_VERIFY_FAILED`); with `SSL_CERT_
 **PHASE RESULTS live/nodata/aging/research/paper = all true** (16+1+1+12+9 tests passed). Note: the Next.js 16.4.3 build prints a one-time
 "known security vulnerability" reminder and exits 1 on first attempt per cycle; a retry continues. `pnpm audit` was clean earlier — re-check the
 Next advisory (registry advisories/bulk) before acceptance; this is an open follow-up, no upgrade was performed.
+
+## Next.js security upgrade (2026-11-21)
+`pnpm audit --prod` reported 7 moderate advisories in Next 16.4.3 (all fixed in >=16.4.5). Upgraded the single dependency to 16.4.5
+(`pnpm add next@16.4.5`; lockfile only). Afterwards: audit "No known vulnerabilities", `tsc` clean, web unit tests 0 fail, browser E2E 5/5 phases.
+The sanitized candidate predates this commit and must be rebuilt again at publish time (PUBLISH-PLAN step 0).
