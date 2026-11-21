@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "8d075ba4d882babdfdba880b8cb0d6cfddc759f4",
+ "generated_from_commit": "7376c2226b26875d8083f2b3e69d04f7fe1a1eff",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -32,11 +32,11 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-ACCEPTANCE.md",
-   "sha256": "4348f415ddcadada656a56ea4c7f3c676cd3cf74dff6f3ae23865dc4208461a3"
+   "sha256": "9869b7105f4e492b9eaf4863f652a246e67d7dd42b4c6ee7d8b3dba8a18118ab"
   },
   {
    "path": "docs/evidence/M3B-FINAL-CEO-DECISION-PACK.md",
-   "sha256": "b6a51880c0ca067a1830c9a38b619b5f124b1f22c1ed784a8b7cc22c16645867"
+   "sha256": "d0809b460a015d84dde698dddb5321f6c929846bd9a74f5a15491a680206eade"
   },
   {
    "path": "docs/evidence/M3B-FINAL-EXECUTION-REGISTER.md",
@@ -44,7 +44,7 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-GATE-MATRIX.md",
-   "sha256": "58a8a43883f03fe94e11b02aaa4fd460be5309ac2d005722ca59379a87693d7d"
+   "sha256": "f199c92fcaf4f2bdc229b9472624f4c459929201b14801958f98b906830590d8"
   },
   {
    "path": "docs/evidence/M3B-GOVERNANCE-01.md",

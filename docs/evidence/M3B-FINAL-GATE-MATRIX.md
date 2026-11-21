@@ -13,7 +13,7 @@ Owner abbreviations: ENG = ASTA engineering, OWN = platform owner (console/privi
 | E-5 | No unapproved kill-switch release | PASS | `tests/integration/test_risk_bridge.py`, 0011 `session_user` | ENG | CLOSED |
 | E-6 | No unexplained ledger discrepancy | PASS | 900/900, 0 discrepancies, digests = frozen | ENG | CLOSED |
 | E-7 | No active secret exposure | PASS | `secret_scan` 0; gitleaks candidate clean (real repo history: 1 synthetic) | ENG | CLOSED (candidate) |
-| E-8 | No unverified mandatory regression | **BLOCKED** | 8 Docker skips, E2E port conflict, skip guard fails | ENG/T | OPEN |
+| E-8 | No unverified mandatory regression | PASS | 2026-11-21: 1367 passed, 5 skipped (4 opt-in network + 1 PowerShell), skip guard OK, boundary stack up; E2E 5/5 phases; see ADDENDUM. Re-run on the final published HEAD / hosted CI | ENG/T | CLOSED locally (hosted CI unverified) |
 | E-9 | All security-critical components supervised | PASS (units, offline) / OPEN (deployed) | `infra/security-host/mac/app-vm/*.service`, tests | ENG/OWN | OPEN until deployed |
 | E-10 | Off-host alerts cover app, bridge, firewall, kill switch, reconciliation, feed, backup | PASS offline / OPEN live | `test_offhost_alerts.py`, SECURITY-EVENTS §5 | ENG/OWN | OPEN (drills AL1–AL9) |
 | E-11 | Synthetic signing + testnet-only boundary | PASS offline | `tests/security/test_synthetic_signer.py` | ENG | CLOSED offline |

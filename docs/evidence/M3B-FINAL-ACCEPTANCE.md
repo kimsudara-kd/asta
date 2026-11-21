@@ -5,7 +5,7 @@ Project/host identifiers are aliases (P1–P8; key outside the repository).
 
 ## 1. Executive summary
 **Recommendation: BUILT — NOT ACCEPTED. Credential readiness: NO-GO.**
-All offline engineering that can be completed safely is complete and verified (1359 Python tests passed, web 48/48, lints/types/audits clean, frozen M0–M2 evidence and the 900/900 paper-ledger replay intact).
+All offline engineering that can be completed safely is complete and verified (1367 Python tests passed with Docker and the boundary stack up [5 reviewed skips], browser E2E 5/5 phases, web 48/48, lints/types/audits clean, frozen M0–M2 evidence and the 900/900 paper-ledger replay intact).
 Mandatory acceptance gates remain open because they need things I am not authorized or able to do: privileged host hardening and VM provisioning (sudo), interruption of P1–P3 and removal of the Docker image, an appointed independent reviewer, a first hosted-CI run, publishing the sanitized history, and separate credential/demo authorization.
 One new environmental fault appeared during the work: **Docker Desktop's daemon stopped creating containers** (existing containers still run); every Docker-dependent verification is therefore marked BLOCKED, not passed.
 
@@ -59,12 +59,12 @@ Implemented: reconciliation discrepancy, market-feed loss/stale, backup missing/
 Env: macOS 26.5 arm64, Python 3.12.8, dev PG 16 on 127.0.0.1:5640 (`ASTA_TEST_DATABASE_URL`), `docker` replaced by a stub that fails fast because the daemon cannot create containers. "Gate" = counts toward a mandatory acceptance gate.
 | Category | Command | Result | Gate met |
 |---|---|---|---|
-| Full Python suite (order lifecycle, fills/overfill, concurrency/crash, intent negatives, gateway bypass, kill switch/bridge, paper, research, contracts, live-lock) | `pytest tests -q -rs` | **1359 passed, 13 skipped** | partially: 8 skips are Docker-blocked, 4 opt-in public-network, 1 PowerShell |
-| Skip guard | `scripts/ci_skip_guard.py` | **FAILS on the 8 Docker skips** (correct: CI has Docker) | NO until Docker works |
-| Boundary / netns / host-config lab tests | same suite, Docker | **BLOCKED** (last green at `8beb277`: 1343 passed, 5 skipped) | NO |
+| Full Python suite (order lifecycle, fills/overfill, concurrency/crash, intent negatives, gateway bypass, kill switch/bridge, paper, research, contracts, live-lock) | `pytest tests -q -rs` | **1367 passed, 5 skipped** (updated 2026-11-21; earlier 1359/13 were with the Docker daemon faulted) | partially: 8 skips are Docker-blocked, 4 opt-in public-network, 1 PowerShell |
+| Skip guard | `scripts/ci_skip_guard.py` | **OK** (2026-11-21, Docker working, boundary stack up) | NO until Docker works |
+| Boundary / netns / host-config lab tests | same suite, Docker | PASS 2026-11-21 (`test_egress.py` 39/39 incl. 70+ negative tests) | yes (local) |
 | Paper reconciliation | `paper_integrity.py --verify` | PASS | yes |
 | Frontend unit + typecheck | `pnpm test`, `pnpm exec tsc --noEmit` | 48/48; clean | yes |
-| Browser E2E | `node e2e/run.mjs` (new `E2E_PSQL` local-PG option) | **BLOCKED**: port 4640 held by the running dev API; not re-verified at HEAD | NO |
+| Browser E2E | `node e2e/run.mjs` (new `E2E_PSQL` local-PG option) | PASS 2026-11-21: live/nodata/aging/research/paper all true (needs `SSL_CERT_FILE` on this Mac) | yes (local) |
 | ARM64 deployment, guest reboot, host reboot, VM firewall negatives, restore from protected backups, vault in real VM | — | **BLOCKED** (sudo / VM / window) — dry-run and lab evidence only | NO |
 | Lint/format/types | `ruff check`, `ruff format --check`, `mypy` (203 files) | clean | yes (pyright not configured) |
 | Dependency audits | `pip-audit`, `pnpm audit --prod` | none | yes |
@@ -93,7 +93,7 @@ Real repository: full-history gitleaks reports **1 finding** (the synthetic stri
 | G-14 | historical synthetic string | resolved in candidate; pending adoption |
 | G-15 | router WAN SSH | OPEN (owner) |
 | G-16 | Mac not dedicated | OPEN |
-| G-17 (new) | Docker daemon cannot create containers | OPEN (environment) |
+| G-17 (new) | Docker daemon cannot create containers | RESOLVED 2026-11-21 (daemon creates containers again; cause unknown, observed recovery) |
 | G-18 (new) | one internal container name in already-public commits | accepted risk unless owner orders a force rewrite |
 | G-19 (new) | unpushed commits carry a local-hostname author email | fixed in candidate |
 | G-20 (new) | signing code cannot live in `src/` under the live-lock ban | by design; staged proposal |
