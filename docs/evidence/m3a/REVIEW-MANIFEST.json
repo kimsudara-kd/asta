@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "122ba56b94910775524f140aac7cc77093d22a30",
+ "generated_from_commit": "0a396dbdd564e5d545ca68a8b091b51122932bfb",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -372,7 +372,7 @@
   },
   {
    "path": "docs/m3b/BINANCE-TESTNET-CONNECTOR-PROPOSAL.md",
-   "sha256": "e8e5b29fa3a1dd8aef51b885011fcbf8243394cd90540b752e9e7acffbfa81b0"
+   "sha256": "ce601141b36668f6cbfaa6ad9073da145107d91d6197a8f14eaf53ef92cca828"
   },
   {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
@@ -445,6 +445,10 @@
   {
    "path": "docs/m3b/SECURITY-TOPOLOGY.md",
    "sha256": "566bc720d10f60b9f0447204a1798b65992ebb5c8fb27c3eacbe0bb474c5f6b0"
+  },
+  {
+   "path": "docs/m3b/STEP-E-KEY-CEREMONY-AND-PROBE.md",
+   "sha256": "90ad5e676df05935d3dedcde4dbaa8213bbbdc311bd9d98d596bd0f1eff01e7c"
   },
   {
    "path": "docs/m3b/VAULT-AND-BACKUP.md",
@@ -843,8 +847,24 @@
    "sha256": "cab69e5c76a11a07a267d8ba8e0154dc48612749e6ae5422be379a478595007d"
   },
   {
+   "path": "proposals/binance_testnet_signer/file_signer.py",
+   "sha256": "06770e6e8842be31154ea6e459d3d520bb0f10d56112005c50dbd15618e0e77c"
+  },
+  {
+   "path": "proposals/binance_testnet_signer/https_transport.py",
+   "sha256": "c1157d171b14f47d3acebab034dd83bda7668e09c6e7e209884da3bad9c0b050"
+  },
+  {
+   "path": "proposals/binance_testnet_signer/keygen.py",
+   "sha256": "06e1b96f6742d0009451e63b0c1c2becb570da9a537faff71fd27f3e3645ff17"
+  },
+  {
    "path": "proposals/binance_testnet_signer/mock_exchange.py",
    "sha256": "c0ec16ed27fbac66998cc594039da1ff94ba130e822a317e835dae710654a569"
+  },
+  {
+   "path": "proposals/binance_testnet_signer/probe.py",
+   "sha256": "a7ccd9f15c0c684a1533280bc3e4e1c340bf194aa2c6135467ca969461826908"
   },
   {
    "path": "proposals/binance_testnet_signer/replay_store.py",
@@ -1136,7 +1156,7 @@
   },
   {
    "path": "tests/security/test_no_vm_install.py",
-   "sha256": "0837159315cd6f174ef7d69b7f93dfd12244c647ee63772bdd7f3b3bb6ce6968"
+   "sha256": "fa50fcd97131690e00d150f76dc8d15117d090ef9d78d25753a3beb067ded159"
   },
   {
    "path": "tests/security/test_pf_anchor.py",
@@ -1149,6 +1169,10 @@
   {
    "path": "tests/security/test_run_service.py",
    "sha256": "9385a3434654b88bd2522eb7912f59bf40168f50c56dbd64513cdf78097e9c0e"
+  },
+  {
+   "path": "tests/security/test_step_e.py",
+   "sha256": "9bf5009f071abf168738cbcab3722667d81931b9fdbf4b6b735a9834ca834953"
   },
   {
    "path": "tests/security/test_synthetic_signer.py",

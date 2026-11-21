@@ -51,7 +51,7 @@ say "(add YOUR app user to the group so it can reach the socket: dseditgroup -o 
 
 run mkdir -p "$CODE/service" "$ETC" "$VAR" "$RUN" "$LOG"
 # least privilege: ONLY the service files and the eight small asta modules it imports (tests/security/test_no_vm_install.py keeps this list honest)
-for f in connector.py credential_service.py mock_exchange.py replay_store.py run_service.py signer.py; do
+for f in connector.py credential_service.py file_signer.py https_transport.py keygen.py mock_exchange.py probe.py replay_store.py run_service.py signer.py; do
   run cp "$REPO/proposals/binance_testnet_signer/$f" "$CODE/service/$f"
 done
 for f in __init__.py core/__init__.py core/environment.py ipc/__init__.py ipc/unix_socket.py orders/__init__.py \
@@ -60,7 +60,7 @@ for f in __init__.py core/__init__.py core/environment.py ipc/__init__.py ipc/un
 done
 if [ "$APPLY" = 1 ] && [ -z "$PY" ]; then echo "REFUSING: --apply needs --python /path/to/python3.12 (for the private virtualenv)" >&2; exit 1; fi
 run "${PY:-python3.12}" -m venv "$CODE/venv"
-run "$CODE/venv/bin/python" -m pip install --quiet "cryptography==50.0.2"
+run "$CODE/venv/bin/python" -m pip install --quiet "cryptography==50.0.2" "certifi==2026.10.23"
 run chown -R root:wheel "$CODE"; run chmod -R go-w "$CODE"
 run chown root:"$IPC_GROUP" "$ETC"; run chmod 0750 "$ETC"
 run chown "$CRED_USER":"$IPC_GROUP" "$VAR"; run chmod 0700 "$VAR"   # state: replay/spend databases, only asta-cred

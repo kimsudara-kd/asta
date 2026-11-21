@@ -138,10 +138,11 @@ print('OUTSIDE:' + repr(bad))
 
 def test_the_pinned_dependency_matches_the_lockfile_and_the_config_template_loads():
     text = INSTALL.read_text()
-    pinned = re.search(r'"cryptography==([0-9.]+)"', text)
-    assert pinned
     lock = (ROOT / "uv.lock").read_text()
-    assert re.search(rf'name = "cryptography"\nversion = "{re.escape(pinned.group(1))}"', lock)
+    for pkg in ("cryptography", "certifi"):
+        pinned = re.search(rf'"{pkg}==([0-9.]+)"', text)
+        assert pinned, pkg
+        assert re.search(rf'name = "{pkg}"\nversion = "{re.escape(pinned.group(1))}"', lock), pkg
     body = re.search(r"<<JSON\n(.*?)\nJSON", text, re.S)
     assert body
     cfg_text = body.group(1).replace("$RUN", "/var/asta-cred-run").replace("$ETC", "/etc/asta-cred")

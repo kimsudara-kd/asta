@@ -115,3 +115,11 @@ shipped constants all False; the gateway module imports nothing configurable; on
 tests; an end-to-end chain test (enabled → reaches the mock exchange; switched off → nothing leaves the app, a cancel is refused too).
 **Still not done:** flipping `TESTNET_EXECUTION_ALLOWED` (never in this work); a durable replay store for the service; the `asta-cred` launchd deployment; any real
 network contact (first would be `POST /api/v3/order/test`); vault-backed signer; credentials; host hardening; reviewer re-review of the gateway change.
+
+## 11. Step E — tooling BUILT (owner-approved "start step e" 2026-11-21); probe not yet run (needs the owner's key)
+Staged in `proposals/binance_testnet_signer/`: `keygen.py` (Ed25519 pair; private key written 0400, never printed, never overwritten), `file_signer.py` (key-file signer with
+strict permission checks, no key accessor), `https_transport.py` (the ONLY network code: https, host pinned to `testnet.binance.vision`, no redirects, no environment proxies,
+verification cannot be disabled, size/time limits, errors never carry the URL), `probe.py` (public time + signed `order/test` + read-only account; cannot place an order).
+Verified offline against a local TLS mock (11 tests: key handling, signature accepted by the mock verifier, redirect/size/junk/timeout/proxy handling, clock gate, no `POST /api/v3/order`
+ever sent) and once against the REAL testnet **without credentials**: `GET /api/v3/time` → HTTP 200, clock offset ≈ 158 ms. Runbook: `STEP-E-KEY-CEREMONY-AND-PROBE.md`.
+Nothing under `src/` changed in step E; the gateway constant is still False.
