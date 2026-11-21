@@ -30,3 +30,16 @@ Open High/Critical after this round: F-01, F-02, F-03, H-1, H-3 (R-01/R-02 close
 
 ## Addendum 2026-11-21 (step C)
 The gateway change (`risk/gateway.py`, migration 0013, boundary pass-through) was made after this review and has **not** been reviewed by the reviewer agent: re-review required before the constant is ever flipped. `tests/live_lock` unchanged; new `tests/live_lock/test_gateway_matrix.py` only adds protection.
+
+## Re-review of steps B and C (2026-11-21) — verdict OK WITH CONDITIONS; conditions closed
+| ID | Sev | Finding | Disposition |
+|---|---|---|---|
+| S-01 | High | EXTERNAL cancel/query were denied once enablement was off or the kill switch latched (resting orders could not be cancelled; the test used a fake that ignored the latch) | **FIXED**: `ExecutionGateway.authorize_reducing` (cell + constant + not-LIVE only, never the enablement); tests use a model of the real SQL behaviour; matrix extended |
+| S-02 | Med | enable vs concurrent latch race could leave a future-dated enablement that revives on release | **FIXED**: migration 0014 (`FOR SHARE` on the state row; auto-off on release too) + regression test |
+| S-03 | Med | credential service did not check the enablement; day cap in memory | **FIXED**: service-side enablement check (required constructor argument), persistent spend store |
+| S-04 | Med | huge Decimal exponents / mid-send exceptions could kill the loop or skip the cap | **FIXED**: magnitude bounds (wire + service), exceptions mapped to REFUSED/UNKNOWN with spend counted, loop never dies |
+| S-05 | Med | slowloris / single-threaded accept loop; no peer check | **FIXED**: overall frame deadline, bounded worker threads, peer-uid allow-list (macOS LOCAL_PEERCRED / Linux SO_PEERCRED) |
+| S-06 | Low | `$` accepted a trailing newline in ids | **FIXED**: `fullmatch` |
+| S-07 | Low | key-id regex before authentication | accepted (harmless, as the reviewer says) |
+| S-08 | Low | sequence = clock µs: a backward clock jump on the app side after a restart is refused until the clock catches up | ACCEPTED/documented (fail-closed self-DoS only) |
+| S-09 | Low | missing migration => DATABASE_UNREADABLE | accepted (fail-loud) |

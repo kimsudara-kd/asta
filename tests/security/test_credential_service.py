@@ -51,6 +51,23 @@ def lim(n: int, qty: str = "0.0001", px: str = "50000", **kw: Any):
     )
 
 
+def wait_listening(path: str, tries: int = 200) -> None:
+    """The socket FILE appears at bind(), before listen(): poll by really connecting."""
+    import socket as _s
+    import time as _t
+
+    for _ in range(tries):
+        c = _s.socket(_s.AF_UNIX)
+        try:
+            c.connect(path)
+            return
+        except OSError:
+            _t.sleep(0.02)
+        finally:
+            c.close()
+    raise AssertionError("service did not start listening")
+
+
 class Clock:
     def __init__(self) -> None:
         self.t = T0
@@ -75,8 +92,16 @@ class Rig:
             require_durable=False,
         )
         self.kill = kill or FlagKill()
+        self.enabled = True
         self.service = cs.CredentialService(
-            rx, AUTH, self.venue_port, caps or cs.Caps(), self.kill.active, self.clock, "k1"
+            rx,
+            AUTH,
+            self.venue_port,
+            caps or cs.Caps(),
+            self.kill.active,
+            self.clock,
+            "k1",
+            execution_enabled=lambda: self.enabled,
         )
         self.channel_calls = 0
         self.drop_reply = (
@@ -202,10 +227,7 @@ def test_a_real_unix_socket_carries_the_same_conversation_and_refuses_garbage():
     th = threading.Thread(target=cs.serve_unix, args=(path, rig.service, stop), daemon=True)
     th.start()
     try:
-        for _ in range(100):
-            if os.path.exists(path):
-                break
-            threading.Event().wait(0.02)
+        wait_listening(path)
         assert oct(os.stat(path).st_mode & 0o777) == "0o660"
         ch: Any = UnixSocketChannel(path, timeout_s=3.0)
         p = ExternalChannelPort(ch, AUTH, "app", "k1", rig.clock)
@@ -263,6 +285,133 @@ def test_declared_external_with_the_constant_on_and_the_enablement_active_the_ch
     assert gx.query(i.decision_id, i).kind.value == "FOUND"
     sw.on = False  # the owner (or the kill switch) switches testnet execution off
     assert d.handle(lim(2)).state is State.REJECTED and len(rig.exchange.orders) == 1
-    with pytest.raises(ExecutionDenied):
-        gx.cancel(i.decision_id, i)
-    assert rig.exchange.orders[i.decision_id]["status"] == "NEW"  # the cancel never left the app
+    from asta.orders.ports import CancelOutcome
+
+    # review S-01: the app can still cancel the resting order after enablement is off
+    assert gx.cancel(i.decision_id, i).outcome is CancelOutcome.CANCELED
+    assert rig.exchange.orders[i.decision_id]["status"] == "CANCELED"
+
+
+# ------------------------------------------------------------------ independent-review hardening (S-03 .. S-06)
+def test_s03_the_service_checks_the_enablement_itself_a_compromised_app_cannot_trade_while_it_is_off():
+    from asta.orders.ports import SendOutcome
+
+    rig = Rig()
+    rig.enabled = False
+    assert rig.port().send(lim(1)) is SendOutcome.REJECTED and not rig.exchange.orders
+    rig.enabled = True
+    assert rig.port().send(lim(2)) is SendOutcome.ACCEPTED
+    rig.service._enabled = lambda: (_ for _ in ()).throw(RuntimeError("db down"))
+    assert rig.port().send(lim(3)) is SendOutcome.REJECTED  # an unreadable enablement is a refusal
+
+
+def test_s03_the_day_cap_survives_a_restart_with_the_persistent_spend_store(tmp_path):
+    from asta.orders.ports import SendOutcome
+
+    sys.path.insert(0, str(Path(__file__).parents[2] / "proposals/binance_testnet_signer"))
+    import replay_store as rstore  # type: ignore[import-not-found]
+
+    path = str(tmp_path / "spend.db")
+
+    def caps() -> cs.Caps:
+        return cs.Caps(
+            max_order_notional=D("20"), max_day_notional=D("8"), spend=rstore.FileSpendStore(path)
+        )
+
+    r1 = Rig(caps())
+    assert r1.port().send(lim(1)) is SendOutcome.ACCEPTED  # 5 of 8 USDT
+    r2 = Rig(
+        caps()
+    )  # "the service restarted": a new process, the same spend file, the same UTC day
+    assert r2.port().send(lim(2)) is SendOutcome.REJECTED and not r2.exchange.orders
+
+
+def test_s04_absurd_numbers_never_kill_the_service_and_midway_failures_still_count_against_the_cap():
+    from asta.orders.ports import SendOutcome
+
+    rig = Rig()
+    p = rig.port()
+    huge = lim(1, qty="9E+999999", px="2")  # passes parsing, would overflow quantity * price
+    assert p.send(huge) is SendOutcome.REJECTED
+    assert p.send(lim(2, qty="1E-30", px="1E-30")) is SendOutcome.REJECTED
+    assert p.send(lim(3)) is SendOutcome.ACCEPTED  # still alive and serving
+    # the connector blows up AFTER the request may have reached the venue: reported UNKNOWN, spend counted
+    real = rig.venue_port.send
+
+    def boom(intent: Any) -> None:
+        real(intent)
+        raise RuntimeError("parse error after the venue accepted it")
+
+    rig.venue_port.send = boom
+    assert p.send(lim(4)) is SendOutcome.UNKNOWN and len(rig.exchange.orders) == 2
+    assert rig.service._caps.spend.get(rig.service._day()) == D("10")
+    assert rig.service.handle(b"\x00\x20" + b"x" * 40).startswith(
+        b"REFUSED:"
+    )  # garbage never raises
+
+
+def test_s05_a_stalled_connection_cannot_block_the_service_and_peers_can_be_restricted():
+    import socket
+    import time
+
+    rig = Rig()
+    d = tempfile.mkdtemp(dir="/tmp")
+    path = os.path.join(d, "c.sock")
+    stop = threading.Event()
+    th = threading.Thread(
+        target=cs.serve_unix,
+        args=(path, rig.service, stop),
+        kwargs={"deadline_s": 1.0, "allowed_uids": frozenset({os.getuid()})},
+        daemon=True,
+    )
+    th.start()
+    try:
+        wait_listening(path)
+        slow = socket.socket(socket.AF_UNIX)
+        slow.connect(path)
+        slow.sendall(b"\x00\x00")  # a slowloris: two bytes of a four-byte header, then silence
+        t0 = time.monotonic()
+        p = ExternalChannelPort(UnixSocketChannel(path, 3.0), AUTH, "app", "k1", rig.clock)
+        from asta.orders.ports import SendOutcome
+
+        assert (
+            p.send(lim(1)) is SendOutcome.ACCEPTED
+        )  # served while the slow peer is still connected
+        assert time.monotonic() - t0 < 1.0
+        slow.settimeout(3.0)
+        assert slow.recv(10) == b""  # the stalled connection is closed by the overall deadline
+        slow.close()
+    finally:
+        stop.set()
+        th.join(3)
+        shutil.rmtree(d, ignore_errors=True)
+    # a peer whose uid is not allowed gets no reply at all
+    rig2 = Rig()
+    d = tempfile.mkdtemp(dir="/tmp")
+    path = os.path.join(d, "c.sock")
+    stop = threading.Event()
+    th = threading.Thread(
+        target=cs.serve_unix,
+        args=(path, rig2.service, stop),
+        kwargs={"allowed_uids": frozenset({os.getuid() + 12345})},
+        daemon=True,
+    )
+    th.start()
+    try:
+        wait_listening(path)
+        with pytest.raises((OSError, ValueError)):
+            UnixSocketChannel(path, 2.0)(b"anything")
+        assert not rig2.exchange.orders
+    finally:
+        stop.set()
+        th.join(3)
+        shutil.rmtree(d, ignore_errors=True)
+
+
+def test_s06_ids_with_a_trailing_newline_are_refused():
+    from asta.orders.extwire import Request
+
+    with pytest.raises(ValueError):
+        Request("app", "k1", 1, "n", 1, 2, "QUERY", "a" * 32 + "\n", "BTC-USDT")
+    with pytest.raises(ValueError):
+        Request("app", "k1", 1, "n", 1, 2, "QUERY", "a" * 32, "BTC-USDT\n")

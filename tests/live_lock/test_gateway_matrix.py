@@ -164,3 +164,25 @@ def test_the_enablement_view_only_asks():
         and len(n.value) < 80
     ]
     assert sql == ["SELECT execution_enabled(:s)"]
+
+
+@pytest.mark.parametrize("testnet_flag", [False, True])
+@pytest.mark.parametrize("live_flag", [False, True])
+def test_reducing_operations_need_the_cell_and_the_constant_but_never_the_enablement(
+    monkeypatch, testnet_flag, live_flag
+):
+    monkeypatch.setattr(gateway, "TESTNET_EXECUTION_ALLOWED", testnet_flag)
+    monkeypatch.setattr(gateway, "LIVE_TRADING_ENABLED", live_flag)
+    for env, venue, en in itertools.product(ENVS, VENUES, ENABLEMENTS):
+        d = ExecutionGateway(None if en is None else Enab(en)).authorize_reducing(req(env, venue))
+        want = (
+            env == "EXCHANGE_DEMO" and venue == "BINANCE_TESTNET" and testnet_flag and not live_flag
+        )
+        assert (d.decision == Decision.ALLOW) is want, (env, venue, en, testnet_flag, live_flag)
+        if not want:
+            assert d.reason_codes
+
+
+def test_as_shipped_even_reducing_operations_are_denied():
+    for env, venue in itertools.product(ENVS, VENUES):
+        assert ExecutionGateway().authorize_reducing(req(env, venue)).decision == Decision.DENY

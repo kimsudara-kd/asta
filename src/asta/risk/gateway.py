@@ -96,6 +96,26 @@ class ExecutionGateway:
             return GatewayDecision(Decision.DENY, tuple(dict.fromkeys(reasons)))
         return GatewayDecision(Decision.ALLOW, ("TESTNET_ONLY",))
 
+    def authorize_reducing(self, request: OrderRequest) -> GatewayDecision:
+        """Query / cancel of an order that already exists (review S-01).
+
+        It can only REDUCE exposure or reveal the truth, so it must keep working after the runtime
+        enablement is off (expired, switched off, or the kill switch latched); otherwise a resting
+        order could not be cancelled. It still needs the exact testnet cell, the reviewed constant
+        and ``LIVE_TRADING_ENABLED`` False. It never needs the enablement."""
+        reasons: list[str] = []
+        if LIVE_TRADING_ENABLED:  # pragma: no cover - invariant: constant is False
+            reasons.append("LIVE_FORBIDDEN")
+        if request.environment != TESTNET_ENVIRONMENT:
+            reasons.append("ENVIRONMENT_NOT_ALLOWED")
+        if request.venue != TESTNET_VENUE:
+            reasons.append("VENUE_NOT_ALLOWED")
+        if not TESTNET_EXECUTION_ALLOWED:
+            reasons.append("M0_EXECUTION_DISABLED")
+        if reasons:
+            return GatewayDecision(Decision.DENY, tuple(dict.fromkeys(reasons)))
+        return GatewayDecision(Decision.ALLOW, ("TESTNET_ONLY_REDUCING",))
+
 
 def is_execution_enabled() -> bool:
     """Read-only view for status screens. Cannot be used to change the policy."""

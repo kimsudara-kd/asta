@@ -97,7 +97,7 @@ class InternalGate:
         if kind == PortKind.SIMULATED:
             pass
         elif kind == PortKind.EXTERNAL:
-            ext = self._external.authorize(
+            ext = self._external.authorize_reducing(
                 OrderRequest(
                     intent.environment.value,
                     intent.venue,

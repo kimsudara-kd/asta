@@ -34,8 +34,8 @@ from asta.orders.lifecycle import Intent
 VERSION = 1
 OPS = ("SEND", "QUERY", "CANCEL")
 _KEY_ID = re.compile(rb'"key_id":"([A-Za-z0-9._-]{1,64})"')
-_CLIENT_ID = re.compile(r"^[0-9a-f]{32}$")
-_SYMBOL = re.compile(r"^[A-Z0-9]{2,12}-[A-Z0-9]{2,12}$")
+_CLIENT_ID = re.compile(r"[0-9a-f]{32}")
+_SYMBOL = re.compile(r"[A-Z0-9]{2,12}-[A-Z0-9]{2,12}")
 _REQUEST_FIELDS = frozenset(
     {"kind", "v", "sender", "key_id", "seq", "nonce", "issued_at", "expires_at", "op",
      "client_id", "symbol", "intent"}
@@ -64,8 +64,19 @@ class Blake2bAuthenticator:
         return secrets.compare_digest(self.tag_for(key_id, payload), tag)
 
 
+MAX_DECIMAL_EXP = 30  # |value| < 10**30 and not finer than 10**-30: far outside any real order
+
+
+def _check_magnitude(d: Decimal) -> None:
+    if not d.is_finite() or (d != 0 and not -MAX_DECIMAL_EXP <= d.adjusted() < MAX_DECIMAL_EXP):
+        raise ValueError("decimal out of range")
+
+
 def _dec(v: Decimal | None) -> str | None:
-    return None if v is None else format(v, "f")
+    if v is None:
+        return None
+    _check_magnitude(v)  # never format an astronomically large number into a string
+    return format(v, "f")
 
 
 def _opt_dec(v: object) -> Decimal | None:
@@ -74,8 +85,7 @@ def _opt_dec(v: object) -> Decimal | None:
     if not isinstance(v, str):
         raise ValueError("decimal must be a string")
     d = Decimal(v)
-    if not d.is_finite():
-        raise ValueError("non-finite decimal")
+    _check_magnitude(d)
     return d
 
 
@@ -97,7 +107,7 @@ class Request:
             raise ValueError("unknown operation")
         if (self.op == "SEND") != (self.intent is not None):
             raise ValueError("exactly SEND carries an intent")
-        if not _CLIENT_ID.match(self.client_id) or not _SYMBOL.match(self.symbol):
+        if not _CLIENT_ID.fullmatch(self.client_id) or not _SYMBOL.fullmatch(self.symbol):
             raise ValueError("bad client id or symbol")
         if self.intent is not None and (
             self.intent.decision_id != self.client_id or self.intent.symbol != self.symbol

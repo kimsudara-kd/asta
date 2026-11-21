@@ -47,3 +47,17 @@ a real-money pilot would need a separate machine or a hardware-backed signer. Th
 ## 5. Privileged steps you would run (later, not now)
 Create user `asta-cred` + group `asta-ipc`; install the connector LaunchDaemon; (optional) load a pf anchor for `asta-cred`. Exact commands will be
 written when step B is approved, with rollback, like the host-hardening change set.
+
+## 6. Step D — BUILT (offline, nothing installed; 2026-11-21)
+Prepared for you to run when you decide (all dry-run by default, root needed for `--apply`, reversible):
+| File | What it does |
+|---|---|
+| `infra/no-vm/install-no-vm.sh` | creates group `asta-ipc` and the hidden user `asta-cred`; installs ONLY the 6 service files + 12 small `asta` modules under `/opt/asta-cred`; private virtualenv with the one pinned dependency (`cryptography==50.0.2`, same as `uv.lock`); `/etc/asta-cred/auth.key` (0440, generated, never printed); `cred.json` in **mock** mode; the launchd plist (not loaded unless `--load`) |
+| `infra/no-vm/uninstall-no-vm.sh` | removes exactly those paths; keeps the key and the state directory unless `--purge-data` |
+| `infra/no-vm/com.asta.cred.plist` | LaunchDaemon: runs as `asta-cred`, `KeepAlive`, private python `-I`, no environment variables |
+| `scripts/render_pf_anchor.py` | OPTIONAL: prints a pf anchor that confines only `asta-cred` (443 to given public testnet IPs + DNS to given resolvers). Prints only; loading it is a shared-firewall change and also needs an `anchor "asta"` line in `/etc/pf.conf` |
+Service hardening from the independent review (S-03..S-06): the service checks the runtime enablement **itself** (file-based view in mock mode), the day cap is
+persisted, no input can kill the accept loop, decimals are bounded, connections have an overall deadline and run concurrently, peers are restricted by user id,
+ids use `fullmatch`. Durable replay store (SQLite, 0600, `synchronous=FULL`). The monitor pings an external heartbeat URL from a private file (`ASTA_HEARTBEAT_URL_FILE`).
+**What you would run (later):** `sh infra/no-vm/install-no-vm.sh` (read the plan) → `sudo sh infra/no-vm/install-no-vm.sh --apply --python /path/to/python3.12` →
+`sudo dseditgroup -o edit -a <your-user> -t user asta-ipc` → optional `--load`. Nothing here needs a credential; `mode: testnet` is refused by the service until step E.

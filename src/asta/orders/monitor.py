@@ -112,8 +112,19 @@ def main() -> int:  # pragma: no cover - supervised entry point
     keyfile, stamp = os.environ.get("ASTA_STATUS_KEY_FILE"), os.environ.get("ASTA_STATUS_FILE")
     if keyfile and stamp:  # the signed status feed read by the firewall VM's dead-man job
         alerting.write_stamp(Path(stamp), Path(keyfile).read_bytes().strip(), alerts)
+    code = exit_code(alerts)
+    hb_file = os.environ.get("ASTA_HEARTBEAT_URL_FILE")
+    if (
+        hb_file
+    ):  # off-host dead-man: healthy => ping; critical => /fail; the service alerts on silence
+        from asta.orders.heartbeat import Heartbeat, HeartbeatError, load_url_file
+
+        try:
+            Heartbeat(load_url_file(hb_file)).ping(code != 2)
+        except (HeartbeatError, OSError) as exc:
+            print(json.dumps({"heartbeat_failed": type(exc).__name__}), file=sys.stderr)
     print(json.dumps({"ok": not alerts, "alerts": [a.__dict__ for a in alerts]}))
-    return exit_code(alerts)
+    return code
 
 
 if __name__ == "__main__":  # pragma: no cover

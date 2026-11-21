@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.asta.cred</string>
+  <key>UserName</key><string>asta-cred</string>
+  <key>GroupName</key><string>asta-ipc</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/asta-cred/venv/bin/python</string>
+    <string>-I</string>
+    <string>/opt/asta-cred/service/run_service.py</string>
+    <string>--config</string>
+    <string>/etc/asta-cred/cred.json</string>
+  </array>
+  <key>WorkingDirectory</key><string>/var/asta-cred</string>
+  <key>RunAtLoad</key><true/>
+  <key>KeepAlive</key><true/>
+  <key>ThrottleInterval</key><integer>5</integer>
+  <key>ProcessType</key><string>Background</string>
+  <key>Umask</key><integer>63</integer>
+  <key>StandardErrorPath</key><string>/var/log/asta-cred/err.log</string>
+  <key>StandardOutPath</key><string>/var/log/asta-cred/out.log</string>
+</dict>
+</plist>

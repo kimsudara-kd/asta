@@ -1,7 +1,8 @@
-"""Review R-12: the order-path package may not open network connections, except the alert notifier.
+"""Review R-12: the order-path package may not open network connections, except two notifiers.
 
-Complements (does not modify) tests/live_lock. alerting.py is the ONLY module allowed a network
-client, limited to urllib.request/urllib.parse; its Notifier refuses all but https or loopback http.
+Complements (does not modify) tests/live_lock. alerting.py and heartbeat.py are the ONLY modules
+allowed a network client, limited to urllib.request/urllib.parse; both refuse anything but https
+or exact-loopback http and never follow redirects.
 """
 
 import ast
@@ -20,7 +21,7 @@ BANNED = {
     "ftplib",
     "smtplib",
 }
-ALLOWED_EXCEPTION = {"alerting.py": {"urllib"}}
+ALLOWED_EXCEPTION = {"alerting.py": {"urllib"}, "heartbeat.py": {"urllib"}}
 
 
 def _imports(path: Path) -> set[str]:
@@ -45,6 +46,7 @@ def test_only_the_notifier_may_use_urllib_and_nothing_in_orders_uses_a_socket_li
     assert not offenders, offenders
 
 
-def test_the_notifier_uses_only_urllib_request_and_parse():
-    mods = {m for m in _imports(ORDERS / "alerting.py") if m.startswith("urllib")}
-    assert mods <= {"urllib.request", "urllib.parse"}, mods
+def test_the_notifier_and_the_heartbeat_use_only_urllib_request_and_parse():
+    for name in ("alerting.py", "heartbeat.py"):
+        mods = {m for m in _imports(ORDERS / name) if m.startswith("urllib")}
+        assert mods <= {"urllib.request", "urllib.parse"}, (name, mods)

@@ -554,3 +554,31 @@ def test_the_application_view_fails_closed_and_the_monitor_announces_enablement(
             raise RuntimeError("database down")
 
     assert SqlEnablement(Broken()).active("BINANCE_TESTNET") is False  # type: ignore[arg-type]
+
+
+def test_releasing_the_kill_switch_never_re_enables_and_the_enable_function_locks_the_state_row(
+    roles, migrated_engine
+):
+    """Review S-02: an enablement can not survive a latch/release cycle (even a future-dated one that slipped in)."""
+    e = migrated_engine
+    _list(e, "rel_alice")
+    as_role(e, "asta_bridge", "SELECT trip_kill_switch('RISK_HALT', 'risk-bridge', 'guard test')")
+    with (
+        e.begin() as c
+    ):  # simulate the race outcome: a future-dated enablement behind a latched switch
+        c.execute(text("SET LOCAL session_replication_role = replica"))
+        c.execute(
+            text("UPDATE execution_enablement SET enabled_until = now() + interval '2 hours'")
+        )
+    assert _on(e) is False  # inert while latched
+    as_login(
+        e, "rel_alice", "SELECT release_kill_switch('reviewed the halt and releasing for the test')"
+    )
+    assert (
+        _on(e) is False
+    )  # the release cleared it: nothing is enabled until a person enables it again
+    assert ("AUTO_OFF", "kill-switch") in _events(e)
+    body = (
+        Path(__file__).parents[2] / "migrations/versions/0014_m3b_enablement_race_and_release.py"
+    ).read_text()
+    assert "FOR SHARE" in body

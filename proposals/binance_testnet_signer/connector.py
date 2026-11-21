@@ -30,7 +30,7 @@ from asta.orders.ports import (
 )
 
 VENUE = "BINANCE_TESTNET"
-_CLIENT_ID = re.compile(r"^[A-Za-z0-9_-]{1,36}$")  # the venue's newClientOrderId rule
+_CLIENT_ID = re.compile(r"[A-Za-z0-9_-]{1,36}")  # the venue's newClientOrderId rule
 
 _STATUS = {
     "NEW": State.ACCEPTED,
@@ -68,7 +68,7 @@ def order_params(intent: Intent) -> dict[str, str]:
     intent.validate()
     if intent.venue != VENUE:
         raise ValueError("this port only serves the Binance Spot Testnet venue")
-    if not _CLIENT_ID.match(intent.decision_id):
+    if not _CLIENT_ID.fullmatch(intent.decision_id):
         raise ValueError("decision id is not a valid client order id")
     p = {
         "symbol": _venue_symbol(intent.symbol),
@@ -168,7 +168,7 @@ class BinanceTestnetPort:
         return SendOutcome.UNKNOWN  # 429/418/5xx, -1021 clock, anything unrecognised
 
     def query(self, client_id: str) -> QueryResult:
-        if not _CLIENT_ID.match(client_id):
+        if not _CLIENT_ID.fullmatch(client_id):
             return QueryResult(QueryKind.UNAVAILABLE)
         # the symbol is not part of ExchangePort.query(); the venue needs it, so the caller binds it (see bind_symbol)
         sym = self._symbols.get(client_id)
@@ -188,7 +188,7 @@ class BinanceTestnetPort:
 
     def cancel(self, client_id: str) -> CancelResult:
         sym = self._symbols.get(client_id)
-        if sym is None or not _CLIENT_ID.match(client_id):
+        if sym is None or not _CLIENT_ID.fullmatch(client_id):
             return CancelResult(CancelOutcome.UNKNOWN)
         res = self._call("DELETE", {"symbol": sym, "origClientOrderId": client_id})
         if res is None:

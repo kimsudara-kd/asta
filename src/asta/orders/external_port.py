@@ -31,6 +31,10 @@ from asta.orders.ports import (
 Channel = Callable[[bytes], bytes]
 
 
+class NotSent(Exception):
+    """The request could not even be encoded (size/range): nothing left this process."""
+
+
 class ExternalChannelPort:
     def __init__(
         self,
@@ -71,7 +75,11 @@ class ExternalChannelPort:
             intent=intent,
         )
         try:
-            wire = self._channel(seal_request(req, self._auth))
+            sealed = seal_request(req, self._auth)
+        except ValueError as exc:  # too large / out of range: nothing was sent
+            raise NotSent from exc
+        try:
+            wire = self._channel(sealed)
         except (TimeoutError, OSError, ValueError):
             return None
         return open_reply(wire, self._auth, frozenset({self._key_id}), req.nonce, op)
@@ -79,7 +87,10 @@ class ExternalChannelPort:
     # ------------------------------------------------------------------ ExchangePort
     def send(self, intent: Intent) -> SendOutcome:
         self.bind_intent(intent)
-        r = self._roundtrip("SEND", intent.decision_id, intent.symbol, intent)
+        try:
+            r = self._roundtrip("SEND", intent.decision_id, intent.symbol, intent)
+        except NotSent:
+            return SendOutcome.REJECTED
         if r is None:
             return SendOutcome.UNKNOWN
         if r.outcome == "REFUSED":
@@ -95,7 +106,7 @@ class ExternalChannelPort:
         sym = self._symbols.get(client_id)
         if sym is None:
             return QueryResult(QueryKind.UNAVAILABLE)
-        r = self._roundtrip("QUERY", client_id, sym, None)
+        r = self._roundtrip("QUERY", client_id, sym, None)  # ids only: cannot fail to encode
         if r is None:
             return QueryResult(QueryKind.UNAVAILABLE)
         try:
