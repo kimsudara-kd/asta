@@ -43,3 +43,12 @@ Run by the operator at the Mac console. Replace `<EXT>` with the external SSD mo
 1. Written owner approvals for P1, P2, P3 downtime. 2. Written approval for step 5 naming the exact path. 3. Verified external copy of `Docker.raw` with matching checksum.
 4. Source repositories for P1/P2/P4/P5/P6/P8 located or an explicit owner statement that they are reconstructible. 5. Non-DB volume archives verified once the Docker daemon can create containers again (or after step 3 by restoring the copy).
 **Impact:** P1/P2/P3 down for ≈ 1–2 h (copy time); P2-db and P3 listeners disappear from the LAN for that period.
+
+## E. EXECUTED 2026-11-21 (owner approval "approved")
+1. Docker Desktop quit cleanly (5 containers of P1/P2/P3 stopped; state recorded in `containers-before.tsv`, kept with the copy).
+2. `Docker.raw` copied with `rsync --sparse` to `<EXT>/asta-docker-final/Docker.raw` (245,106,737,152 bytes apparent); source size and mtime unchanged during the copy.
+3. `shasum -a 256` of source and copy are identical: `ed99e0adf31e95328d11e1ae938e802f612fde16a62beab785b29aaa6f520502` (file `Docker.raw.sha256` beside the copy).
+4. The internal `Docker.raw` was removed (not moved: the verified copy on the external SSD is the retained one). Free space on the Mac 49 GiB → **100 GiB**.
+5. Docker Desktop was NOT restarted and its login item was NOT changed. If it is opened it will create a new EMPTY engine; P1–P8 data is in the copy only.
+**Restore:** quit Docker; `rsync -a --sparse "<EXT>/asta-docker-final/Docker.raw" ~/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw` (needs ~51 GB free; the external volume stores it fully allocated); verify `shasum -a 256` equals the value above; start Docker Desktop; compare with `containers-before.tsv`.
+Do not delete the external copy for at least 14 days / until each project owner confirms.

@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "272345afe5da5cad93907d473935d1b8962af176",
+ "generated_from_commit": "3c0774643561490a3a09a9669cb65e0a35572b2c",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -44,7 +44,7 @@
   },
   {
    "path": "docs/evidence/M3B-FINAL-GATE-MATRIX.md",
-   "sha256": "f199c92fcaf4f2bdc229b9472624f4c459929201b14801958f98b906830590d8"
+   "sha256": "1768fc9c22579340dd93a700bfadf4c2ce914e6b2f51ff2f8085bb9b1e9ea7c1"
   },
   {
    "path": "docs/evidence/M3B-GOVERNANCE-01.md",
@@ -380,7 +380,7 @@
   },
   {
    "path": "docs/m3b/DOCKER-STORAGE-RECOVERY-PACKAGE.md",
-   "sha256": "a8cad0b11710efc582d1c94ef2a456fc519c0e4b112a3c6d6a4f69afd68a785d"
+   "sha256": "6c8eb471eec5f99accbba552c25bbaeb064e9d04e9c9031aa13fd6258936f4dc"
   },
   {
    "path": "docs/m3b/GITLEAKS-EXCEPTIONS-REVIEW.md",

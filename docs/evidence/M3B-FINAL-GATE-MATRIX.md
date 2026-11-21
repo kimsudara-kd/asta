@@ -27,7 +27,7 @@ Owner abbreviations: ENG = ASTA engineering, OWN = platform owner (console/privi
 | I-5 | Adequate storage and memory | OPEN | 54 GiB free; needs Docker image removal (package ready) | OWN/CEO | OPEN |
 | I-6 | Verified reboot behavior | BLOCKED | needs approved window + provisioned VMs | OWN | OPEN |
 | I-7 | Off-host critical-service monitoring live | OPEN | no external destination configured | OWN | OPEN |
-| I-8 | Docker storage recovery | BLOCKED | `DOCKER-STORAGE-RECOVERY-PACKAGE.md`; daemon fault G-17 | CEO/OWN | OPEN |
+| I-8 | Docker storage recovery | PASS (executed 2026-11-21, owner-approved) | `DOCKER-STORAGE-RECOVERY-PACKAGE.md` §E: verified checksummed copy on external SSD, internal image removed, free space 49→100 GiB; Docker intentionally not restarted | CEO/OWN | CLOSED |
 ## Governance gates
 | Gate | Requirement | Result | Evidence | Owner | Closure |
 |---|---|---|---|---|---|
