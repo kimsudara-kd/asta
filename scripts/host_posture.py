@@ -11,6 +11,7 @@ tools. With --require-dedicated exits 1 when any dedicated-host control is not i
 from __future__ import annotations
 
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -32,6 +33,14 @@ def port_open(port: int) -> bool:
     with socket.socket() as s:
         s.settimeout(1)
         return s.connect_ex(("127.0.0.1", port)) == 0
+
+
+def firewall_on(text: str) -> bool:
+    """socketfilterfw --getglobalstate: State = 1 (on) or 2 (block all incoming). Anything unparseable is OFF."""
+    m = re.search(r"\(State = ([0-9])\)", text)
+    if m is not None:
+        return m.group(1) in ("1", "2")
+    return "enabled" in text.lower() and "disabled" not in text.lower()
 
 
 def listeners() -> list[dict[str, str]]:
@@ -68,9 +77,7 @@ def posture() -> dict[str, object]:
     }
     return {
         "filevault_on": "On" in fv and "Off" not in fv,
-        "app_firewall_on": "enabled" in fw_state.lower()
-        or "state = 1" in fw_state
-        or "State = 1" in fw_state,
+        "app_firewall_on": firewall_on(fw_state),
         "stealth_on": "enabled" in stealth.lower(),
         "auto_login_disabled": auto.startswith("The domain/default pair")
         or "does not exist" in auto,

@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "6ed7b7a6f8e606b5e8dc43ede8196ae014d52871",
+ "generated_from_commit": "8c42400b5d1120bd033bbf72daf99ea026b020a7",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -688,7 +688,7 @@
   },
   {
    "path": "infra/security-host/mac/host-separation-check.sh",
-   "sha256": "617cf53b7a0bf7975308acb98ff835911c180a4c19e41e89d10f12d76fd991d8"
+   "sha256": "bffadd1da82af984a8202d903de8c5eb2300a0bc003ec95e9a0cec95cf46b6a1"
   },
   {
    "path": "infra/security-host/mac/launchd/com.asta.socket_vmnet.plist",
@@ -896,7 +896,7 @@
   },
   {
    "path": "scripts/host_posture.py",
-   "sha256": "2c5361a20f44da1087349b13b242be2f83befd37ed278166eb151f25238a6b45"
+   "sha256": "e7953eefa69b57a241b056b65c89251403aae107caf7f7ee90885a4764a58182"
   },
   {
    "path": "scripts/paper_integrity.py",
@@ -1073,6 +1073,10 @@
   {
    "path": "tests/m3a/test_frozen_evidence.py",
    "sha256": "f1e5f64ea73c4a0ff4259cb360925706515c98c508f56efcebeb34cf02437e2e"
+  },
+  {
+   "path": "tests/m3a/test_host_posture_firewall.py",
+   "sha256": "ae4da74bd73b626714726c6adf1c6727835c61a3418bc0b3370ea3e8b5b78a68"
   },
   {
    "path": "tests/m3a/test_legacy_isolation.py",

@@ -35,14 +35,14 @@ IP="$(ipconfig getifaddr en0 2>/dev/null || ipconfig getifaddr en1 2>/dev/null |
 if [ -n "$IP" ]; then
   EXPOSED=""
   for p in 21 22 23 80 88 139 443 445 548 631 3000 3283 3389 5000 5432 5442 5900 7000 8080 8443 49366 52415; do
-    nc -z -w1 "$IP" "$p" 2>/dev/null && EXPOSED="$EXPOSED $p"
+    nc -z -G 1 -w1 "$IP" "$p" 2>/dev/null && EXPOSED="$EXPOSED $p"
   done
   [ -z "$EXPOSED" ] && rec no_lan_reachable_listeners PASS "none of the common service ports answer on $IP" || rec no_lan_reachable_listeners FAIL "answering on $IP:$EXPOSED"
 else
   rec no_lan_reachable_listeners INFO "no LAN address found"
 fi
 for p in $ALLOWED_PORTS; do
-  if [ -n "$IP" ] && nc -z -w1 "$IP" "$p" 2>/dev/null; then rec "asta_port_$p" FAIL "answers on the LAN address (must be loopback only)"; fi
+  if [ -n "$IP" ] && nc -z -G 1 -w1 "$IP" "$p" 2>/dev/null; then rec "asta_port_$p" FAIL "answers on the LAN address (must be loopback only)"; fi
 done
 
 # 3 unrelated software that listens or runs unattended
@@ -53,12 +53,12 @@ OTHER="$(launchctl list 2>/dev/null | awk 'NR>1{print $3}' | grep -v -E "^($(ech
 # 4 sharing and remote services (owner decides which are required; the default expectation is none)
 for spec in "22:Remote Login (ssh)" "445:File Sharing (SMB)" "5900:Screen Sharing" "548:AFP"; do
   port="${spec%%:*}"; name="${spec#*:}"
-  nc -z -w1 127.0.0.1 "$port" 2>/dev/null && rec "service_off_$port" FAIL "$name is on" || rec "service_off_$port" PASS "$name is off"
+  nc -z -G 1 -w1 127.0.0.1 "$port" 2>/dev/null && rec "service_off_$port" FAIL "$name is on" || rec "service_off_$port" PASS "$name is off"
 done
 
 # 5 host posture
 fdesetup status 2>/dev/null | grep -q "FileVault is On" && rec filevault_on PASS "" || rec filevault_on FAIL "FileVault is not on"
-/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate 2>/dev/null | grep -q "enabled" && rec app_firewall_on PASS "" || rec app_firewall_on FAIL "application firewall is off"
+/usr/libexec/ApplicationFirewall/socketfilterfw --getglobalstate 2>/dev/null | grep -Eq "State = [12]\)" && rec app_firewall_on PASS "" || rec app_firewall_on FAIL "application firewall is off"
 [ "$(defaults read /Library/Preferences/com.apple.loginwindow autoLoginUser 2>/dev/null || true)" = "" ] && rec no_auto_login PASS "" || rec no_auto_login FAIL "automatic login is set"
 [ "$(dscl . -read /Groups/admin GroupMembership 2>/dev/null | wc -w)" -le 4 ] && rec admin_group_small PASS "" || rec admin_group_small FAIL "more than the expected admins"
 
