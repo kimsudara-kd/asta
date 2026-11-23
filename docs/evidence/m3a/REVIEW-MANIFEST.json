@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "0d22e1aecdd7cde51fcef7bd1ad5744bd53b1788",
+ "generated_from_commit": "6ed7b7a6f8e606b5e8dc43ede8196ae014d52871",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -448,7 +448,7 @@
   },
   {
    "path": "docs/m3b/STEP-E-KEY-CEREMONY-AND-PROBE.md",
-   "sha256": "90ad5e676df05935d3dedcde4dbaa8213bbbdc311bd9d98d596bd0f1eff01e7c"
+   "sha256": "abd11661dcb1fbced4cbfeb5eb851acb4778b8baceccc55a5dbbe93791015329"
   },
   {
    "path": "docs/m3b/STEP-F-TESTNET-ORDERS-RUNBOOK.md",

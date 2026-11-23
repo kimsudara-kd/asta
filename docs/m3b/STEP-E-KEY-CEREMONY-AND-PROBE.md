@@ -24,10 +24,12 @@ clock offset ≈ 158 ms (limit 1000 ms), TLS verified with the `certifi` bundle 
    {"stage": "probe",
     "private_key_file": "/Users/apple/asta-private/testnet/ed25519.pem",
     "api_key_file": "/Users/apple/asta-private/testnet/api.key",
+    "probe_stamp_file": "/Users/apple/asta-private/testnet/probe.stamp",
     "symbol": "BTCUSDT", "quote": "20", "max_clock_offset_ms": 1000}
    ```
 6. **Run the probe:**
    `cd ~/asta && .venv/bin/python proposals/binance_testnet_signer/probe.py --config ~/asta-private/testnet/probe.json`
+   A pass also writes `probe.stamp` (valid 7 days, for exactly this key): step F's service refuses `testnet` mode without it. Without `probe_stamp_file` in the config no stamp is written.
 7. **Send me the JSON it prints** — it contains no key, no signature and no URL. Then I can interpret it.
 
 ## How to read the result
