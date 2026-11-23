@@ -19,7 +19,15 @@ from asta.orders.fills import FillBook
 from asta.orders.lifecycle import UNRESOLVED, Intent, State
 from asta.orders.ports import ExchangeView
 
-SERIOUS = frozenset({"UNKNOWN_AT_EXCHANGE", "STATE_MISMATCH", "BALANCE_MISMATCH", "ORDER_MISSING"})
+SERIOUS = frozenset(
+    {
+        "UNKNOWN_AT_EXCHANGE",
+        "STATE_MISMATCH",
+        "BALANCE_MISMATCH",
+        "ORDER_MISSING",
+        "OPEN_ORDERS_OVERFLOW",
+    }
+)
 _LIVE = frozenset({State.ACCEPTED, State.PARTIALLY_FILLED, State.CANCEL_REQUESTED})
 
 

@@ -155,6 +155,26 @@ class ExternalChannelPort:
         except (ValueError, IndexError, ArithmeticError):
             return None
 
+    def open_orders(self, symbol: str) -> tuple[QueryKind, set[str], bool]:
+        """Client ids of the orders currently OPEN at the venue for ``symbol`` (read-only).
+
+        FOUND with an empty set means none are open; anything unreadable is UNAVAILABLE. The
+        last value is True when the venue listed more than one reply can carry."""
+        try:
+            r = self._roundtrip("OPEN_ORDERS", NO_ORDER_ID, symbol, None)
+        except (NotSent, ValueError):  # a malformed symbol: nothing was sent
+            return QueryKind.UNAVAILABLE, set(), False
+        if r is None:
+            return QueryKind.UNAVAILABLE, set(), False
+        try:
+            kind = QueryKind(r.outcome)
+            ids = {row[0] for row in r.data}
+        except (ValueError, IndexError):
+            return QueryKind.UNAVAILABLE, set(), False
+        if kind is not QueryKind.FOUND:
+            return QueryKind.UNAVAILABLE, set(), False
+        return kind, ids, r.state == "MORE"
+
     def cancel(self, client_id: str) -> CancelResult:
         sym = self._symbols.get(client_id)
         if sym is None:

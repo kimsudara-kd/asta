@@ -42,4 +42,5 @@ the probe (step E) has not run, the service is not installed and the host is not
   versus the venue account). A serious finding (`ORDER_MISSING`, `STATE_MISMATCH`, `BALANCE_MISMATCH`) or any trade conflict latches the kill switch (`RECONCILIATION_ANOMALY`).
 * **Use:** before the first order of a session `python -m asta.orders.venue_sync --config FILE --snapshot` saves the baseline balances; after any order or at the end of the session
   `… --reconcile` prints the report (exit 1 if not clean). The config adds `baseline_file` to the drill config keys.
-* **Not covered:** detecting an order that exists at the venue but not locally (`UNKNOWN_AT_EXCHANGE`) needs a venue order-list call; and strategy-driven trading itself is a later step. Real money is a separate decision.
+* **Open orders:** `--reconcile` also lists the orders resting at the venue per symbol and treats any id we never created as `UNKNOWN_AT_EXCHANGE` (kill switch). Add `"symbols": ["BTC-USDT", "ETH-USDT"]` to the sync config to scan more than the session symbol. Only OPEN orders are listed.
+* **Not covered:** a stranger order that already finished (seen only via the balance check); strategy-driven trading itself is a later step. Real money is a separate decision.

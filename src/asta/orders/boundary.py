@@ -158,6 +158,10 @@ class GatedExchange:
         """Read-only: the venue account's non-zero balances. Same gate as query/cancel."""
         return self._reader("balances", intent)()
 
+    def open_orders(self, symbol: str, intent: Intent | None = None) -> Any:
+        """Read-only: client ids of the orders OPEN at the venue for ``symbol``. Same gate."""
+        return self._reader("open_orders", intent)(symbol)
+
     def _reader(self, name: str, intent: Intent | None) -> Callable[..., Any]:
         if self.kind == PortKind.EXTERNAL:
             self._external_gate(intent)  # also binds the intent's symbol to the port

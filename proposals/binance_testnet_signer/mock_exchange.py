@@ -110,6 +110,13 @@ class MockTestnetExchange:
                 if x["orderId"] == oid and x["symbol"] == q.get("symbol")
             ]
             return 200, {"value": rows}  # the real transport wraps a JSON list the same way
+        if path == "/api/v3/openOrders" and method == "GET":
+            rows = [
+                self._view(o)
+                for o in self.orders.values()
+                if o["symbol"] == q.get("symbol") and o["status"] in ("NEW", "PARTIALLY_FILLED")
+            ]
+            return 200, {"value": rows}
         if path == "/api/v3/account" and method == "GET":
             rows = [
                 {"asset": a, "free": format(v, "f"), "locked": "0.00000000"}

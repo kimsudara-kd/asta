@@ -228,6 +228,24 @@ class BinanceTestnetPort:
         chunk = rows[skip : skip + page]
         return QueryKind.FOUND, chunk, skip + page < len(rows)
 
+    def open_orders(
+        self, symbol: str, limit: int = 64
+    ) -> tuple[QueryKind, list[tuple[str, ...]], bool]:
+        """Client ids of the orders OPEN at the venue for one symbol, as 1-tuples, at most ``limit``.
+        The last value is True when there were more. Anything unreadable is UNAVAILABLE: a list we cannot
+        read exactly is never guessed."""
+        res = self._call("GET", {"symbol": _venue_symbol(symbol)}, "/api/v3/openOrders")
+        if res is None or res[0] != 200 or not isinstance(res[1].get("value"), list):
+            return QueryKind.UNAVAILABLE, [], False
+        ids: list[str] = []
+        for o in res[1]["value"]:
+            cid = o.get("clientOrderId") if isinstance(o, dict) else None
+            if not isinstance(cid, str) or not 1 <= len(cid) <= 48:
+                return QueryKind.UNAVAILABLE, [], False
+            ids.append(cid)
+        ids = sorted(set(ids))
+        return QueryKind.FOUND, [(i,) for i in ids[:limit]], len(ids) > limit
+
     def balances(self) -> list[tuple[str, str, str]] | None:
         """Non-zero balances of the virtual account as (asset, free, locked), or None when unavailable."""
         res = self._call("GET", {"omitZeroBalances": "true"}, "/api/v3/account")

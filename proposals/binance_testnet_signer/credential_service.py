@@ -176,7 +176,7 @@ class CredentialService:
         if r.symbol not in self._caps.symbols:
             return self._reply(r, "REFUSED", code="SYMBOL_NOT_ALLOWED")
         bind = getattr(self._port, "bind_symbol", None)
-        if bind is not None and r.op != "BALANCES":
+        if bind is not None and r.op not in ("BALANCES", "OPEN_ORDERS"):
             bind(r.client_id, r.symbol)
         try:
             if (
@@ -186,6 +186,9 @@ class CredentialService:
                 if rows is None or len(rows) > 60:
                     return self._reply(r, "UNAVAILABLE")
                 return self._reply(r, QueryKind.FOUND.value, data=tuple(rows))
+            if r.op == "OPEN_ORDERS":  # read-only: which orders rest at the venue right now
+                okind, id_rows, omore = self._port.open_orders(r.symbol)  # type: ignore[attr-defined]
+                return self._reply(r, okind.value, "MORE" if omore else "", data=tuple(id_rows))
             if r.op == "TRADES":  # read-only trades of one order, a page at a time
                 kind, trade_rows, more = self._port.trades(r.client_id, r.skip)  # type: ignore[attr-defined]
                 return self._reply(r, kind.value, "MORE" if more else "", data=tuple(trade_rows))
@@ -199,7 +202,7 @@ class CredentialService:
             )  # CANCEL: allowed even while the kill switch is latched
             return self._reply(r, c.outcome.value, c.state.value if c.state else "")
         except Exception:  # noqa: BLE001
-            return self._reply(r, "UNAVAILABLE" if r.op == "QUERY" else "UNKNOWN")
+            return self._reply(r, "UNAVAILABLE" if r.op in ("QUERY", "OPEN_ORDERS") else "UNKNOWN")
 
 
 def serve_unix(

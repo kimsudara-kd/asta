@@ -176,8 +176,15 @@ def reconcile_session(
     baseline: dict[str, Decimal],
     kill: KillTrip | None = None,
     current: Callable[[str], Intent | None] | None = None,
+    known_ids: Iterable[str] | None = None,
+    scan_symbols: Iterable[str] | None = None,
 ) -> Reconciliation:
-    """Sync every order's trades, then compare states and balances with the venue."""
+    """Sync every order's trades, then compare states, open orders and balances with the venue.
+
+    ``known_ids`` are ALL client ids we ever created (any state); ``scan_symbols`` the symbols
+    whose open orders are listed (default: the symbols of ``intents``). An order resting at the
+    venue under an id outside ``known_ids`` is UNKNOWN_AT_EXCHANGE. Only OPEN orders are listed:
+    an order that already finished at the venue is seen through the trades/balances checks."""
     syncs = [sync_order(gx, sink, i) for i in intents]
     if (
         current is not None
@@ -201,6 +208,9 @@ def reconcile_session(
     rec.findings += reconcile_orders(
         [i for i in intents if i.decision_id in views or i.decision_id in absent], views
     )
+    _scan_open_orders(
+        gx, rec, intents, set(known_ids) if known_ids is not None else set(), scan_symbols
+    )
     try:
         actual_raw = gx.balances(intents[0] if intents else None)
     except ExecutionDenied:
@@ -221,6 +231,37 @@ def reconcile_session(
         kill.trip("RECONCILIATION_ANOMALY", "venue-sync", why)
         rec.tripped = "RECONCILIATION_ANOMALY"
     return rec
+
+
+def _scan_open_orders(
+    gx: GatedExchange,
+    rec: Reconciliation,
+    intents: list[Intent],
+    known: set[str],
+    scan_symbols: Iterable[str] | None,
+) -> None:
+    """List the open orders per symbol; add a finding for each one we never created."""
+    if not intents:
+        return  # no intent to authorise the read with (and nothing of ours to compare)
+    known = known | {i.decision_id for i in intents}
+    symbols = sorted(set(scan_symbols) if scan_symbols is not None else {i.symbol for i in intents})
+    for sym in symbols:
+        try:
+            kind, ids, more = gx.open_orders(sym, intents[0])
+        except ExecutionDenied:
+            rec.unavailable.append(f"open orders {sym}: denied")
+            continue
+        if kind is not QueryKind.FOUND:
+            rec.unavailable.append(f"open orders {sym}: venue unavailable")
+            continue
+        for cid in sorted(ids - known):
+            rec.findings.append(
+                Finding("UNKNOWN_AT_EXCHANGE", cid[:48], f"open at the venue ({sym}), not ours")
+            )
+        if more:
+            rec.findings.append(
+                Finding("OPEN_ORDERS_OVERFLOW", sym, "more open orders than can be checked")
+            )
 
 
 def snapshot_baseline(gx: GatedExchange, intent: Intent) -> dict[str, str] | None:
@@ -278,6 +319,8 @@ def main(argv: list[str]) -> int:  # pragma: no cover - needs the real stack
         return 0
     baseline = {a: Decimal(v) for a, v in json.loads(baseline_path.read_text()).items()}
     intents = sorted(store.by_state(LEDGER_STATES), key=lambda i: i.decision_id)
+    known = [i.decision_id for i in store.by_state(frozenset(State))]
+    symbols = cfg.get("symbols") or [cfg["symbol"]]
     rec = reconcile_session(
         gx,
         SqlFillStore(sessions),
@@ -286,6 +329,8 @@ def main(argv: list[str]) -> int:  # pragma: no cover - needs the real stack
         baseline,
         kill,
         store.get,
+        known,
+        symbols,
     )
     print(json.dumps(rec.to_json(), indent=1))
     return 0 if rec.ok else 1

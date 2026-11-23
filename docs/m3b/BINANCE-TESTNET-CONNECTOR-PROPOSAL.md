@@ -132,4 +132,11 @@ drill (`src/asta/orders/testnet_session.py`, inert unless every gate is open); r
 ## 13. Fill ingestion and venue reconciliation — BUILT (offline, 2026-11-21)
 `TRADES`/`BALANCES` wire operations, gated read-only `trades()/balances()`, `src/asta/orders/venue_sync.py` (idempotent trade ingestion into `SqlFillStore`, order-state and balance
 reconciliation against our ledger, kill switch on serious findings, "venue unreachable" is never reported as a missing order). 22 new tests incl. a real-SQL fill-store test; the mock exchange now
-keeps trades and balances. Details: `STEP-F-TESTNET-ORDERS-RUNBOOK.md`. Still open: `UNKNOWN_AT_EXCHANGE` detection (needs an order-list call).
+keeps trades and balances. Details: `STEP-F-TESTNET-ORDERS-RUNBOOK.md`. `UNKNOWN_AT_EXCHANGE` detection was added next (§14).
+
+## 14. Open-orders listing and UNKNOWN_AT_EXCHANGE — BUILT (offline, 2026-11-23)
+New read-only wire op `OPEN_ORDERS` (no-order id, one symbol per request, the service re-checks the symbol allow-list), signed path `GET /api/v3/openOrders` with the single parameter `symbol`
+(already in the signer allow-list; nothing new can be signed), gated like `query/cancel/trades/balances`. `reconcile_session` lists the open orders of every scanned symbol and flags any client
+id outside the set of ids WE ever created (all states, not only ledger states) as `UNKNOWN_AT_EXCHANGE` (serious: kill switch `RECONCILIATION_ANOMALY`). More open orders than one reply carries
+(64) is `OPEN_ORDERS_OVERFLOW` (serious). An unreadable listing is "unavailable", never a finding. Limits, stated plainly: only OPEN orders are listed, so a stranger order that already filled or
+was cancelled is seen only through the balance check; symbols not scanned are not looked at (`symbols` in the sync config, default the session symbol). Tests: `tests/security/test_open_orders.py`.

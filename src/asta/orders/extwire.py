@@ -32,8 +32,9 @@ from asta.orders.channel import (
 from asta.orders.lifecycle import Intent
 
 VERSION = 1
-OPS = ("SEND", "QUERY", "CANCEL", "TRADES", "BALANCES")
-NO_ORDER_ID = "0" * 32  # BALANCES is about the account, not an order
+OPS = ("SEND", "QUERY", "CANCEL", "TRADES", "BALANCES", "OPEN_ORDERS")
+NO_ORDER_ID = "0" * 32  # BALANCES / OPEN_ORDERS are about the account/symbol, not one order
+NO_ORDER_OPS = frozenset({"BALANCES", "OPEN_ORDERS"})
 MAX_REPLY_BYTES = 6_144  # replies may carry a page of trades or the balances
 MAX_DATA_ROWS, MAX_DATA_COLS, MAX_DATA_STR = 64, 8, 48
 _KEY_ID = re.compile(rb'"key_id":"([A-Za-z0-9._-]{1,64})"')
@@ -119,8 +120,8 @@ class Request:
             or not 0 <= self.skip <= 10_000
         ):
             raise ValueError("bad skip")
-        if (self.op == "BALANCES") != (self.client_id == NO_ORDER_ID):
-            raise ValueError("BALANCES (and only BALANCES) uses the no-order id")
+        if (self.op in NO_ORDER_OPS) != (self.client_id == NO_ORDER_ID):
+            raise ValueError("BALANCES and OPEN_ORDERS (and only they) use the no-order id")
         if self.intent is not None and (
             self.intent.decision_id != self.client_id or self.intent.symbol != self.symbol
         ):

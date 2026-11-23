@@ -1,5 +1,5 @@
 {
- "generated_from_commit": "34a33fc5cc1684028c11279e0b780f497c7ec2bf",
+ "generated_from_commit": "0d22e1aecdd7cde51fcef7bd1ad5744bd53b1788",
  "note": "SHA-256 of review artifacts; text normalised to LF. Regenerate only deliberately.",
  "files": [
   {
@@ -372,7 +372,7 @@
   },
   {
    "path": "docs/m3b/BINANCE-TESTNET-CONNECTOR-PROPOSAL.md",
-   "sha256": "7e3f4780b67ba14361a23c3f16d49edf4159738caa9c7609ec94feb70ee3c893"
+   "sha256": "8484da9e69b7228921134741e1dc55b712b204357dfa378b6c4ce358c791a567"
   },
   {
    "path": "docs/m3b/CAPACITY-ASSESSMENT.md",
@@ -452,7 +452,7 @@
   },
   {
    "path": "docs/m3b/STEP-F-TESTNET-ORDERS-RUNBOOK.md",
-   "sha256": "073ba2d1ac30d1429456eaf0584494bacb390074ebaa5e6c56081034b0f89adc"
+   "sha256": "dfa057ba95c561fabbaa13163f4324840dab78e262c6e07d453ad811aeb16b56"
   },
   {
    "path": "docs/m3b/VAULT-AND-BACKUP.md",
@@ -844,11 +844,11 @@
   },
   {
    "path": "proposals/binance_testnet_signer/connector.py",
-   "sha256": "3f7e65b9cad1306c2639b34e9728f5522c43258af76d808bdca0fd3333dcaac4"
+   "sha256": "e01194a4cb5997ba91c7513d2bd660cb8e841b8c00e5cbd5c4de0f11a8a5a266"
   },
   {
    "path": "proposals/binance_testnet_signer/credential_service.py",
-   "sha256": "5a7028023568e22ec1157997d89bd64e84208edaf768bd5d1634a28f0d6f5341"
+   "sha256": "68a1511646be05ad9912e077b2eae2cef782a7e26c634caffc792770bf28c525"
   },
   {
    "path": "proposals/binance_testnet_signer/file_signer.py",
@@ -864,7 +864,7 @@
   },
   {
    "path": "proposals/binance_testnet_signer/mock_exchange.py",
-   "sha256": "53c310c0eed23187fc8d8d490dfc53f33f66973468d484e4306703e5f7667daa"
+   "sha256": "87e65dc4cc38e429cbed542d9bd0eb093e69a272b4470d1dc3a36170b14953dd"
   },
   {
    "path": "proposals/binance_testnet_signer/probe.py",
@@ -932,7 +932,7 @@
   },
   {
    "path": "src/asta/orders/boundary.py",
-   "sha256": "240be82d8bdfe4c6c2a5635577ba5c4950085857ff3795480ea7ff4e4f5080e9"
+   "sha256": "4b0b1b4a7d4db1747d2b4ffd3fd35a5153409b42d7d68ddfc912756bd17a74d3"
   },
   {
    "path": "src/asta/orders/channel.py",
@@ -952,11 +952,11 @@
   },
   {
    "path": "src/asta/orders/external_port.py",
-   "sha256": "8c6e7d8ac05ff0c4314d845d46c7c6b017b400e258614216af22d904b54ff7ed"
+   "sha256": "9c5eacc3bbb66031d5f8b70d761bd38139f1931de0e1c71df04e9f80440a67d2"
   },
   {
    "path": "src/asta/orders/extwire.py",
-   "sha256": "eda4a9263f6f3d53045d909a6e7dcef4daeecdb5d60a89f784e59b67b2868e6d"
+   "sha256": "90682e1504e0c9f6877bda33841ba392a30044ba78566345ffe54482ab772102"
   },
   {
    "path": "src/asta/orders/fills.py",
@@ -992,7 +992,7 @@
   },
   {
    "path": "src/asta/orders/reconcile.py",
-   "sha256": "c03207044bc132e2ed0c08e62e107d141e26bc09f41c5b70236c617aff82a534"
+   "sha256": "b946fae40ae0a138f55937a54cef80ba20d5916fa010210ff145a5b1618686f1"
   },
   {
    "path": "src/asta/orders/replace.py",
@@ -1016,7 +1016,7 @@
   },
   {
    "path": "src/asta/orders/venue_sync.py",
-   "sha256": "54503f8f7f19c929dbbf6bbdfa3f332fc215cca0620270ab419785f99f4be681"
+   "sha256": "2c6d28ba8bae0ea6994cd09d5c0f424b79cfa4453d718c3c03d57bcf950a4e51"
   },
   {
    "path": "src/asta/security/__init__.py",
@@ -1169,6 +1169,10 @@
   {
    "path": "tests/security/test_no_vm_install.py",
    "sha256": "fa50fcd97131690e00d150f76dc8d15117d090ef9d78d25753a3beb067ded159"
+  },
+  {
+   "path": "tests/security/test_open_orders.py",
+   "sha256": "0e362e27ea511cf9302f33d62e61cf988d73fada3f6dbb0f138e15e0386f19ad"
   },
   {
    "path": "tests/security/test_pf_anchor.py",
